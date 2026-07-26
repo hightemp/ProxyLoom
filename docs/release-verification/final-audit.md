@@ -27,6 +27,8 @@ Current disposition: **NOT RELEASE APPROVED**
   smoke from the final Firefox production build: Add-ons/Options/Popup, profile creation, real
   regular/private request-time proxy routing, a 70-second MV3 idle-wake check, private in-memory
   log isolation, extension-storage canary scan and DIRECT restoration.
+- Firefox 153 automated API runs additionally passed browser-manual fallback semantics, MV3 reload,
+  real second-extension precedence/no-fight/recovery and a locked enterprise Proxy policy.
 - The Firefox Stable run found and fixed late MV3 event-listener registration. The Edge Stable run
   found and fixed Chromium private-log classification when `webRequest` omits `incognito`.
   Focused regression tests and repeated branded-browser runs cover both defects.
@@ -56,18 +58,16 @@ Current disposition: **NOT RELEASE APPROVED**
 
 ## Release blockers
 
-1. PL-015 still requires a real Firefox competing-extension/enterprise-policy run. PL-004's
-   browser-defined manual-proxy on/off, fallback and MV3 reload matrix is automated and accepted.
-2. PL-107 and PL-108 require hosted GitHub pass/fail runs. This workspace has no configured remote
+1. PL-107 and PL-108 require hosted GitHub pass/fail runs. This workspace has no configured remote
    and its GitHub CLI authentication is invalid, so a local workflow parser cannot claim them.
-3. PL-112 requires a real hosted tag, one GitHub Release and an idempotent retry. The local PL-111
+2. PL-112 requires a real hosted tag, one GitHub Release and an idempotent retry. The local PL-111
    tagged dry-run deliberately stopped before any external release action.
-4. PL-115 and PL-116 require final brand/legal ownership, a real Firefox extension ID, public
+3. PL-115 and PL-116 require final brand/legal ownership, a real Firefox extension ID, public
    support/privacy URLs and authenticated store-portal validation. Placeholder IDs or invented
    URLs are not acceptable.
-5. PL-121…PL-123 require release-owner-signed Chrome, Firefox, Edge and Yandex package matrices
+4. PL-121…PL-123 require release-owner-signed Chrome, Firefox, Edge and Yandex package matrices
    beyond the completed branded-browser smokes.
-6. PL-124 requires human release-owner approval after all preceding external gates.
+5. PL-124 requires human release-owner approval after all preceding external gates.
 
 The repository is therefore an extensively tested release candidate, not a store-ready approved
 release. This status must not be changed merely because automated CI is green.

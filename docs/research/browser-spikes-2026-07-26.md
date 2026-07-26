@@ -12,7 +12,8 @@ pnpm test:e2e
 
 pnpm test:integration
 Firefox MV3 temporary BiDi install: browser manual proxy on/off, single/array fallback,
-terminal null, controlled fail-closed, Full URL, one-attempt auth and runtime reload.
+terminal null, controlled fail-closed, Full URL, one-attempt auth, runtime reload,
+second-extension ownership/recovery and locked enterprise Proxy policy.
 ```
 
 Chromium evidence использует только loopback origin/proxy fixtures. Проверены `DIRECT`,
@@ -30,6 +31,12 @@ Firefox API evidence использует временный MV3 install чер�
 без proxy, Full URL доступен `proxy.onRequest`, а settings сохраняются после `runtime.reload`.
 Production поэтому возвращает `null` для DIRECT и трактует settings control как capability gate
 для fail-closed proxy actions.
+
+В том же BiDi harness два реальных MV3 add-on подтвердили Firefox precedence:
+более новый controller получил `controlled_by_this_extension`, subject наблюдал
+`controlled_by_other_extensions` и не перезаписывал settings. После controller `clear` прежнее
+значение subject восстановилось, явный retry вернул owned `none`. Отдельный настоящий locked
+enterprise `Proxy` policy дал `not_controllable`, отклонил `set` и сохранил policy manual proxy.
 
 Дополнительный headed smoke загрузил финальную `.output/firefox-mv3` build в чистый временный
 профиль official Firefox 153 Stable Snap. После выдачи private permission обычный и private

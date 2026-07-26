@@ -45,7 +45,7 @@ interface FirefoxProxyApi {
         | 'controllable_by_this_extension'
         | 'controlled_by_this_extension'
     }>
-    set(details: { value: { proxyType: 'none' }; scope?: 'regular' }): Promise<void>
+    set(details: { value: { proxyType: 'none' }; scope?: 'regular' }): Promise<boolean>
   }
 }
 
@@ -108,10 +108,13 @@ export class FirefoxProxyAdapter implements ProxyPlatformAdapter {
 
   async applyDirect(revision: number): Promise<Result<number, PlatformApplyError>> {
     try {
-      await proxyApi().settings.set({
+      const changed = await proxyApi().settings.set({
         scope: 'regular',
         value: { proxyType: 'none' },
       })
+      if (!changed) {
+        throw new Error('Firefox proxy settings were not changed.')
+      }
       this.setRouteState({ kind: 'DIRECT' })
       return ok(revision)
     } catch (error) {
@@ -125,10 +128,13 @@ export class FirefoxProxyAdapter implements ProxyPlatformAdapter {
 
   async applySnapshot(snapshot: RoutingSnapshot): Promise<Result<number, PlatformApplyError>> {
     try {
-      await proxyApi().settings.set({
+      const changed = await proxyApi().settings.set({
         scope: 'regular',
         value: { proxyType: 'none' },
       })
+      if (!changed) {
+        throw new Error('Firefox proxy settings were not changed.')
+      }
       this.setRouteState({ kind: 'SNAPSHOT', snapshot })
       return ok(snapshot.revision)
     } catch (error) {

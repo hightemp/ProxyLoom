@@ -1,6 +1,6 @@
 # ADR-015: Proxy control conflict
 
-Статус: Accepted with manual release gate.
+Статус: Accepted.
 
 ## Решение
 
@@ -14,5 +14,16 @@ Firefox дополнительно считает ошибку `proxy.settings.s
 перейти к browser-defined manual/system proxy. Поэтому безопасный routing snapshot применить
 нельзя даже при доступном `proxy.onRequest`.
 
-Unit tests покрывают mapping/apply errors; ручная policy/competing-extension matrix обязательна
-для release report. Recovery — повторная явная команда после освобождения контроля.
+`BrowserSetting.set()` в Firefox возвращает boolean. `false` считается apply failure так же, как
+rejected promise: adapter переводит routing state в fail-closed и не сообщает ложный успех.
+
+Chromium E2E использует отдельное реальное control extension и подтверждает ownership, no-fight,
+Retry до/после `clear`. Firefox 153 BiDi integration устанавливает два реальных MV3 add-on в одном
+профиле. Более новый controller получает precedence; subject наблюдает
+`controlled_by_other_extensions`, не пишет settings, а controller остаётся владельцем. После
+`clear` прежнее `proxyType: none` subject автоматически восстанавливается, и явный retry успешен.
+
+Отдельный Firefox 153 enterprise fixture загружает настоящий locked `Proxy` policy через
+`PLAYWRIGHT_FIREFOX_POLICIES_JSON`. `proxy.settings.get()` возвращает `not_controllable` и
+`proxyType: manual`, попытка `set` отклоняется, а policy proxy остаётся активным. Recovery для
+policy возможен только после снятия администратором; расширение не ведёт борьбу за контроль.

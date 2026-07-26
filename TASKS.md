@@ -146,7 +146,7 @@
   - **Тесты:** flags `i/m/g/y/s/u/v/d`, nested quantifiers, newline/quote/backslash/IDN.
   - **Артефакт/влияние/готово:** `ADR-014-regexp-compat.md`; обновляет validator/compiler/tester.
 
-- [ ] **PL-015 — Проверить proxy control conflicts**
+- [x] **PL-015 — Проверить proxy control conflicts**
   - **Цель:** исследовать другой proxy extension, enterprise policy и ownership events.
   - **Требования:** FR-021–FR-023, SEC-007, раздел 32 PRD.
   - **Действия:** получить/потерять control, изменить settings извне, проверить owner information и retry policy.

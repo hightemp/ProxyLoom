@@ -854,7 +854,7 @@ origin requests: ${JSON.stringify(origin.requests)}`,
       expect(params.get('beforeProxyType')).toBe('manual')
       expect(params.get('afterLevel')).toBe('not_controllable')
       expect(params.get('afterProxyType')).toBe('manual')
-      expect(['false', 'rejected']).toContain(params.get('setResult'))
+      expect(params.get('setResult')).toBe('rejected')
       expect(policyRequest?.headers['x-proxyloom-test-proxy']).toBe('firefox-policy')
     } finally {
       await stopProcessGroup(launched.child)

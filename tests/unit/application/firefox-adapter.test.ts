@@ -65,7 +65,7 @@ describe('FirefoxProxyAdapter event-page lifecycle', () => {
     mocks.settingsGet.mockResolvedValue({
       levelOfControl: 'controllable_by_this_extension',
     })
-    mocks.settingsSet.mockResolvedValue(undefined)
+    mocks.settingsSet.mockResolvedValue(true)
   })
 
   it('registers proxy.onRequest synchronously in the constructor', () => {
@@ -79,10 +79,10 @@ describe('FirefoxProxyAdapter event-page lifecycle', () => {
   })
 
   it('holds the wake-up request until the persisted snapshot has been restored', async () => {
-    let releaseSettings: (() => void) | undefined
+    let releaseSettings: ((changed: boolean) => void) | undefined
     mocks.settingsSet.mockImplementation(
       () =>
-        new Promise<void>((resolve) => {
+        new Promise<boolean>((resolve) => {
           releaseSettings = resolve
         }),
     )
@@ -101,7 +101,7 @@ describe('FirefoxProxyAdapter event-page lifecycle', () => {
     await Promise.resolve()
     expect(settled).toBe(false)
 
-    releaseSettings?.()
+    releaseSettings?.(true)
     await expect(apply).resolves.toEqual({ ok: true, value: 1 })
     await expect(wakeUpRoute).resolves.toEqual({
       host: '127.0.0.1',
@@ -141,6 +141,30 @@ describe('FirefoxProxyAdapter event-page lifecycle', () => {
       ok: false,
     })
     await expect(wakeUpRoute).resolves.toEqual({
+      host: '127.0.0.1',
+      port: 9,
+      type: 'http',
+    })
+  })
+
+  it('fails closed when Firefox reports that a competing owner rejected the write', async () => {
+    mocks.settingsSet.mockResolvedValue(false)
+    const adapter = new FirefoxProxyAdapter()
+
+    await expect(adapter.applyDirect(5)).resolves.toEqual({
+      error: {
+        code: 'API_ERROR',
+        message: 'Firefox proxy settings were not changed.',
+      },
+      ok: false,
+    })
+    expect(
+      listener()({
+        incognito: false,
+        tabId: 10,
+        url: 'https://example.com/',
+      }),
+    ).toEqual({
       host: '127.0.0.1',
       port: 9,
       type: 'http',

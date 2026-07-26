@@ -24,6 +24,10 @@ therefore does not close PL-122.
   DIRECT remains unproxied.
 - Proxy authentication returns credentials for one proxy challenge attempt.
 - The owned `none` setting survives an MV3 `runtime.reload`.
+- Two real MV3 add-ons prove higher-precedence ownership, subject no-fight behavior,
+  `controlled_by_other_extensions`, restoration after controller `clear` and successful retry.
+- A real locked enterprise `Proxy` policy reports `not_controllable`, rejects extension writes and
+  keeps its manual proxy active.
 - Firefox MV3 production build and target-specific manifest validation.
 
 ## Passed official-Stable full-product smoke
@@ -91,7 +95,7 @@ regular, 70-second idle-wake and private routing evidence above.
 
 The run did not install a signed XPI/ZIP and did not cover update/uninstall, the full
 DIRECT/PROXY/RULES UI matrix under every browser manual-proxy state, every
-HTTP/HTTPS/WS/WSS/download/auth variant, full browser restart, second-extension/enterprise control
-conflicts, theme/screen-reader/long-session checks or Mozilla Add-ons review. Those cases remain
-release-owner checks. The document claims an official Firefox Stable runtime smoke plus automated
-API semantics, not signed-package or store approval.
+HTTP/HTTPS/WS/WSS/download/auth variant, full browser restart, theme/screen-reader/long-session
+checks or Mozilla Add-ons review. Those cases remain release-owner checks. The document claims an
+official Firefox Stable runtime smoke plus automated API semantics, not signed-package or store
+approval.
