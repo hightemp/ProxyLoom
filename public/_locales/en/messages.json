@@ -1,0 +1,597 @@
+{
+  "extensionName": {
+    "message": "ProxyLoom"
+  },
+  "extensionDescription": {
+    "message": "Clear, deterministic HTTP and HTTPS proxy routing."
+  },
+  "loading": {
+    "message": "Loading…"
+  },
+  "openSettings": {
+    "message": "Open Settings"
+  },
+  "direct": {
+    "message": "DIRECT"
+  },
+  "proxy": {
+    "message": "PROXY"
+  },
+  "rules": {
+    "message": "RULES"
+  },
+  "settingsTitle": {
+    "message": "ProxyLoom Settings"
+  },
+  "errorTitle": {
+    "message": "Proxy connection failed"
+  },
+  "badgeProxyConnectionFailed": {
+    "message": "Proxy connection failed"
+  },
+  "badgeDirect": {
+    "message": "DIRECT · Direct connection"
+  },
+  "badgeConfigurationError": {
+    "message": "Configuration error · $ERROR$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "badgeGlobalProxyMissing": {
+    "message": "PROXY · No valid global proxy profile"
+  },
+  "badgeGlobalProxy": {
+    "message": "PROXY · Via $PROFILE$",
+    "placeholders": {
+      "profile": {
+        "content": "$1"
+      }
+    }
+  },
+  "badgeRulesDirect": {
+    "message": "RULES · Direct connection"
+  },
+  "badgeRulesProxy": {
+    "message": "RULES · Via $PROFILE$",
+    "placeholders": {
+      "profile": {
+        "content": "$1"
+      }
+    }
+  },
+  "unknownError": {
+    "message": "Unknown error"
+  },
+  "applyStatusHealthy": {
+    "message": "The persisted routing configuration is applied."
+  },
+  "applyStatusFailed": {
+    "message": "The persisted routing configuration could not be applied."
+  },
+  "routingApplyFailed": {
+    "message": "The saved routing configuration is not currently applied."
+  },
+  "retryApply": {
+    "message": "Retry apply"
+  },
+  "appearanceEyebrow": {
+    "message": "Across every surface"
+  },
+  "appearanceTitle": {
+    "message": "Appearance"
+  },
+  "appearanceDescription": {
+    "message": "System follows the browser or operating-system color preference."
+  },
+  "theme": {
+    "message": "Theme"
+  },
+  "themeSystem": {
+    "message": "System"
+  },
+  "themeLight": {
+    "message": "Light"
+  },
+  "themeDark": {
+    "message": "Dark"
+  },
+  "diagnosticsEyebrow": {
+    "message": "Safe support snapshot"
+  },
+  "diagnosticsTitle": {
+    "message": "About / Diagnostics"
+  },
+  "diagnosticsPrivacy": {
+    "message": "This view excludes credentials, browsing URLs, logs, and private state."
+  },
+  "version": {
+    "message": "Version"
+  },
+  "platform": {
+    "message": "Platform"
+  },
+  "control": {
+    "message": "Control"
+  },
+  "schema": {
+    "message": "Schema"
+  },
+  "persistedRevision": {
+    "message": "Persisted revision"
+  },
+  "appliedRevision": {
+    "message": "Applied revision"
+  },
+  "fullUrlRules": {
+    "message": "Full URL rules"
+  },
+  "tabSpecificOverrides": {
+    "message": "Tab-specific overrides"
+  },
+  "notApplied": {
+    "message": "Not applied"
+  },
+  "supported": {
+    "message": "Supported"
+  },
+  "firefoxOnly": {
+    "message": "Firefox only"
+  },
+  "originScopedCompatibility": {
+    "message": "Origin-scoped compatibility mode"
+  },
+  "lastApplyError": {
+    "message": "Last apply error:"
+  },
+  "copySafeDiagnostics": {
+    "message": "Copy safe diagnostics"
+  },
+  "copiedSafeDiagnostics": {
+    "message": "Copied safe diagnostics"
+  },
+  "knownPlatformBoundaries": {
+    "message": "Known platform boundaries"
+  },
+  "boundaryFullUrl": {
+    "message": "Full URL path/query routing is Firefox-only; Chromium PAC receives origins."
+  },
+  "boundaryChromiumOnce": {
+    "message": "Chromium Once overrides may affect other tabs on the same origin until cleanup."
+  },
+  "boundaryErrorPage": {
+    "message": "Error-page navigation is best effort and only for supported main-frame failures."
+  },
+  "boundaryFailClosed": {
+    "message": "Assigned proxy routes are fail-closed and never append a hidden DIRECT fallback."
+  },
+  "boundaryWebSocket": {
+    "message": "Established WebSocket message payloads are not observed or logged."
+  },
+  "connectionPolicy": {
+    "message": "Connection policy"
+  },
+  "globalRouting": {
+    "message": "Global routing"
+  },
+  "globalRoutingDescription": {
+    "message": "Choose the fallback policy. Site rules are evaluated only in Rules mode."
+  },
+  "globalRoutingMode": {
+    "message": "Global routing mode"
+  },
+  "globalProxyProfile": {
+    "message": "Global proxy profile"
+  },
+  "selectProfile": {
+    "message": "Select a profile"
+  },
+  "applyFailurePrefix": {
+    "message": "Persisted revision"
+  },
+  "applyFailureSuffix": {
+    "message": "could not be applied:"
+  },
+  "privacyControls": {
+    "message": "Privacy controls"
+  },
+  "loggingAndErrors": {
+    "message": "Logging and error handling"
+  },
+  "enableLocalLog": {
+    "message": "Enable local routing log"
+  },
+  "enableLocalLogDescription": {
+    "message": "Stores hostname and scheme, never path, query, headers, or credentials."
+  },
+  "pauseLogging": {
+    "message": "Pause logging"
+  },
+  "pauseLoggingDescription": {
+    "message": "Routing continues unchanged."
+  },
+  "collectionMode": {
+    "message": "Collection mode"
+  },
+  "navigationsAndFailures": {
+    "message": "Navigations and failures"
+  },
+  "allSupportedRequests": {
+    "message": "All supported requests"
+  },
+  "bestEffortErrorPage": {
+    "message": "Best-effort proxy error page"
+  },
+  "bestEffortErrorPageDescription": {
+    "message": "Only supported main-frame failures can be redirected."
+  },
+  "manualCheckEndpoint": {
+    "message": "Manual check endpoint"
+  },
+  "timeoutMilliseconds": {
+    "message": "Timeout (milliseconds)"
+  },
+  "readCountry": {
+    "message": "Read country from provider response"
+  },
+  "readCountryDescription": {
+    "message": "The endpoint is contacted only after an explicit Check click."
+  },
+  "saveGeneralSettings": {
+    "message": "Save general settings"
+  },
+  "privateBrowsing": {
+    "message": "Private browsing"
+  },
+  "incognitoAccess": {
+    "message": "Incognito access"
+  },
+  "browserPermission": {
+    "message": "Browser permission:"
+  },
+  "unknown": {
+    "message": "Unknown"
+  },
+  "allowed": {
+    "message": "Allowed"
+  },
+  "notAllowed": {
+    "message": "Not allowed"
+  },
+  "incognitoPermissionDescription": {
+    "message": "ProxyLoom cannot enable this browser-owned permission. Private logs stay in memory and are cleared after the last private window closes."
+  },
+  "incognitoHelpChromium": {
+    "message": "To change access, open this extension's browser details page and use “Allow in Incognito”, then reopen ProxyLoom."
+  },
+  "incognitoHelpFirefox": {
+    "message": "To change access, open Manage Extension in Firefox, choose the Details tab, and change “Run in Private Windows”, then reopen ProxyLoom."
+  },
+  "extensionAbbreviation": { "message": "PL" },
+  "deterministicRouting": { "message": "Deterministic routing" },
+  "settings": { "message": "Settings" },
+  "sectionGeneral": { "message": "General" },
+  "sectionGeneralEyebrow": { "message": "Routing policy" },
+  "sectionProxies": { "message": "Proxies" },
+  "sectionProxiesEyebrow": { "message": "Endpoints" },
+  "sectionRules": { "message": "Rules" },
+  "sectionRulesEyebrow": { "message": "Priority" },
+  "sectionLogs": { "message": "Logs" },
+  "sectionLogsEyebrow": { "message": "Local only" },
+  "sectionImportExport": { "message": "Import & Export" },
+  "sectionImportExportEyebrow": { "message": "Portable data" },
+  "sectionAppearanceEyebrow": { "message": "Theme" },
+  "sectionAboutEyebrow": { "message": "Support" },
+  "revision": { "message": "Revision" },
+  "applying": { "message": "Applying…" },
+  "loadingSettings": { "message": "Loading settings…" },
+  "settingsUnavailable": { "message": "Settings are unavailable" },
+  "backgroundInvalidConfiguration": {
+    "message": "The background service did not return a valid configuration."
+  },
+  "retry": { "message": "Retry" },
+  "savedAndApplied": { "message": "Saved and applied." },
+  "bestEffortRecovery": { "message": "Best-effort recovery" },
+  "loadingSafeErrorDetails": { "message": "Loading safe error details…" },
+  "errorContextExpired": {
+    "message": "This error context expired. Retry the page from the browser."
+  },
+  "noSafeErrorContext": { "message": "No safe error context is available." },
+  "proxyFailureBeforeHost": {
+    "message": "The assigned proxy could not complete the navigation to"
+  },
+  "proxyFailureAfterHost": {
+    "message": "The original path and query are intentionally not displayed or persisted."
+  },
+  "technicalCode": { "message": "Technical code" },
+  "proxyProfile": { "message": "Proxy profile" },
+  "matchedRule": { "message": "Matched rule" },
+  "occurred": { "message": "Occurred" },
+  "unavailable": { "message": "Unavailable" },
+  "globalRouteFallback": { "message": "Global route / fallback" },
+  "chromiumDirectOnceWarning": {
+    "message": "On Chromium, Open Directly Once may also affect other tabs using the same site until this source tab closes."
+  },
+  "switchProxy": { "message": "Switch Proxy" },
+  "openDirectlyOnce": { "message": "Open Directly Once" },
+  "noSupportedTab": { "message": "No supported tab" },
+  "invalidProxyRoute": { "message": "Invalid proxy route" },
+  "via": { "message": "Via" },
+  "directConnection": { "message": "Direct connection" },
+  "configurationError": { "message": "Configuration error" },
+  "missingRule": { "message": "Missing rule" },
+  "selectProxyFirst": { "message": "Select a proxy profile first." },
+  "temporaryOverrideWarning": {
+    "message": "On Chromium, a temporary override can affect other tabs using the same site until this source tab closes."
+  },
+  "createPermanentRule": { "message": "Create a permanent rule" },
+  "createTemporaryOverride": { "message": "Create a temporary override" },
+  "pattern": { "message": "Pattern" },
+  "action": { "message": "Action" },
+  "globalMode": { "message": "Global mode" },
+  "useProxyGlobally": { "message": "Use proxy globally" },
+  "currentSite": { "message": "Current site" },
+  "unsupportedPage": { "message": "Unsupported page" },
+  "noActiveTab": { "message": "No active tab" },
+  "scope": { "message": "Scope" },
+  "exactHostname": { "message": "Exact hostname" },
+  "domainSubdomains": { "message": "Domain + subdomains" },
+  "route": { "message": "Route" },
+  "directLabel": { "message": "Direct" },
+  "proxyLabel": { "message": "Proxy" },
+  "selectProfileShort": { "message": "Select profile" },
+  "once": { "message": "Once" },
+  "alwaysCreateRule": { "message": "Always (create rule)" },
+  "editMatchedRule": { "message": "Edit matched rule" },
+  "portableBackup": { "message": "Portable backup" },
+  "nativeExport": { "message": "Native export" },
+  "nativeExportDescription": {
+    "message": "Includes profiles, groups, rules, general settings, and appearance. Logs, overrides, and other transient state are never exported."
+  },
+  "includeProxyCredentials": { "message": "Include proxy credentials" },
+  "includeProxyCredentialsDescription": {
+    "message": "Off by default. Enabling it writes plaintext credentials into the JSON file."
+  },
+  "downloadJsonExport": { "message": "Download JSON export" },
+  "credentialExportWarning": {
+    "message": "This export will contain proxy usernames and passwords in plaintext. Continue?"
+  },
+  "exported": { "message": "Exported" },
+  "validatedAtomic": { "message": "Validated and atomic" },
+  "nativeImport": { "message": "Native import" },
+  "nativeImportDescription": {
+    "message": "Choose a file, inspect counts and conflicts, then merge or explicitly replace."
+  },
+  "nativeJsonFile": { "message": "Native JSON file" },
+  "validatePreview": { "message": "Validate and preview" },
+  "profilesCountLabel": { "message": "profiles" },
+  "groupsCountLabel": { "message": "groups" },
+  "rulesCountLabel": { "message": "rules" },
+  "credentials": { "message": "Credentials:" },
+  "presentInFile": { "message": "present in file" },
+  "notPresent": { "message": "not present" },
+  "importStrategy": { "message": "Import strategy" },
+  "merge": { "message": "Merge" },
+  "replace": { "message": "Replace" },
+  "apply": { "message": "Apply" },
+  "replaceImportWarning": {
+    "message": "Replace all profiles, groups, rules, and settings with this file? A recovery backup is kept locally."
+  },
+  "nativeImportCommitted": { "message": "Native import committed and applied." },
+  "profilesOnly": { "message": "Profiles only" },
+  "foxyProxyImport": { "message": "FoxyProxy import" },
+  "foxyProxyImportDescription": {
+    "message": "Supports reproducible FoxyProxy 6–9 JSON variants. HTTP/HTTPS endpoints can be imported; patterns, rules, subscriptions, PAC, direct, and SOCKS entries are excluded."
+  },
+  "foxyProxyJsonFile": { "message": "FoxyProxy JSON file" },
+  "parsePreview": { "message": "Parse and preview" },
+  "detected": { "message": "Detected" },
+  "credentialsPresent": { "message": "credentials present" },
+  "skipped": { "message": "Skipped" },
+  "entry": { "message": "entry" },
+  "importSelectedProfiles": { "message": "Import selected profiles" },
+  "foxyProxyProfilesImported": { "message": "Selected FoxyProxy profiles imported." },
+  "localDiagnostics": { "message": "Local diagnostics" },
+  "routingLogs": { "message": "Routing logs" },
+  "routingLogsDescription": {
+    "message": "The newest 100 entries are loaded. Storage is capped at 1000 entries. Paths, queries, fragments, headers, bodies, cookies, and credentials are never stored."
+  },
+  "clearLogs": { "message": "Clear logs" },
+  "clearLogsWarning": {
+    "message": "Clear persistent and current private-session routing logs? This cannot be undone."
+  },
+  "hostnameContains": { "message": "Hostname contains" },
+  "exampleHostname": { "message": "example.com" },
+  "all": { "message": "All" },
+  "chromium": { "message": "Chromium" },
+  "firefox": { "message": "Firefox" },
+  "errorsAuthOnly": { "message": "Errors and auth failures only" },
+  "applyFilters": { "message": "Apply filters" },
+  "privateEntriesPrefix": {
+    "message": "private entry/entries are held only in memory and are not included in this persistent page."
+  },
+  "noLogEntries": { "message": "No log entries" },
+  "noLogEntriesDescription": {
+    "message": "Browse a supported page or change filters. Logging may also be paused or disabled."
+  },
+  "localRoutingLog": { "message": "Local routing log" },
+  "time": { "message": "Time" },
+  "request": { "message": "Request" },
+  "hostname": { "message": "Hostname" },
+  "plannedRoute": { "message": "Planned route" },
+  "rule": { "message": "Rule" },
+  "status": { "message": "Status" },
+  "actual": { "message": "Actual:" },
+  "authFailure": { "message": "AUTH FAILURE" },
+  "completed": { "message": "Completed" },
+  "newer": { "message": "Newer" },
+  "older": { "message": "Older" },
+  "offset": { "message": "Offset" },
+  "endpoints": { "message": "Endpoints" },
+  "proxyProfiles": { "message": "Proxy profiles" },
+  "proxyProfilesDescription": {
+    "message": "HTTP and HTTPS target traffic can use separate proxy endpoints."
+  },
+  "addProfile": { "message": "Add profile" },
+  "credentialsStorageNotice": {
+    "message": "Proxy credentials are stored locally by the browser extension and are not protected by a master password."
+  },
+  "noProxyProfiles": { "message": "No proxy profiles yet" },
+  "noProxyProfilesDescription": {
+    "message": "Add an HTTP or HTTPS proxy endpoint to use Proxy and Rules modes."
+  },
+  "global": { "message": "Global" },
+  "httpWs": { "message": "HTTP / WS" },
+  "httpsWss": { "message": "HTTPS / WSS" },
+  "available": { "message": "Available" },
+  "noIp": { "message": "No IP" },
+  "connectDuration": { "message": "Connect duration:" },
+  "notAvailable": { "message": "Not available" },
+  "millisecondsShort": { "message": "ms" },
+  "edit": { "message": "Edit" },
+  "duplicate": { "message": "Duplicate" },
+  "check": { "message": "Check" },
+  "checking": { "message": "Checking…" },
+  "cancelCheck": { "message": "Cancel check" },
+  "delete": { "message": "Delete" },
+  "addProxyProfile": { "message": "Add proxy profile" },
+  "editProxyProfile": { "message": "Edit proxy profile" },
+  "close": { "message": "Close" },
+  "name": { "message": "Name" },
+  "shortNameDescription": {
+    "message": "Short name (optional, 1–3 ASCII letters or numbers)"
+  },
+  "color": { "message": "Color" },
+  "checkUrl": { "message": "Check URL" },
+  "note": { "message": "Note" },
+  "useHttpForAll": { "message": "Use the HTTP endpoint for all supported schemes" },
+  "useHttpForAllDescription": {
+    "message": "HTTPS and WSS targets will use an exact canonical copy."
+  },
+  "httpWsEndpoint": { "message": "HTTP / WS endpoint" },
+  "httpsWssEndpoint": { "message": "HTTPS / WSS endpoint" },
+  "transport": { "message": "Transport" },
+  "httpProxy": { "message": "HTTP proxy" },
+  "httpsProxy": { "message": "HTTPS proxy" },
+  "host": { "message": "Host" },
+  "port": { "message": "Port" },
+  "username": { "message": "Username" },
+  "password": { "message": "Password" },
+  "effectiveHttpsEndpoint": { "message": "Effective HTTPS / WSS endpoint:" },
+  "hostNotSet": { "message": "host not set" },
+  "showPasswords": { "message": "Show passwords while editing" },
+  "saveProfile": { "message": "Save profile" },
+  "cancel": { "message": "Cancel" },
+  "activeGlobalRoute": { "message": "the active global route" },
+  "rulesAffected": { "message": "rule(s)" },
+  "and": { "message": "and" },
+  "deleteProfileBeforeName": { "message": "Delete" },
+  "deleteProfileAffects": { "message": "This affects" },
+  "deleteProfileInvalidRules": {
+    "message": "Referring rules will remain visible and invalid."
+  },
+  "manualCheckBeforeUrl": { "message": "Send one manual request to" },
+  "manualCheckThrough": { "message": "through" },
+  "manualCheckDisclosure": {
+    "message": "The endpoint receives your proxy egress IP."
+  },
+  "firstMatchWins": { "message": "First match wins" },
+  "orderedRules": { "message": "Ordered rules" },
+  "orderedRulesDescription": {
+    "message": "Groups organize rules but never change their global priority."
+  },
+  "addRule": { "message": "Add rule" },
+  "search": { "message": "Search" },
+  "nameOrPattern": { "message": "Name or pattern" },
+  "group": { "message": "Group" },
+  "allGroups": { "message": "All groups" },
+  "allActions": { "message": "All actions" },
+  "enabled": { "message": "Enabled" },
+  "disabled": { "message": "Disabled" },
+  "anyState": { "message": "Any state" },
+  "compatibility": { "message": "Compatibility" },
+  "chromeFirefox": { "message": "Chrome + Firefox" },
+  "clearFilters": { "message": "Clear filters" },
+  "clearFiltersToReorder": { "message": "Clear filters to reorder rules." },
+  "noMatchingRules": { "message": "No matching rules" },
+  "noMatchingRulesDescription": {
+    "message": "Create a rule or clear filters. Unmatched traffic follows the selected mode."
+  },
+  "rulesGlobalOrder": { "message": "Rules in global priority order" },
+  "missingGroup": { "message": "Missing group" },
+  "missingProfile": { "message": "Missing profile" },
+  "enable": { "message": "Enable" },
+  "move": { "message": "Move" },
+  "up": { "message": "up" },
+  "down": { "message": "down" },
+  "editRule": { "message": "Edit rule" },
+  "matcherTarget": { "message": "Matcher target" },
+  "originPortable": { "message": "Origin (portable)" },
+  "fullUrlFirefoxOnly": { "message": "Full URL (Firefox only)" },
+  "flags": { "message": "Flags" },
+  "description": { "message": "Description" },
+  "regularExpression": { "message": "Regular expression" },
+  "regexGuidance": {
+    "message": "Anchor with ^/$, escape dots as \\., and account for optional ports. Origin targets end in /. Full URL includes path/query but no fragment and works in Firefox only."
+  },
+  "template": { "message": "Template" },
+  "exactOrigin": { "message": "Exact origin" },
+  "httpOnly": { "message": "HTTP only" },
+  "httpsOnly": { "message": "HTTPS only" },
+  "customPort": { "message": "Custom port" },
+  "localhost": { "message": "Localhost" },
+  "privateIpv4": { "message": "Private IPv4" },
+  "firefoxUrlPath": { "message": "Firefox URL path" },
+  "firefoxQueryParameter": { "message": "Firefox query parameter" },
+  "templateHostname": { "message": "Template hostname" },
+  "generateEditablePattern": { "message": "Generate editable pattern" },
+  "singleMultipleTester": { "message": "Single and multiple URL tester" },
+  "testerPrivacyDescription": {
+    "message": "No URL leaves the extension. At most 1000 lines run in a cancellable worker."
+  },
+  "urlsOnePerLine": { "message": "URLs, one per line" },
+  "testPattern": { "message": "Test pattern" },
+  "match": { "message": "MATCH" },
+  "noMatch": { "message": "NO MATCH" },
+  "saveRule": { "message": "Save rule" },
+  "fullUrlSaveWarning": {
+    "message": "Full URL rules work in Firefox only. Save this portable configuration anyway?"
+  },
+  "templateApplied": {
+    "message": "Template applied. Review and edit it before saving."
+  },
+  "testingLocally": { "message": "Testing locally…" },
+  "linesLabel": { "message": "line(s)" },
+  "noNetworkRequest": { "message": "No network request was made." },
+  "organization": { "message": "Organization" },
+  "groups": { "message": "Groups" },
+  "groupsPriorityDescription": { "message": "Groups do not change rule priority." },
+  "rename": { "message": "Rename" },
+  "saveName": { "message": "Save name" },
+  "rulesCountSuffix": { "message": "rule(s)" },
+  "preset": { "message": "Preset" },
+  "moveRulesTo": { "message": "Move rules to" },
+  "selectGroup": { "message": "Select group" },
+  "newGroupName": { "message": "New group name" },
+  "addGroup": { "message": "Add group" },
+  "chooseDestinationGroup": {
+    "message": "Choose a destination group before deleting a group that contains rules."
+  },
+  "deleteGroupPrefix": { "message": "Delete the group" },
+  "deleteGroupMovePrefix": { "message": "and move" },
+  "deleteGroupMoveSuffix": {
+    "message": "rule(s) to the selected group? Rule priority will not change."
+  },
+  "authoritativeResolver": { "message": "Authoritative resolver" },
+  "globalRoutingTester": { "message": "Global routing tester" },
+  "url": { "message": "URL" },
+  "resolveRoute": { "message": "Resolve route" },
+  "dragHandleSymbol": { "message": "⋮⋮" },
+  "upSymbol": { "message": "↑" },
+  "downSymbol": { "message": "↓" },
+  "downloadFailed": { "message": "Proxy download failed" },
+  "downloadFailedFrom": { "message": "A download from" },
+  "openLogsForDetails": { "message": "Open Logs for safe details." }
+}

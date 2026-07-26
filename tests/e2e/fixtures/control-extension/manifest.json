@@ -1,0 +1,9 @@
+{
+  "manifest_version": 3,
+  "name": "ProxyLoom E2E Control Fixture",
+  "version": "1.0.0",
+  "permissions": ["proxy"],
+  "background": {
+    "service_worker": "background.js"
+  }
+}

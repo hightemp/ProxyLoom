@@ -277,9 +277,9 @@ WXT underlying commands:
 
 ```bash
 wxt build
-wxt build -b firefox
+wxt build -b firefox --mv3
 wxt zip
-wxt zip -b firefox
+wxt zip -b firefox --mv3
 ```
 
 До PL-016 этих команд закономерно нет. После scaffolding не документировать несуществующую команду: при script rename одновременно обновить `package.json`, этот раздел, README и CI.

@@ -1,0 +1,21 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "files": ["README.md", "docs/privacy.md", "docs/user-guide/**/*.md", "store/**/*.md"],
+  "ignorePaths": ["store/assets/*.svg"],
+  "words": [
+    "Chromium",
+    "FoxyProxy",
+    "GeoIP",
+    "ProxyLoom",
+    "WebSocket",
+    "failover",
+    "hostname",
+    "hostnames",
+    "localhost",
+    "loopback",
+    "pnpm",
+    "sideload",
+    "sideloaded"
+  ]
+}

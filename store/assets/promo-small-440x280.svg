@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="280" viewBox="0 0 440 280" role="img" aria-label="ProxyLoom deterministic proxy routing">
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#172554"/>
+      <stop offset="0.55" stop-color="#405cf5"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="thread" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#9fb2ff" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.65"/>
+      <stop offset="1" stop-color="#d8b4fe" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="440" height="280" rx="22" fill="url(#background)"/>
+  <g fill="none" stroke="url(#thread)" stroke-width="2">
+    <path d="M-20 47c92-44 145 58 235 20s145-31 245 13"/>
+    <path d="M-12 220c89-51 158 23 246-7s147-14 230 33"/>
+    <path d="M84-8c-33 86 40 119 12 206s8 104 38 122"/>
+    <path d="M368-8c-45 76 19 124-9 195s-2 105 29 126"/>
+  </g>
+  <rect x="34" y="38" width="72" height="72" rx="18" fill="#ffffff"/>
+  <path d="M50 93V55h23c15 0 24 7 24 19s-9 19-24 19h-9v13H50zm14-26v14h9c7 0 11-3 11-8s-4-6-11-6h-9z" fill="#405cf5"/>
+  <text x="128" y="72" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="31" font-weight="700">ProxyLoom</text>
+  <text x="128" y="99" fill="#dbeafe" font-family="Inter, Arial, sans-serif" font-size="16">Deterministic proxy routing</text>
+  <rect x="34" y="146" width="372" height="1" fill="#ffffff" opacity="0.24"/>
+  <g font-family="Inter, Arial, sans-serif" font-size="14" font-weight="700" text-anchor="middle">
+    <rect x="34" y="176" width="105" height="42" rx="21" fill="#ffffff" opacity="0.96"/>
+    <text x="86.5" y="202" fill="#334155">DIRECT</text>
+    <rect x="168" y="176" width="105" height="42" rx="21" fill="#ffffff" opacity="0.96"/>
+    <text x="220.5" y="202" fill="#334155">PROXY</text>
+    <rect x="301" y="176" width="105" height="42" rx="21" fill="#ffffff" opacity="0.96"/>
+    <text x="353.5" y="202" fill="#334155">RULES</text>
+  </g>
+  <text x="34" y="252" fill="#dbeafe" font-family="Inter, Arial, sans-serif" font-size="13">Explicit routes. Ordered rules. No hidden fallback.</text>
+</svg>

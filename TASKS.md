@@ -6,7 +6,7 @@
 
 ## Фаза 1. Research spikes
 
-- [ ] **PL-001 — Проверить Manifest V3 proxy API в актуальных Chrome и Firefox**
+- [x] **PL-001 — Проверить Manifest V3 proxy API в актуальных Chrome и Firefox**
   - **Цель:** доказать доступность routing API, permissions и lifecycle для двух release targets.
   - **Требования:** COMPAT-001, COMPAT-004, COMPAT-014, SEC-007.
   - **Действия:** собрать минимальные MV3 prototypes, применить direct/proxy config, перезапустить service worker, записать browser versions и install warnings.
@@ -16,7 +16,7 @@
   - **Тесты:** ручные сценарии apply/read/restart; сохранённые console/network traces без credentials.
   - **Артефакт/влияние/готово:** `docs/adr/ADR-001-mv3-proxy-api.md`; разблокированы foundation, adapters и manifest.
 
-- [ ] **PL-002 — Исследовать URL, доступный Chromium PAC**
+- [x] **PL-002 — Исследовать URL, доступный Chromium PAC**
   - **Цель:** установить фактический `FindProxyForURL(url, host)` input для HTTP, HTTPS, WS и WSS.
   - **Требования:** FR-015–FR-018, COMPAT-012, раздел 35 PRD.
   - **Действия:** PAC prototype безопасно кодирует наблюдаемый scheme/host/path availability в выбор локальных endpoints; проверить default/non-default ports и IDN.
@@ -26,7 +26,7 @@
   - **Тесты:** controlled HTTP/HTTPS/WS/WSS requests, повтор на Chrome и Chromium.
   - **Артефакт/влияние/готово:** `ADR-002-chromium-pac-url.md`; определяет normalization и PAC compiler.
 
-- [ ] **PL-003 — Проверить fail-closed при недоступном proxy**
+- [x] **PL-003 — Проверить fail-closed при недоступном proxy**
   - **Цель:** доказать отсутствие direct/system/second-proxy fallback.
   - **Требования:** FR-006, FR-075, SEC-017.
   - **Действия:** направить запрос к unreachable/refusing/hanging proxy; наблюдать на local origin, был ли direct request; сравнить PAC directives.
@@ -36,17 +36,17 @@
   - **Тесты:** HTTP, HTTPS, WS handshake и download в Chromium/Firefox.
   - **Артефакт/влияние/готово:** `ADR-003-fail-closed.md` + reproducible scripts; gate для adapters/integration.
 
-- [ ] **PL-004 — Проверить Firefox fallback semantics**
-  - **Цель:** подтвердить terminal `null`, array behavior и влияние browser-defined manual proxy на `direct`.
+- [x] **PL-004 — Проверить Firefox fallback semantics**
+  - **Цель:** подтвердить single `ProxyInfo`, array behavior, `null`/`undefined` и влияние browser-defined manual proxy на `direct`.
   - **Требования:** COMPAT-013, SEC-017, раздел 35 PRD.
-  - **Действия:** вернуть proxy, `[proxy, null]`, direct и null при разных user settings; снять network evidence.
+  - **Действия:** вернуть один proxy, массив proxy fallback, direct и null/undefined при разных user settings; снять network evidence.
   - **Прототип/модули:** `spikes/firefox-fallback/`.
   - **Зависимости:** PL-001.
   - **Ожидаемый результат и критерии:** точная return shape для PROXY/DIRECT и честный control-conflict UX определены.
   - **Тесты:** reachable/unreachable proxy, manual browser proxy on/off, restart.
   - **Артефакт/влияние/готово:** `ADR-004-firefox-fallback.md`; обновлены PRD/TASKS при расхождении.
 
-- [ ] **PL-005 — Проверить proxy authentication в Chromium MV3 и Firefox**
+- [x] **PL-005 — Проверить proxy authentication в Chromium MV3 и Firefox**
   - **Цель:** подтвердить challenge fields, permissions, async response, cancellation и cleanup events.
   - **Требования:** FR-046–FR-049, COMPAT-007, SEC-014.
   - **Действия:** local authenticating proxies; correct/wrong credentials; site auth negative case; повторная challenge.
@@ -56,7 +56,7 @@
   - **Тесты:** HTTP proxy auth, CONNECT auth, main-frame/background, worker suspension.
   - **Артефакт/влияние/готово:** `ADR-005-proxy-auth.md`; задаёт auth adapter contract.
 
-- [ ] **PL-006 — Проверить разные HTTP/HTTPS proxy endpoints**
+- [x] **PL-006 — Проверить разные HTTP/HTTPS proxy endpoints**
   - **Цель:** подтвердить mapping target scheme → endpoint и proxy transport HTTP/HTTPS.
   - **Требования:** FR-015–FR-017, FR-041, COMPAT-012.
   - **Действия:** поднять различимые local proxy endpoints и проверить HTTP/HTTPS/WS/WSS/download routing.
@@ -66,7 +66,7 @@
   - **Тесты:** same endpoint и separate endpoints, оба proxy transport types.
   - **Артефакт/влияние/готово:** `ADR-006-endpoint-routing.md`; разблокирует model/compiler/adapters.
 
-- [ ] **PL-007 — Исследовать manual check неактивного профиля в Chromium**
+- [x] **PL-007 — Исследовать manual check неактивного профиля в Chromium**
   - **Цель:** проверить targeted temporary PAC override без глобального нарушения routing.
   - **Требования:** FR-063–FR-066, SEC-011.
   - **Действия:** сериализованный prototype добавляет override только для check/IP origins, имитирует worker stop и выполняет startup recovery.
@@ -76,7 +76,7 @@
   - **Тесты:** success/timeout/crash/concurrent click/config change.
   - **Артефакт/влияние/готово:** `ADR-007-inactive-check.md`; определяет proxy-check service.
 
-- [ ] **PL-008 — Проверить best-effort error page**
+- [x] **PL-008 — Проверить best-effort error page**
   - **Цель:** определить, какие main-frame proxy failures можно надёжно коррелировать и перенаправить.
   - **Требования:** FR-024, FR-049, FR-055–FR-056, COMPAT-008.
   - **Действия:** вызвать DNS/refused/timeout/auth errors; проверить tab state, redirect timing, loop guard и missing-tab cases.
@@ -86,7 +86,7 @@
   - **Тесты:** main-frame/subresource/WS/download/internal URL.
   - **Артефакт/влияние/готово:** `ADR-008-error-page.md`; задаёт error coordinator.
 
-- [ ] **PL-009 — Проверить session overrides и tab-close cleanup**
+- [x] **PL-009 — Проверить session overrides и tab-close cleanup**
   - **Цель:** подтвердить storage/session/alarms и tab isolation после worker restart.
   - **Требования:** FR-057–FR-059, COMPAT-009.
   - **Действия:** создать Once, suspend/restart worker, закрыть tab, открыть same origin в другой tab.
@@ -96,7 +96,7 @@
   - **Тесты:** normal/private tabs, tab reuse, browser restart, stale ID.
   - **Артефакт/влияние/готово:** `ADR-009-session-overrides.md`; определяет session repository.
 
-- [ ] **PL-010 — Проверить incognito scopes**
+- [x] **PL-010 — Проверить incognito scopes**
   - **Цель:** установить spanning/split behavior, permissions и storage/log isolation.
   - **Требования:** FR-073–FR-074, COMPAT-010, PRIV-001, PRIV-004.
   - **Действия:** включить/выключить browser permission, проверить routing, session state и IndexedDB writes.
@@ -106,7 +106,7 @@
   - **Тесты:** normal/private concurrent windows, close last private window, restart.
   - **Артефакт/влияние/готово:** `ADR-010-incognito.md`; разблокирует repositories/adapters/UI.
 
-- [ ] **PL-011 — Проверить Firefox extension E2E tooling**
+- [x] **PL-011 — Проверить Firefox extension E2E tooling**
   - **Цель:** найти воспроизводимый unsigned MV3 Firefox smoke/E2E flow, не имитируя поддержку Playwright.
   - **Требования:** раздел 33 PRD, COMPAT-015, NFR-017.
   - **Действия:** проверить актуальный Playwright, web-ext и допустимые alternatives; запустить popup/options smoke.
@@ -116,7 +116,7 @@
   - **Тесты:** clean-machine repeat, service worker/page access, failure reporting.
   - **Артефакт/влияние/готово:** `ADR-011-firefox-e2e.md`; уточняет E2E/CI tasks.
 
-- [ ] **PL-012 — Проверить downloads и WebSocket**
+- [x] **PL-012 — Проверить downloads и WebSocket**
   - **Цель:** подтвердить scheme mapping, observable events и error handling.
   - **Требования:** FR-015–FR-018, FR-049, FR-056.
   - **Действия:** local WS/WSS and download servers, distinct proxies, failure injection.
@@ -126,7 +126,7 @@
   - **Тесты:** handshake success/failure, established messages invisible, download success/cancel/failure.
   - **Артефакт/влияние/готово:** `ADR-012-ws-downloads.md`; влияет на permissions/logging.
 
-- [ ] **PL-013 — Измерить практический размер generated PAC**
+- [x] **PL-013 — Измерить практический размер generated PAC**
   - **Цель:** определить safe limit для 1000 rules, config apply и browser PAC parser.
   - **Требования:** NFR-002, NFR-003, COMPAT-012.
   - **Действия:** генерировать representative/worst-case snapshots, измерять bytes/compile/apply/startup и ошибки API.
@@ -136,7 +136,7 @@
   - **Тесты:** 1/100/1000 rules, max patterns, injection characters.
   - **Артефакт/влияние/готово:** `ADR-013-pac-size.md`; задаёт compiler validation/performance gates.
 
-- [ ] **PL-014 — Проверить RegExp compatibility в PAC и Firefox runtime**
+- [x] **PL-014 — Проверить RegExp compatibility в PAC и Firefox runtime**
   - **Цель:** доказать общий safe subset flags/features и DoS controls.
   - **Требования:** FR-038–FR-040, SEC-001–SEC-002.
   - **Действия:** corpus syntax/features/Unicode/escaping выполняется в PAC и background; измеряются pathological cases.
@@ -158,7 +158,7 @@
 
 ## Фаза 2. Project foundation
 
-- [ ] **PL-016 — Создать WXT/Vue/TypeScript strict scaffold**
+- [x] **PL-016 — Создать WXT/Vue/TypeScript strict scaffold**
   - **Цель:** создать минимальный проект без продуктовой логики.
   - **Требования:** COMPAT-001, REL-002, NFR-001.
   - **Действия:** WXT, Vue module, MV3, pnpm, strict tsconfig, editor config, centralized product config.
@@ -168,7 +168,7 @@
   - **Тесты:** `pnpm typecheck`, оба build commands.
   - **Готово, когда:** lockfile committed, build output не committed, AGENTS commands актуализированы.
 
-- [ ] **PL-017 — Настроить entrypoints и i18n**
+- [x] **PL-017 — Настроить entrypoints и i18n**
   - **Цель:** заложить popup/options/error/background и English-first localization.
   - **Требования:** FR-012, NFR-015, COMPAT-011.
   - **Действия:** создать WXT entrypoints, `_locales/en`, typed message accessor, no-literal lint policy.
@@ -178,7 +178,7 @@
   - **Тесты:** build smoke и locale key test.
   - **Готово, когда:** browser-specific entry config не попал в UI/domain.
 
-- [ ] **PL-018 — Настроить качество и тестовые runners**
+- [x] **PL-018 — Настроить качество и тестовые runners**
   - **Цель:** единые lint/format/type/unit scripts до feature work.
   - **Требования:** REL-003, NFR-017, SEC-013.
   - **Действия:** ESLint, formatter, Vitest, coverage, dependency audit/licence scripts.
@@ -188,7 +188,7 @@
   - **Тесты:** self-smoke всех scripts.
   - **Готово, когда:** команды документированы и reproducible.
 
-- [ ] **PL-019 — Определить future project boundaries**
+- [x] **PL-019 — Определить future project boundaries**
   - **Цель:** физически запретить недопустимые зависимости слоёв.
   - **Требования:** FR-080, COMPAT-011, SEC-007.
   - **Действия:** создать directories/path aliases/import-boundary rules для domain/application/platform/storage/UI.
@@ -200,7 +200,7 @@
 
 ## Фаза 3. Shared domain model
 
-- [ ] **PL-020 — Реализовать branded IDs, enums и timestamps**
+- [x] **PL-020 — Реализовать branded IDs, enums и timestamps**
   - **Цель:** стабильные, display-name-independent primitives.
   - **Требования:** FR-027, FR-076, раздел 27 PRD.
   - **Действия:** typed IDs, modes/actions/matchers/transports/platforms, clock interface.
@@ -210,7 +210,7 @@
   - **Тесты:** serialization and exhaustive-switch unit tests.
   - **Готово, когда:** primitives не импортируют runtime APIs.
 
-- [ ] **PL-021 — Реализовать ProxyProfile и endpoint invariants**
+- [x] **PL-021 — Реализовать ProxyProfile и endpoint invariants**
   - **Цель:** покрыть все поля и same/separate semantics.
   - **Требования:** FR-002, FR-041–FR-045, SEC-003.
   - **Действия:** constructors/validators, host/port/transport/short-name/color/check URL constraints.
@@ -220,7 +220,7 @@
   - **Тесты:** valid/invalid table, generated short-name collisions.
   - **Готово, когда:** every PRD field round-trips through safe schema.
 
-- [ ] **PL-022 — Реализовать Rule, Group и temporary state entities**
+- [x] **PL-022 — Реализовать Rule, Group и temporary state entities**
   - **Цель:** выразить priority, validity, compatibility и session state.
   - **Требования:** FR-030–FR-036, FR-057–FR-059.
   - **Действия:** entity schemas, action/reference invariants, temporary expiry models, preset group factory.
@@ -230,7 +230,7 @@
   - **Тесты:** entity validation, timestamps, preset demo safety.
   - **Готово, когда:** invalid references representable и не удаляются.
 
-- [ ] **PL-023 — Реализовать routing snapshot и diagnostic contracts**
+- [x] **PL-023 — Реализовать routing snapshot и diagnostic contracts**
   - **Цель:** единый normalized immutable input/output всех routing consumers.
   - **Требования:** FR-019–FR-020, FR-080, NFR-001.
   - **Действия:** snapshot builder contracts, revision/hash, decision/source/trace/diagnostic types.
@@ -242,7 +242,7 @@
 
 ## Фаза 4. Storage and migrations
 
-- [ ] **PL-024 — Реализовать versioned local config repository**
+- [x] **PL-024 — Реализовать versioned local config repository**
   - **Цель:** атомарно хранить конфигурацию и revision.
   - **Требования:** FR-076, FR-078, SEC-004.
   - **Действия:** read/validate/copy-update/commit, optimistic revision, typed failures.
@@ -252,7 +252,7 @@
   - **Тесты:** mocked storage failures/concurrency/corruption.
   - **Готово, когда:** UI не пишет storage напрямую.
 
-- [ ] **PL-025 — Реализовать migration runner и recovery**
+- [x] **PL-025 — Реализовать migration runner и recovery**
   - **Цель:** безопасные idempotent schema upgrades.
   - **Требования:** FR-076–FR-078, SEC-004.
   - **Действия:** migration registry, bounded backup, in-progress marker, rollback/startup recovery.
@@ -262,7 +262,7 @@
   - **Тесты:** version fixtures, injected interruption, repeat run.
   - **Готово, когда:** migration ADR/template и backup retention определены.
 
-- [ ] **PL-026 — Реализовать session repository**
+- [x] **PL-026 — Реализовать session repository**
   - **Цель:** хранить overrides, temporary disables, auth/recovery state вне globals.
   - **Требования:** FR-014, FR-048, FR-059, NFR-006.
   - **Действия:** storage.session adapter/fallback, namespace, expiry/reconciliation APIs.
@@ -272,7 +272,7 @@
   - **Тесты:** restart simulation, expiry, unavailable session API fallback.
   - **Готово, когда:** stale state cannot become effective silently.
 
-- [ ] **PL-027 — Реализовать first-run seed**
+- [x] **PL-027 — Реализовать first-run seed**
   - **Цель:** создать defaults и безопасные preset groups один раз.
   - **Требования:** FR-013, раздел 27 PRD.
   - **Действия:** initial config factory, five groups, disabled test-domain rule each, English descriptions.
@@ -284,7 +284,7 @@
 
 ## Фаза 5. URL normalization
 
-- [ ] **PL-028 — Реализовать Origin URL normalization**
+- [x] **PL-028 — Реализовать Origin URL normalization**
   - **Цель:** получить переносимый `scheme://hostname[:port]/`.
   - **Требования:** FR-015–FR-018, раздел 14.1 PRD.
   - **Действия:** standard URL parser, lower-case, Punycode, ports, scheme mapping, typed invalid/internal results.
@@ -294,7 +294,7 @@
   - **Тесты:** exhaustive table IDN/IPv4/IPv6/default ports/malformed/internal.
   - **Готово, когда:** documented examples match exactly.
 
-- [ ] **PL-029 — Реализовать Full URL normalization**
+- [x] **PL-029 — Реализовать Full URL normalization**
   - **Цель:** сформировать Firefox matcher target без fragment.
   - **Требования:** COMPAT-002, COMPAT-006, раздел 14.2 PRD.
   - **Действия:** canonical URL serialization с path/query, compatibility metadata.
@@ -304,7 +304,7 @@
   - **Тесты:** encoded paths, empty query, explicit ports, fragments.
   - **Готово, когда:** no network access occurs.
 
-- [ ] **PL-030 — Интегрировать локальную PSL**
+- [x] **PL-030 — Интегрировать локальную PSL**
   - **Цель:** корректно строить Exact hostname и Domain + subdomains.
   - **Требования:** FR-057, SEC-013.
   - **Действия:** выбрать audited local PSL library/data update policy, implement registrable-domain result types.
@@ -316,7 +316,7 @@
 
 ## Фаза 6. Rule engine
 
-- [ ] **PL-031 — Реализовать regex validator**
+- [x] **PL-031 — Реализовать regex validator**
   - **Цель:** безопасно валидировать pattern/flags до persistence.
   - **Требования:** SEC-001–SEC-002, FR-038–FR-040.
   - **Действия:** allowlist flags, length limit, syntax parse, risk analyzer, normalized error codes.
@@ -326,7 +326,7 @@
   - **Тесты:** corpus из ADR, ReDoS/injection fixtures.
   - **Готово, когда:** same validator used editor/import/compiler.
 
-- [ ] **PL-032 — Реализовать pure resolver**
+- [x] **PL-032 — Реализовать pure resolver**
   - **Цель:** выполнить decision table и first-match semantics.
   - **Требования:** FR-001, FR-006, FR-019, FR-027–FR-032, FR-079–FR-080.
   - **Действия:** override/mode/rule/fallback pipeline, platform compatibility, invalid-reference error, trace.
@@ -336,7 +336,7 @@
   - **Тесты:** table-driven matrix/property determinism.
   - **Готово, когда:** no browser/storage/time imports.
 
-- [ ] **PL-033 — Реализовать reorder и filtering domain services**
+- [x] **PL-033 — Реализовать reorder и filtering domain services**
   - **Цель:** сохранять единый deterministic priority.
   - **Требования:** FR-030, FR-033–FR-034.
   - **Действия:** atomic move/renumber, query/filter predicates, filtered reorder guard.
@@ -346,7 +346,7 @@
   - **Тесты:** moves across groups, concurrent revision, all filters.
   - **Готово, когда:** group never changes priority implicitly.
 
-- [ ] **PL-034 — Реализовать rule templates и routing tester trace**
+- [x] **PL-034 — Реализовать rule templates и routing tester trace**
   - **Цель:** генерировать editable safe patterns и объяснять full resolution.
   - **Требования:** FR-037–FR-040.
   - **Действия:** ten templates, escaping helpers, single-rule outcome and global trace presenter.
@@ -358,7 +358,7 @@
 
 ## Фаза 7. PAC compiler
 
-- [ ] **PL-035 — Спроектировать safe PAC intermediate representation**
+- [x] **PL-035 — Спроектировать safe PAC intermediate representation**
   - **Цель:** исключить raw string injection и отделить normalized data от code emission.
   - **Требования:** SEC-001, SEC-006, FR-075.
   - **Действия:** typed IR for match/action/endpoints, literal serializer, directive allowlist.
@@ -368,7 +368,7 @@
   - **Тесты:** quotes/newlines/backslashes/Unicode/prototype keys.
   - **Готово, когда:** security review of serializer passes.
 
-- [ ] **PL-036 — Реализовать PAC compiler mode/rule semantics**
+- [x] **PL-036 — Реализовать PAC compiler mode/rule semantics**
   - **Цель:** компилировать PROXY/RULES, Origin first-match и separate endpoints.
   - **Требования:** COMPAT-012, FR-015–FR-020, FR-075.
   - **Действия:** emit deterministic `FindProxyForURL`, skip Full URL, no fallback directive, explicit direct fallback only for RULES/rule action.
@@ -378,7 +378,7 @@
   - **Тесты:** golden snapshots, modes/schemes/ports/transports.
   - **Готово, когда:** browser PAC parser accepts corpus.
 
-- [ ] **PL-037 — Реализовать resolver/PAC parity harness**
+- [x] **PL-037 — Реализовать resolver/PAC parity harness**
   - **Цель:** доказать эквивалентность shared resolver и generated PAC.
   - **Требования:** FR-080, NFR-014, SEC-017.
   - **Действия:** isolated PAC evaluator/browser harness, generated URL/rules corpus, comparison of actions/endpoints.
@@ -388,7 +388,7 @@
   - **Тесты:** property-based, injection, disabled/incompatible/invalid cases.
   - **Готово, когда:** mismatch fails CI with reproducible seed.
 
-- [ ] **PL-038 — Реализовать PAC size/performance validation**
+- [x] **PL-038 — Реализовать PAC size/performance validation**
   - **Цель:** enforce limits и coalescing inputs до browser failure.
   - **Требования:** NFR-002–NFR-003, NFR-016.
   - **Действия:** byte/entry checks, compile metrics, actionable diagnostics.
@@ -400,7 +400,7 @@
 
 ## Фаза 8. Chromium adapter
 
-- [ ] **PL-039 — Реализовать Chromium proxy control service**
+- [x] **PL-039 — Реализовать Chromium proxy control service**
   - **Цель:** читать level of control и честно блокировать apply.
   - **Требования:** FR-021–FR-023, PL-015 ADR.
   - **Действия:** map ChromeSetting levels, watch changes, expose capabilities.
@@ -410,7 +410,7 @@
   - **Тесты:** API mocks + manual second-extension/policy.
   - **Готово, когда:** controls can use status without browser branches.
 
-- [ ] **PL-040 — Реализовать revisioned Chromium config application**
+- [x] **PL-040 — Реализовать revisioned Chromium config application**
   - **Цель:** применять direct/PAC без races и false applied state.
   - **Требования:** FR-014, FR-020–FR-023, NFR-002, NFR-004.
   - **Действия:** debounce/coalesce, monotonic revision, apply/read-back, startup restore, error rollback semantics.
@@ -420,7 +420,7 @@
   - **Тесты:** rapid updates, worker restart, control loss, API error.
   - **Готово, когда:** persisted and applied revisions visible in diagnostics.
 
-- [ ] **PL-041 — Реализовать Chromium routing/error event bridge**
+- [x] **PL-041 — Реализовать Chromium routing/error event bridge**
   - **Цель:** обеспечить diagnostics correlation без route duplication.
   - **Требования:** FR-024–FR-025, FR-049, FR-056.
   - **Действия:** classify requests, correlate snapshot decisions, exclude internal check/extension traffic.
@@ -432,7 +432,7 @@
 
 ## Фаза 9. Firefox adapter
 
-- [ ] **PL-042 — Реализовать Firefox capability/control service**
+- [x] **PL-042 — Реализовать Firefox capability/control service**
   - **Цель:** представить permissions, control и API limitations единым contract.
   - **Требования:** COMPAT-004–COMPAT-005, COMPAT-010, COMPAT-014.
   - **Действия:** runtime checks, proxy settings observation, incognito and Full URL capabilities.
@@ -442,17 +442,17 @@
   - **Тесты:** API mocks + Firefox manual.
   - **Готово, когда:** no Firefox conditions enter UI/domain.
 
-- [ ] **PL-043 — Реализовать Firefox onRequest routing**
+- [x] **PL-043 — Реализовать Firefox onRequest routing**
   - **Цель:** применять shared resolver к Origin/Full URL и tab override.
   - **Требования:** FR-030–FR-032, FR-057, COMPAT-002, COMPAT-013.
-  - **Действия:** convert RequestDetails→context, resolve, map DIRECT/PROXY/error, terminal null/no fallback per ADR.
+  - **Действия:** convert RequestDetails→context, resolve, map DIRECT/PROXY/error; для PROXY вернуть один `ProxyInfo` без массива/fallback, для DIRECT применить settings-control semantics по ADR.
   - **Модули:** `src/platform/firefox/routing.ts`.
   - **Зависимости:** PL-004, PL-006, PL-032, PL-042.
   - **Критерии приёмки:** first match/full URL/tab scope work; invalid profile never direct.
   - **Тесты:** integration matrix origin/full URL/fallback/speculative tab.
   - **Готово, когда:** no second rules implementation exists.
 
-- [ ] **PL-044 — Реализовать Firefox lifecycle/event bridge**
+- [x] **PL-044 — Реализовать Firefox lifecycle/event bridge**
   - **Цель:** startup restore, errors, control changes и redacted diagnostics.
   - **Требования:** FR-014, FR-024–FR-025, NFR-004.
   - **Действия:** register listeners idempotently, reconcile session state, correlate proxy events.
@@ -464,7 +464,7 @@
 
 ## Фаза 10. Proxy authentication
 
-- [ ] **PL-045 — Реализовать auth attempt tracker**
+- [x] **PL-045 — Реализовать auth attempt tracker**
   - **Цель:** допустить ровно одну credential attempt на request ID.
   - **Требования:** FR-047–FR-048, SEC-014.
   - **Действия:** record/check/reject/cleanup/timeout APIs, bounded stale cleanup.
@@ -474,7 +474,7 @@
   - **Тесты:** lifecycle permutations, restart/stale entries.
   - **Готово, когда:** no credentials stored in attempt record.
 
-- [ ] **PL-046 — Реализовать challenge-to-profile matcher**
+- [x] **PL-046 — Реализовать challenge-to-profile matcher**
   - **Цель:** отвечать только ожидаемому proxy endpoint.
   - **Требования:** FR-046, SEC-003, SEC-014.
   - **Действия:** require `isProxy`, normalize challenger, match effective endpoint/profile, return redacted failure.
@@ -484,7 +484,7 @@
   - **Тесты:** host/port/transport/site-auth/redirect cases.
   - **Готово, когда:** matcher logs only IDs and codes.
 
-- [ ] **PL-047 — Реализовать Chromium и Firefox auth adapters**
+- [x] **PL-047 — Реализовать Chromium и Firefox auth adapters**
   - **Цель:** подключить common policy к platform callbacks.
   - **Требования:** FR-046–FR-049, COMPAT-007.
   - **Действия:** asyncBlocking/cancel mapping, lifecycle cleanup, auth failure diagnostic/error page signal.
@@ -496,7 +496,7 @@
 
 ## Фаза 11. Proxy profiles UI
 
-- [ ] **PL-048 — Реализовать application service для profile CRUD**
+- [x] **PL-048 — Реализовать application service для profile CRUD**
   - **Цель:** централизовать create/edit/duplicate/delete и impact analysis.
   - **Требования:** FR-002, FR-035, FR-041–FR-045, FR-053.
   - **Действия:** commands, validation, generated short name, referring-rules query, atomic mutations.
@@ -506,7 +506,7 @@
   - **Тесты:** CRUD, duplicate collision, used-profile impact, rollback.
   - **Готово, когда:** UI не содержит business logic.
 
-- [ ] **PL-049 — Создать список и редактор proxy profiles**
+- [x] **PL-049 — Создать список и редактор proxy profiles**
   - **Цель:** предоставить полный English UI всех полей профиля.
   - **Требования:** FR-041–FR-045, FR-054, NFR-010.
   - **Действия:** list/empty state/form, same/separate toggle, endpoint transport/host/port/credentials, note/color/check URL.
@@ -516,7 +516,7 @@
   - **Тесты:** component keyboard/validation/theme tests.
   - **Готово, когда:** all ProxyProfile fields view/edit/round-trip.
 
-- [ ] **PL-050 — Реализовать duplicate/delete/usage dialogs**
+- [x] **PL-050 — Реализовать duplicate/delete/usage dialogs**
   - **Цель:** сделать destructive profile workflows прозрачными.
   - **Требования:** FR-026, FR-035, FR-045, NFR-008.
   - **Действия:** usage list, invalid-rule outcome, confirmation, post-delete navigation/focus.
@@ -528,7 +528,7 @@
 
 ## Фаза 12. Rules UI
 
-- [ ] **PL-051 — Реализовать application service для rules CRUD**
+- [x] **PL-051 — Реализовать application service для rules CRUD**
   - **Цель:** атомарные create/edit/duplicate/delete/enable operations.
   - **Требования:** FR-030–FR-036, FR-053.
   - **Действия:** commands, validation, position assignment, invalid reference preservation, config apply.
@@ -538,7 +538,7 @@
   - **Тесты:** command table, concurrency, apply failure.
   - **Готово, когда:** rules UI consumes view models/commands only.
 
-- [ ] **PL-052 — Создать ordered rules list**
+- [x] **PL-052 — Создать ordered rules list**
   - **Цель:** показать global priority, validity, group, action и compatibility без двусмысленности.
   - **Требования:** FR-030–FR-035, NFR-016.
   - **Действия:** list rows/cards, position, badges, invalid/deleted-profile states, empty/loading/error states.
@@ -548,7 +548,7 @@
   - **Тесты:** component snapshots/accessible names/state matrix.
   - **Готово, когда:** list of 1000 remains usable with chosen virtualization strategy.
 
-- [ ] **PL-053 — Создать rule editor**
+- [x] **PL-053 — Создать rule editor**
   - **Цель:** безопасно создавать/редактировать Origin и advanced Full URL rules.
   - **Требования:** FR-038–FR-040, COMPAT-002, COMPAT-006.
   - **Действия:** fields, matcher selection, flags, templates, action/profile, regex helper, generated preview.
@@ -558,7 +558,7 @@
   - **Тесты:** all templates, invalid regex/reference, Firefox/Chromium capability view.
   - **Готово, когда:** helper contains all PRD topics in English.
 
-- [ ] **PL-054 — Реализовать rule search и filters**
+- [x] **PL-054 — Реализовать rule search и filters**
   - **Цель:** искать/фильтровать без скрытого priority mutation.
   - **Требования:** FR-034, раздел 18 Rules PRD.
   - **Действия:** search, group/action/profile/compatibility/enabled filters, clear-all, URL state if appropriate.
@@ -570,7 +570,7 @@
 
 ## Фаза 13. Regex tester
 
-- [ ] **PL-055 — Реализовать cancellable regex execution service**
+- [x] **PL-055 — Реализовать cancellable regex execution service**
   - **Цель:** проверять untrusted patterns/URL batches без зависания UI.
   - **Требования:** SEC-002, NFR-005, раздел 12 PRD.
   - **Действия:** worker/chunk execution, time budget, cancellation, line/result limits, no-network guarantee.
@@ -580,7 +580,7 @@
   - **Тесты:** timeout/cancel/1000 lines/worker failure.
   - **Готово, когда:** main thread threshold is met.
 
-- [ ] **PL-056 — Создать Single и Multiple URL tester UI**
+- [x] **PL-056 — Создать Single и Multiple URL tester UI**
   - **Цель:** показать validity, normalized target, match, flags, compatibility и action.
   - **Требования:** разделы 12.1–12.2 PRD, FR-054.
   - **Действия:** single form, multiline input, progressive rows, invalid/compatibility states, copy-safe output.
@@ -590,7 +590,7 @@
   - **Тесты:** component cases and no-network assertion.
   - **Готово, когда:** results match domain matcher exactly.
 
-- [ ] **PL-057 — Создать Global routing tester UI**
+- [x] **PL-057 — Создать Global routing tester UI**
   - **Цель:** объяснить evaluation whole ordered ruleset.
   - **Требования:** FR-037, FR-080.
   - **Действия:** URL/platform/mode context, trace list, first match, final action/profile/fallback and invalid diagnostics.
@@ -602,7 +602,7 @@
 
 ## Фаза 14. Groups and sorting
 
-- [ ] **PL-058 — Реализовать group management**
+- [x] **PL-058 — Реализовать group management**
   - **Цель:** организовывать rules без влияния на priority.
   - **Требования:** FR-030, раздел 13 PRD.
   - **Действия:** list/create/rename/delete group with reassignment strategy, preset seed presentation.
@@ -612,7 +612,7 @@
   - **Тесты:** group CRUD/order invariance/demo deletion.
   - **Готово, когда:** UI states `Groups do not change rule priority.`
 
-- [ ] **PL-059 — Реализовать drag-and-drop global sorting**
+- [x] **PL-059 — Реализовать drag-and-drop global sorting**
   - **Цель:** изменять единственный global order безопасно.
   - **Требования:** FR-033–FR-034, NFR-007.
   - **Действия:** DnD handle, optimistic preview, atomic command, rollback, filtered-view lock.
@@ -622,7 +622,7 @@
   - **Тесты:** component/application/E2E sorting.
   - **Готово, когда:** resolver observes exact displayed order after success.
 
-- [ ] **PL-060 — Добавить keyboard sorting alternative**
+- [x] **PL-060 — Добавить keyboard sorting alternative**
   - **Цель:** сделать reorder доступным без pointer.
   - **Требования:** NFR-007–NFR-009.
   - **Действия:** move up/down/to position controls, announcements, focus preservation.
@@ -634,7 +634,7 @@
 
 ## Фаза 15. Popup
 
-- [ ] **PL-061 — Реализовать current-tab inspection service**
+- [x] **PL-061 — Реализовать current-tab inspection service**
   - **Цель:** дать popup/badge один authoritative effective route.
   - **Требования:** FR-004, FR-024–FR-025, FR-050–FR-052, FR-080.
   - **Действия:** retrieve eligible active tab, build context, resolve, merge error/control/capability state.
@@ -644,7 +644,7 @@
   - **Тесты:** mode/rule/override/error/control fixtures.
   - **Готово, когда:** popup and badge share inspection view model.
 
-- [ ] **PL-062 — Создать popup status header**
+- [x] **PL-062 — Создать popup status header**
   - **Цель:** быстро показать mode/site/effective route/rule/error.
   - **Требования:** FR-004, FR-052, NFR-012.
   - **Действия:** compact responsive layout, status badges, current hostname, warning and `Open Settings`.
@@ -654,7 +654,7 @@
   - **Тесты:** component accessibility/theme/error states.
   - **Готово, когда:** warm/cold popup benchmarks recorded.
 
-- [ ] **PL-063 — Реализовать popup global controls**
+- [x] **PL-063 — Реализовать popup global controls**
   - **Цель:** явно менять mode и global proxy.
   - **Требования:** FR-001, FR-028–FR-029, FR-050.
   - **Действия:** segmented mode control, `Use Globally` profile list, disabled/control-conflict handling.
@@ -664,7 +664,7 @@
   - **Тесты:** application/component/E2E mode matrix.
   - **Готово, когда:** actions never imply site rule creation.
 
-- [ ] **PL-064 — Реализовать popup site actions и retry**
+- [x] **PL-064 — Реализовать popup site actions и retry**
   - **Цель:** начать Once/Always/Edit/Open Directly workflows.
   - **Требования:** FR-005, FR-050–FR-051, FR-057.
   - **Действия:** action chooser, scope, profile/DIRECT, link existing rule, current-error Retry.
@@ -676,7 +676,7 @@
 
 ## Фаза 16. Temporary overrides
 
-- [ ] **PL-065 — Реализовать override application service**
+- [x] **PL-065 — Реализовать override application service**
   - **Цель:** создавать/валидировать/remove Once state выше rules.
   - **Требования:** FR-057–FR-059, COMPAT-009.
   - **Действия:** scope pattern generation via PSL, session persist, invalid profile handling, inspection invalidation.
@@ -686,7 +686,7 @@
   - **Тесты:** exact/domain, mode changes, deleted profile, private separation.
   - **Готово, когда:** shared resolver consumes stored override.
 
-- [ ] **PL-066 — Реализовать tab lifecycle cleanup**
+- [x] **PL-066 — Реализовать tab lifecycle cleanup**
   - **Цель:** удалить Once при tab close/restart и temporary disables по expiry.
   - **Требования:** FR-036, FR-059, NFR-004.
   - **Действия:** tabs/alarms listeners, startup reconciliation, tab ID reuse protection.
@@ -696,7 +696,7 @@
   - **Тесты:** fake clock, tab close, restart, missed alarm.
   - **Готово, когда:** reconciliation idempotent.
 
-- [ ] **PL-067 — Подключить Firefox tab-specific overrides**
+- [x] **PL-067 — Подключить Firefox tab-specific overrides**
   - **Цель:** применить real tab scope where request has reliable tab ID.
   - **Требования:** FR-057, COMPAT-010.
   - **Действия:** context mapping, speculative/invalid ID exclusion, private scope.
@@ -706,7 +706,7 @@
   - **Тесты:** Firefox integration and manual tabs/private.
   - **Готово, когда:** tab-specific behavior evidenced.
 
-- [ ] **PL-068 — Подключить Chromium origin-scoped overrides и warning**
+- [x] **PL-068 — Подключить Chromium origin-scoped overrides и warning**
   - **Цель:** compile session override above rules while honestly exposing scope.
   - **Требования:** COMPAT-009, FR-020, FR-075.
   - **Действия:** snapshot override injection, source-tab cleanup regeneration, exact warning in popup/error.
@@ -718,7 +718,7 @@
 
 ## Фаза 17. Error page
 
-- [ ] **PL-069 — Реализовать redacted error correlation store**
+- [x] **PL-069 — Реализовать redacted error correlation store**
   - **Цель:** связать main-frame failure с safe error context.
   - **Требования:** FR-024, FR-055–FR-056, SEC-003.
   - **Действия:** bounded TTL state keyed by tab/request, hostname-only target, loop token.
@@ -728,7 +728,7 @@
   - **Тесты:** redirects, tab close, duplicate event, auth failure, expiry.
   - **Готово, когда:** store cannot trigger internal redirect loop.
 
-- [ ] **PL-070 — Создать error page UI**
+- [x] **PL-070 — Создать error page UI**
   - **Цель:** объяснить proxy failure и доступные recovery actions.
   - **Требования:** раздел 19 PRD, FR-054–FR-056.
   - **Действия:** render title/reason/code/profile/hostname/rule/time, Retry/Switch/Open Directly Once/Open Settings.
@@ -738,7 +738,7 @@
   - **Тесты:** component/accessibility/all action states.
   - **Готово, когда:** Chromium scope warning exact on direct-once.
 
-- [ ] **PL-071 — Реализовать best-effort error navigation coordinator**
+- [x] **PL-071 — Реализовать best-effort error navigation coordinator**
   - **Цель:** открыть own page только для supported main-frame errors.
   - **Требования:** FR-055–FR-056, COMPAT-008.
   - **Действия:** classify, guard, tab update, retry original URL via transient secure state, background/download exclusions.
@@ -750,7 +750,7 @@
 
 ## Фаза 18. Logging
 
-- [ ] **PL-072 — Реализовать IndexedDB log repository**
+- [x] **PL-072 — Реализовать IndexedDB log repository**
   - **Цель:** bounded persistent ring buffer без storage.local rewrite.
   - **Требования:** FR-060–FR-062, PRIV-002, NFR-006.
   - **Действия:** schema/indexes, append batch, trim oldest >1000, page/query/clear.
@@ -760,7 +760,7 @@
   - **Тесты:** 1001+, concurrent batches, DB upgrade/failure.
   - **Готово, когда:** no array rewrite per event.
 
-- [ ] **PL-073 — Реализовать logging policy и redaction**
+- [x] **PL-073 — Реализовать logging policy и redaction**
   - **Цель:** собирать только разрешённые fields/modes.
   - **Требования:** FR-060–FR-062, PRIV-001–PRIV-002, PRIV-009.
   - **Действия:** event→entry mapping, default/advanced filters, disabled/pause, internal/private handling.
@@ -770,7 +770,7 @@
   - **Тесты:** redaction/property tests, logging modes, private session.
   - **Готово, когда:** log schema contains only PRD allowlist.
 
-- [ ] **PL-074 — Реализовать in-memory private log**
+- [x] **PL-074 — Реализовать in-memory private log**
   - **Цель:** optional transient diagnostics без persistence.
   - **Требования:** PRIV-001, PRIV-004.
   - **Действия:** bounded memory buffer per private session, clear on last private close, never export.
@@ -780,7 +780,7 @@
   - **Тесты:** concurrent windows, last-close, restart.
   - **Готово, когда:** private entries cannot survive process/session.
 
-- [ ] **PL-075 — Создать Logs UI**
+- [x] **PL-075 — Создать Logs UI**
   - **Цель:** искать/фильтровать/очищать/pause и переходить к entities.
   - **Требования:** раздел 18 Logs PRD, NFR-012.
   - **Действия:** paginated/virtualized list, planned vs actual, filters/search, links, empty/privacy notices.
@@ -792,7 +792,7 @@
 
 ## Фаза 19. Manual proxy check
 
-- [ ] **PL-076 — Реализовать pluggable IP/GeoIP provider**
+- [x] **PL-076 — Реализовать pluggable IP/GeoIP provider**
   - **Цель:** manual-only external IP/country lookup с видимым endpoint.
   - **Требования:** FR-007, FR-063–FR-064, PRIV-003, PRIV-006–PRIV-007.
   - **Действия:** provider config, timeout/size/schema/IP validation, GeoIP off, candidate privacy gate.
@@ -802,7 +802,7 @@
   - **Тесты:** mocked success/timeout/non-2xx/malformed/oversize/IP variants.
   - **Готово, когда:** retention disclosure shown for default candidate or default left empty.
 
-- [ ] **PL-077 — Реализовать common proxy check orchestration**
+- [x] **PL-077 — Реализовать common proxy check orchestration**
   - **Цель:** измерить allowed metrics и сохранить last result.
   - **Требования:** FR-043, FR-063–FR-066.
   - **Действия:** one-at-a-time state machine, total timing, status/IP/country mapping, connect duration optional, cancellation/finally.
@@ -812,7 +812,7 @@
   - **Тесты:** state transitions, concurrent click, cancel, profile edit/delete.
   - **Готово, когда:** credentials absent from provider payload/error.
 
-- [ ] **PL-078 — Реализовать Chromium targeted test PAC/recovery**
+- [x] **PL-078 — Реализовать Chromium targeted test PAC/recovery**
   - **Цель:** проверить inactive profile безопасной ADR-approved strategy.
   - **Требования:** FR-065–FR-066, SEC-011.
   - **Действия:** high-priority endpoint-origin override, mutex, prior snapshot marker, finally/startup restore, log exclusion.
@@ -822,7 +822,7 @@
   - **Тесты:** full Chromium integration crash/timeout/config-change.
   - **Готово, когда:** unsafe ADR outcome triggers documented alternate UX instead of implementation.
 
-- [ ] **PL-079 — Создать Manual Check UI**
+- [x] **PL-079 — Создать Manual Check UI**
   - **Цель:** явно запускать check и показывать endpoint/results.
   - **Требования:** FR-007, FR-043, FR-063–FR-066, FR-054.
   - **Действия:** confirm endpoint/provider, progress/cancel, availability/durations/IP/country/status/error/time.
@@ -834,7 +834,7 @@
 
 ## Фаза 20. Native import/export
 
-- [ ] **PL-080 — Определить versioned native export schema**
+- [x] **PL-080 — Определить versioned native export schema**
   - **Цель:** стабильный product-name-independent format.
   - **Требования:** FR-067–FR-070, FR-076, SEC-009.
   - **Действия:** JSON schema, format/schema versions, credential-omitted/included variants, limits and fixtures.
@@ -844,7 +844,7 @@
   - **Тесты:** schema/golden/unknown keys/limits.
   - **Готово, когда:** schema documented and migration hook exists.
 
-- [ ] **PL-081 — Реализовать safe export**
+- [x] **PL-081 — Реализовать safe export**
   - **Цель:** выдавать JSON без credentials по умолчанию.
   - **Требования:** FR-067, PRIV-008, SEC-003.
   - **Действия:** DTO mapper, opt-in secret inclusion, deterministic serialization, safe filename.
@@ -854,7 +854,7 @@
   - **Тесты:** secret scans, round-trip, unusual strings.
   - **Готово, когда:** export never includes logs/session/transient state.
 
-- [ ] **PL-082 — Реализовать preview/merge/replace import engine**
+- [x] **PL-082 — Реализовать preview/merge/replace import engine**
   - **Цель:** атомарно импортировать untrusted JSON.
   - **Требования:** FR-068–FR-070, SEC-004, SEC-009, SEC-012.
   - **Действия:** size/depth parse, schema migration, duplicate/remap plan, preview, transaction, backup/rollback/report.
@@ -864,7 +864,7 @@
   - **Тесты:** corrupt/oversize/duplicate/interrupted/old-version/credentials fixtures.
   - **Готово, когда:** failure leaves byte-equivalent prior logical config.
 
-- [ ] **PL-083 — Создать Native Import & Export UI**
+- [x] **PL-083 — Создать Native Import & Export UI**
   - **Цель:** дать preview, merge/replace, credentials consent и report.
   - **Требования:** FR-067–FR-070, FR-026, FR-054.
   - **Действия:** file picker/drop, preview counts/conflicts, credential checkbox/warning, result/download.
@@ -876,7 +876,7 @@
 
 ## Фаза 21. FoxyProxy import
 
-- [ ] **PL-084 — Собрать FoxyProxy fixture corpus и parser contracts**
+- [x] **PL-084 — Собрать FoxyProxy fixture corpus и parser contracts**
   - **Цель:** ограничить поддержку воспроизводимыми modern JSON variants.
   - **Требования:** FR-071–FR-072, SEC-009.
   - **Действия:** документировать provenance/redact fixtures, adapter detection, supported endpoint fields, skipped reasons.
@@ -886,7 +886,7 @@
   - **Тесты:** fixture classification and zero-profile cases.
   - **Готово, когда:** unsupported historical formats are not advertised.
 
-- [ ] **PL-085 — Реализовать adapter-based FoxyProxy parsers**
+- [x] **PL-085 — Реализовать adapter-based FoxyProxy parsers**
   - **Цель:** best-effort извлечь только HTTP/HTTPS proxy profiles.
   - **Требования:** FR-071–FR-072, SEC-003, SEC-009.
   - **Действия:** parse adapters, field normalization, skip unsupported types, duplicate-name suggestions, safe credentials mapping.
@@ -896,7 +896,7 @@
   - **Тесты:** all fixtures, malformed/prototype/oversize, SOCKS skip, name collisions.
   - **Готово, когда:** no FoxyProxy rule enters ProxyLoom rules.
 
-- [ ] **PL-086 — Создать FoxyProxy preview/import UI**
+- [x] **PL-086 — Создать FoxyProxy preview/import UI**
   - **Цель:** показать found/skipped profiles и разрешить collisions.
   - **Требования:** FR-071–FR-072, FR-026, FR-054.
   - **Действия:** file workflow, adapter label, selectable profiles, skipped explanations, rename/conflict resolution, result.
@@ -908,7 +908,7 @@
 
 ## Фаза 22. Incognito
 
-- [ ] **PL-087 — Реализовать incognito capability/status service**
+- [x] **PL-087 — Реализовать incognito capability/status service**
   - **Цель:** определить доступ и показать browser-owned enablement instructions.
   - **Требования:** FR-073, COMPAT-010.
   - **Действия:** runtime access check, browser-specific help model, change/restart refresh.
@@ -918,7 +918,7 @@
   - **Тесты:** granted/denied/unavailable mocks and manual.
   - **Готово, когда:** General shows actionable English status.
 
-- [ ] **PL-088 — Изолировать private routing/session state**
+- [x] **PL-088 — Изолировать private routing/session state**
   - **Цель:** применять persistent config, не смешивая overrides/tab correlations.
   - **Требования:** FR-058, FR-074, COMPAT-010.
   - **Действия:** incognito key in contexts/repositories, spanning/split behavior per ADR, cleanup.
@@ -928,7 +928,7 @@
   - **Тесты:** cross-window integration and restart.
   - **Готово, когда:** private state isolation evidence exists for both families.
 
-- [ ] **PL-089 — Добавить incognito privacy UI и tests**
+- [x] **PL-089 — Добавить incognito privacy UI и tests**
   - **Цель:** объяснить storage/log behavior и verify no persistence.
   - **Требования:** PRIV-001, PRIV-004, PRIV-010.
   - **Действия:** General/About notices, private log indicator, diagnostics exclusion.
@@ -940,7 +940,7 @@
 
 ## Фаза 23. WebSocket/downloads
 
-- [ ] **PL-090 — Интегрировать WS/WSS routing**
+- [x] **PL-090 — Интегрировать WS/WSS routing**
   - **Цель:** route handshake через HTTP/HTTPS endpoint mapping.
   - **Требования:** FR-015–FR-016, раздел 25 PRD.
   - **Действия:** request classification, PAC/Firefox mapping, handshake logging and established-message limitation.
@@ -950,7 +950,7 @@
   - **Тесты:** local WS/WSS integration through distinct proxies.
   - **Готово, когда:** no-fallback case passes.
 
-- [ ] **PL-091 — Интегрировать download routing и failure notification**
+- [x] **PL-091 — Интегрировать download routing и failure notification**
   - **Цель:** применять URL route без случайной error page.
   - **Требования:** FR-017, FR-049, FR-056.
   - **Действия:** download request correlation, log event, safe notification and Settings link where permission justified.
@@ -960,7 +960,7 @@
   - **Тесты:** HTTP/HTTPS download success/failure/cancel on both families.
   - **Готово, когда:** permission rationale/manifest updated from spike evidence.
 
-- [ ] **PL-092 — Добавить WS/download diagnostics scenarios**
+- [x] **PL-092 — Добавить WS/download diagnostics scenarios**
   - **Цель:** сделать limitations/errors видимыми в Logs/About.
   - **Требования:** FR-009, NFR-016.
   - **Действия:** request type labels, error codes, planned route and limitation copy.
@@ -972,7 +972,7 @@
 
 ## Фаза 24. Themes and accessibility
 
-- [ ] **PL-093 — Реализовать System/Light/Dark theme service**
+- [x] **PL-093 — Реализовать System/Light/Dark theme service**
   - **Цель:** единая persistent appearance across surfaces.
   - **Требования:** FR-013, NFR-011.
   - **Действия:** setting, system listener, early theme application avoiding flash, semantic tokens.
@@ -982,7 +982,7 @@
   - **Тесты:** component/E2E persistence/system change.
   - **Готово, когда:** profile colors retain required contrast treatment.
 
-- [ ] **PL-094 — Провести keyboard/focus audit**
+- [x] **PL-094 — Провести keyboard/focus audit**
   - **Цель:** все actions доступны с keyboard и focus predictable.
   - **Требования:** NFR-007–NFR-009.
   - **Действия:** tab order, dialogs focus trap/restore, async mutation focus, DnD alternative, skip/navigation.
@@ -992,7 +992,7 @@
   - **Тесты:** automated keyboard paths + manual screen reader smoke.
   - **Готово, когда:** no critical focus loss/trap.
 
-- [ ] **PL-095 — Провести semantics/contrast/zoom audit**
+- [x] **PL-095 — Провести semantics/contrast/zoom audit**
   - **Цель:** WCAG 2.2 AA и usable popup/options.
   - **Требования:** NFR-010–NFR-012.
   - **Действия:** accessible names, labels/errors/live regions, contrast, non-color cues, 200% zoom/reduced motion.
@@ -1002,7 +1002,7 @@
   - **Тесты:** axe-equivalent, contrast, zoom viewports, reduced motion.
   - **Готово, когда:** accessibility checklist signed.
 
-- [ ] **PL-096 — Оптимизировать popup/options responsiveness**
+- [x] **PL-096 — Оптимизировать popup/options responsiveness**
   - **Цель:** выполнить performance thresholds без потери accessibility.
   - **Требования:** NFR-002–NFR-005, NFR-012.
   - **Действия:** measure cold/warm popup, lazy sections, list virtualization, worker batch, render profiling.
@@ -1014,7 +1014,7 @@
 
 ## Фаза 25. Unit tests
 
-- [ ] **PL-097 — Завершить domain unit coverage**
+- [x] **PL-097 — Завершить domain unit coverage**
   - **Цель:** закрыть normalization, PSL, regex, models, priority, modes, compatibility.
   - **Требования:** раздел 33 PRD, NFR-001, NFR-014.
   - **Действия:** table/property tests for every resolver branch and URL/template edge.
@@ -1024,7 +1024,7 @@
   - **Тесты:** указанный suite является результатом задачи.
   - **Готово, когда:** deleted references/session overrides/temp disables explicitly covered.
 
-- [ ] **PL-098 — Завершить storage/import/log unit coverage**
+- [x] **PL-098 — Завершить storage/import/log unit coverage**
   - **Цель:** доказать migrations, atomic import/export, Foxy parsing и ring buffer.
   - **Требования:** FR-060–FR-072, FR-076–FR-078, SEC-004, SEC-009.
   - **Действия:** corruption/interruption/limit/duplicate/secret/property fixtures.
@@ -1034,7 +1034,7 @@
   - **Тесты:** suite itself plus secret scan snapshots.
   - **Готово, когда:** migration from every supported schema version passes.
 
-- [ ] **PL-099 — Завершить PAC/auth/application unit coverage**
+- [x] **PL-099 — Завершить PAC/auth/application unit coverage**
   - **Цель:** доказать escaping/parity/apply races/auth attempts/control mapping.
   - **Требования:** FR-020–FR-023, FR-046–FR-049, FR-075, SEC-001, SEC-014.
   - **Действия:** adversarial serializer corpus, fake timers/events, revision races, challenge mapping.
@@ -1046,7 +1046,7 @@
 
 ## Фаза 26. Integration test infrastructure
 
-- [ ] **PL-100 — Создать local origin/check servers**
+- [x] **PL-100 — Создать local origin/check servers**
   - **Цель:** deterministic HTTP/HTTPS/WS/WSS/download targets без публичной сети.
   - **Требования:** NFR-013, раздел 33.2 PRD.
   - **Действия:** certificates, request capture, auth origin negative fixture, delays/errors/status/IP JSON.
@@ -1056,7 +1056,7 @@
   - **Тесты:** infrastructure self-tests.
   - **Готово, когда:** no random public proxy/service dependency.
 
-- [ ] **PL-101 — Создать local test proxies**
+- [x] **PL-101 — Создать local test proxies**
   - **Цель:** управляемые HTTP/HTTPS transports, CONNECT auth и failures.
   - **Требования:** NFR-013, SEC-017.
   - **Действия:** distinct endpoint markers, basic auth, wrong auth, refuse/hang/drop, traffic capture.
@@ -1066,7 +1066,7 @@
   - **Тесты:** proxy self-tests for HTTP/CONNECT/TLS/failures.
   - **Готово, когда:** CI certificates/secrets are ephemeral.
 
-- [ ] **PL-102 — Создать browser integration harness**
+- [x] **PL-102 — Создать browser integration harness**
   - **Цель:** load unpacked builds, drive browser/network и collect safe evidence.
   - **Требования:** COMPAT-015, NFR-017.
   - **Действия:** profiles, extension ID discovery, background access, clean user data, artifact redaction.
@@ -1076,7 +1076,7 @@
   - **Тесты:** harness smoke/retry/cleanup.
   - **Готово, когда:** tests never reuse developer browser profile.
 
-- [ ] **PL-103 — Реализовать critical routing integration matrix**
+- [x] **PL-103 — Реализовать critical routing integration matrix**
   - **Цель:** gate no-fallback, endpoints, auth, override, restart/control/incognito/error/check.
   - **Требования:** SEC-017 и весь список раздела 33.2 PRD.
   - **Действия:** parameterized cases across supported automated targets with local captures.
@@ -1088,7 +1088,7 @@
 
 ## Фаза 27. Playwright E2E
 
-- [ ] **PL-104 — Создать Chromium extension E2E fixtures**
+- [x] **PL-104 — Создать Chromium extension E2E fixtures**
   - **Цель:** stable persistent-context access к popup/options/service worker.
   - **Требования:** раздел 33.3 PRD, REL-003.
   - **Действия:** load build, seed/reset storage, open surfaces, test IDs/accessibility selectors, screenshots redaction.
@@ -1098,7 +1098,7 @@
   - **Тесты:** fixture smoke/headless supported mode.
   - **Готово, когда:** no dependence on Chrome/Edge sideload flags.
 
-- [ ] **PL-105 — Покрыть core CRUD/routing E2E**
+- [x] **PL-105 — Покрыть core CRUD/routing E2E**
   - **Цель:** проверить popup/options/profile/rule/mode/override flows end to end.
   - **Требования:** FR-001–FR-005, FR-041–FR-059.
   - **Действия:** profile CRUD, rules CRUD/DnD, tester, mode switching, Once/Always/Edit/Retry.
@@ -1108,7 +1108,7 @@
   - **Тесты:** suite itself; retry only for proven flaky browser startup with diagnostic.
   - **Готово, когда:** all named PRD Playwright core flows covered.
 
-- [ ] **PL-106 — Покрыть import/theme/error E2E и Firefox smoke**
+- [x] **PL-106 — Покрыть import/theme/error E2E и Firefox smoke**
   - **Цель:** завершить UI E2E и выполнить ADR-selected Firefox check.
   - **Требования:** FR-054–FR-072, NFR-011, COMPAT-015.
   - **Действия:** native/Foxy import, theme persistence, validation/control/error states; Firefox smoke via selected tooling or documented integration/manual fallback.
@@ -1140,7 +1140,7 @@
   - **Тесты:** pass/fail workflow runs.
   - **Готово, когда:** no external random proxy dependency.
 
-- [ ] **PL-109 — Добавить dual build и artifact jobs**
+- [x] **PL-109 — Добавить dual build и artifact jobs**
   - **Цель:** собирать Chromium/Firefox on PR/push.
   - **Требования:** REL-003, REL-005–REL-007.
   - **Действия:** WXT builds/zips, artifact naming, manifest/content validation, upload retention.
@@ -1152,7 +1152,7 @@
 
 ## Фаза 29. GitHub releases
 
-- [ ] **PL-110 — Реализовать tag/version validation**
+- [x] **PL-110 — Реализовать tag/version validation**
   - **Цель:** принимать только согласованный `v*` release version.
   - **Требования:** REL-004.
   - **Действия:** validate semver tag vs manifest/package centralized version, fail on dirty mismatch.
@@ -1162,7 +1162,7 @@
   - **Тесты:** valid/invalid tag fixtures.
   - **Готово, когда:** version has one authoritative source.
 
-- [ ] **PL-111 — Реализовать release build/checksums/notes**
+- [x] **PL-111 — Реализовать release build/checksums/notes**
   - **Цель:** создать два ZIP, SHA-256 и release notes после all gates.
   - **Требования:** REL-004–REL-007.
   - **Действия:** reuse quality jobs, clean build, checksum manifest, generated notes, Firefox source review package if required.
@@ -1184,7 +1184,7 @@
 
 ## Фаза 30. Documentation and store readiness
 
-- [ ] **PL-113 — Создать English README и user guide**
+- [x] **PL-113 — Создать English README и user guide**
   - **Цель:** объяснить modes, rules, setup, privacy and limitations.
   - **Требования:** FR-079, COMPAT-002, COMPAT-008–COMPAT-010.
   - **Действия:** English docs, screenshots without secrets, Once warning, Firefox-only/full URL, no fallback.
@@ -1194,7 +1194,7 @@
   - **Тесты:** link/spell/command verification.
   - **Готово, когда:** new user can install and configure one profile/rule.
 
-- [ ] **PL-114 — Подготовить privacy disclosure**
+- [x] **PL-114 — Подготовить privacy disclosure**
   - **Цель:** прозрачно описать permissions, local credentials/logs и manual provider.
   - **Требования:** PRIV-005–PRIV-012, SEC-007.
   - **Действия:** English privacy policy/store answers, data inventory/retention, provider disclosure, incognito behavior.
@@ -1226,7 +1226,7 @@
 
 ## Фаза 31. Security review
 
-- [ ] **PL-117 — Провести PAC/regex security review**
+- [x] **PL-117 — Провести PAC/regex security review**
   - **Цель:** независимо проверить injection, ReDoS и fail-closed outputs.
   - **Требования:** SEC-001–SEC-002, SEC-006, SEC-017–SEC-018.
   - **Действия:** adversarial corpus/fuzz, code review, timeout/size/flags, PAC directive inspection.
@@ -1236,7 +1236,7 @@
   - **Тесты:** fuzz/property/parity/no-fallback suites.
   - **Готово, когда:** report signed and fixes regression-tested.
 
-- [ ] **PL-118 — Провести import/storage security review**
+- [x] **PL-118 — Провести import/storage security review**
   - **Цель:** проверить untrusted JSON, migrations, atomicity and secret handling.
   - **Требования:** SEC-004, SEC-008–SEC-009, SEC-012, PRIV-008.
   - **Действия:** prototype pollution/depth/size/corruption/interruption tests, export secret scan.
@@ -1246,7 +1246,7 @@
   - **Тесты:** adversarial fixture corpus.
   - **Готово, когда:** rollback evidence retained.
 
-- [ ] **PL-119 — Провести permissions/CSP/dependency review**
+- [x] **PL-119 — Провести permissions/CSP/dependency review**
   - **Цель:** минимизировать browser power и supply-chain exposure.
   - **Требования:** SEC-005, SEC-007, SEC-013, SEC-016.
   - **Действия:** per-target manifest diff, permission traceability, CSP/remote-code scan, licenses/audit/lockfile.
@@ -1256,7 +1256,7 @@
   - **Тесты:** static artifact scan and install-warning capture.
   - **Готово, когда:** report includes accepted residual risks.
 
-- [ ] **PL-120 — Провести credential/privacy leak review**
+- [x] **PL-120 — Провести credential/privacy leak review**
   - **Цель:** найти secrets/full URLs в logs/messages/errors/telemetry/artifacts.
   - **Требования:** SEC-003, SEC-008, SEC-015, PRIV-005–PRIV-012.
   - **Действия:** seeded canary credentials/paths, inspect console/storage/IDB/export/traces/screenshots/network.
@@ -1284,7 +1284,7 @@
   - **Действия:** выполнить Firefox checklist, включая manual proxy setting and private window.
   - **Модули:** `docs/release-verification/firefox-<version>.md`.
   - **Зависимости:** PL-103, PL-106, PL-109, PL-117–PL-120.
-  - **Критерии приёмки:** terminal-null fail-closed evidence and Full URL behavior recorded.
+  - **Критерии приёмки:** single-`ProxyInfo` fail-closed evidence, settings-control semantics and Full URL behavior recorded.
   - **Тесты:** manual matrix.
   - **Готово, когда:** no false parity claim remains.
 
@@ -1313,17 +1313,17 @@
 # Release checklist
 
 - [ ] Version and `v*` tag agree with centralized source.
-- [ ] Clean checkout passes frozen install, lint, format, typecheck, unit, integration and E2E.
+- [x] Clean checkout passes frozen install, lint, format, typecheck, unit, integration and E2E.
 - [ ] Chromium and Firefox ZIPs install from release candidates.
-- [ ] SHA-256 checksums reproduce.
-- [ ] Resolver/PAC parity and unavailable-proxy no-DIRECT tests pass.
+- [x] SHA-256 checksums reproduce.
+- [x] Resolver/PAC parity and unavailable-proxy no-DIRECT tests pass.
 - [ ] All four browser matrices name exact browser/OS/build versions.
-- [ ] Migration from every supported schema and rollback pass.
-- [ ] Credentials canary scan of logs/export/traces/artifacts passes.
-- [ ] Current IP/GeoIP provider documentation, CORS, retention and UI disclosure rechecked.
-- [ ] Browser limitations and known issues included in release notes.
-- [ ] English UI/README/store text and Russian PRD/TASKS/AGENTS language checks pass.
-- [ ] Store publishing remains a separate human action.
+- [x] Migration from every supported schema and rollback pass.
+- [x] Credentials canary scan of logs/export/traces/artifacts passes.
+- [x] Current IP/GeoIP provider documentation, CORS, retention and UI disclosure rechecked.
+- [x] Browser limitations and known issues included in release notes.
+- [x] English UI/README/store text and Russian PRD/TASKS/AGENTS language checks pass.
+- [x] Store publishing remains a separate human action.
 
 # Chrome manual matrix
 
@@ -1349,7 +1349,7 @@
 - [ ] Install/update/uninstall Firefox MV3 ZIP and verify minimum version.
 - [ ] `DIRECT`, `PROXY`, `RULES` with browser manual proxy on/off.
 - [ ] Origin Rules and Full URL path/query Rules; first match and badges.
-- [ ] `[proxy, null]`/approved adapter response proves no browser-defined/direct fallback.
+- [ ] Single-`ProxyInfo` adapter response proves no browser-defined/direct/second-proxy fallback.
 - [ ] Same/separate HTTP/HTTPS endpoints; HTTP/HTTPS/WS/WSS/download.
 - [ ] Proxy auth success/wrong/site-auth negative/one attempt.
 - [ ] True tab-specific Once does not affect same origin in another tab.
@@ -1388,33 +1388,33 @@
 
 # Security checklist
 
-- [ ] No `eval`, `new Function`, remote script, CDN code or unsafe CSP.
-- [ ] PAC injection corpus and resolver parity pass.
-- [ ] Assigned proxy results contain no hidden `DIRECT`/other proxy/system fallback.
-- [ ] Regex flags/length/safety/time budget enforced in editor/import/tester/PAC.
-- [ ] Proxy auth checks `isProxy`, endpoint and one attempt; secrets redacted.
-- [ ] Import size/depth/count/schema/prototype-pollution controls pass.
-- [ ] Migrations/imports are atomic with backup/recovery.
-- [ ] External responses are schema-validated and never raw HTML.
-- [ ] Manifest permissions are minimal and traced to PRD.
-- [ ] Dependencies/lockfile/licenses/audit reviewed.
-- [ ] Extension/internal URLs excluded from rules/error loops.
-- [ ] Temporary check PAC crash recovery proven.
-- [ ] Build artifacts contain no dev secrets, fixtures or source maps with secrets.
+- [x] No `eval`, `new Function`, remote script, CDN code or unsafe CSP.
+- [x] PAC injection corpus and resolver parity pass.
+- [x] Assigned proxy results contain no hidden `DIRECT`/other proxy/system fallback.
+- [x] Regex flags/length/safety/time budget enforced in editor/import/tester/PAC.
+- [x] Proxy auth checks `isProxy`, endpoint and one attempt; secrets redacted.
+- [x] Import size/depth/count/schema/prototype-pollution controls pass.
+- [x] Migrations/imports are atomic with backup/recovery.
+- [x] External responses are schema-validated and never raw HTML.
+- [x] Manifest permissions are minimal and traced to PRD.
+- [x] Dependencies/lockfile/licenses/audit reviewed.
+- [x] Extension/internal URLs excluded from rules/error loops.
+- [x] Temporary check PAC crash recovery proven.
+- [x] Build artifacts contain no dev secrets, fixtures or source maps with secrets.
 
 # Privacy checklist
 
-- [ ] No analytics, telemetry, remote config, ads or crash upload.
-- [ ] Logging can be disabled; default and 1000-entry limit work.
-- [ ] Logs contain hostname/scheme only, never path/query/fragment/body/headers/cookies.
-- [ ] Credentials appear only in local credential storage, auth boundary and explicit export.
-- [ ] Native export excludes credentials by default and warns on opt-in.
-- [ ] Private logs never persist and private session state is isolated.
-- [ ] Regex/routing testers make no network request.
-- [ ] Manual check is the only external provider call; endpoint shown/replaceable/disableable.
-- [ ] Provider retention/privacy disclosure is current and accurate.
-- [ ] User URLs and credentials are not sent to provider.
-- [ ] Diagnostics and screenshots are redacted.
+- [x] No analytics, telemetry, remote config, ads or crash upload.
+- [x] Logging can be disabled; default and 1000-entry limit work.
+- [x] Logs contain hostname/scheme only, never path/query/fragment/body/headers/cookies.
+- [x] Credentials appear only in local credential storage, auth boundary and explicit export.
+- [x] Native export excludes credentials by default and warns on opt-in.
+- [x] Private logs never persist and private session state is isolated.
+- [x] Regex/routing testers make no network request.
+- [x] Manual check is the only external provider call; endpoint shown/replaceable/disableable.
+- [x] Provider retention/privacy disclosure is current and accurate.
+- [x] User URLs and credentials are not sent to provider.
+- [x] Diagnostics and screenshots are redacted.
 - [ ] Store privacy answers match observed network/storage behavior.
 
 # Store submission checklist
@@ -1422,11 +1422,11 @@
 - [ ] Product name/trademark/domain/store availability rechecked; centralized replacement tested.
 - [ ] English name, summary, description, support and privacy links are current.
 - [ ] Icons/screenshots meet each store specification and contain no private data.
-- [ ] Permission justifications match per-target manifest.
+- [x] Permission justifications match per-target manifest.
 - [ ] Chrome Web Store privacy practices completed.
 - [ ] Firefox Add-ons MV3, source package and review instructions satisfied.
 - [ ] Edge/Yandex listing differences reviewed where submission is planned.
-- [ ] Release ZIP/checksum/version match tested artifacts.
-- [ ] Known browser limitations disclosed without overclaim.
-- [ ] No automatic store publication credential or job exists.
+- [x] Release ZIP/checksum/version match tested artifacts.
+- [x] Known browser limitations disclosed without overclaim.
+- [x] No automatic store publication credential or job exists.
 - [ ] Human reviewer installs each final artifact before manual submission.

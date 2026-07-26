@@ -77,32 +77,32 @@ ProxyLoom решает проблему через:
 
 ## 8. Термины
 
-| Термин | Однозначное значение |
-|---|---|
-| Target scheme | Протокол целевого URL: `http`, `https`, `ws` или `wss`. |
-| Proxy transport | Протокол соединения браузера с proxy server: `HTTP` или `HTTPS`. Не равен target scheme. |
-| Proxy profile | Именованная конфигурация endpoints, credentials и диагностических метаданных. |
-| Origin target | Нормализованная строка `scheme://hostname[:port]/` без path/query/fragment/credentials. |
-| Full URL target | URL сетевого запроса с scheme/host/port/path/query, но без fragment. |
-| Rule | Matcher плюс действие `DIRECT` или `PROXY(profileId)`. |
-| First match | Первое сверху совместимое, enabled и не временно отключённое совпавшее правило завершает поиск. |
-| Effective route | Итог resolver с источником решения, действием и proxy profile. |
-| Routing snapshot | Иммутабельная, валидированная, нормализованная конфигурация для resolver/адаптера/PAC. |
-| Temporary override | Session-only действие для origin с приоритетом выше постоянных правил. |
-| Fail-closed | Ошибка назначенного прокси завершает запрос ошибкой; прямой/system/другой proxy fallback не используется. |
-| Permanent disabled | `enabled=false`, сохранено в обычной конфигурации. |
-| Temporary disabled | Отдельное session/expiry-состояние; не меняет `enabled`. |
-| Compatible rule | Origin Rule везде; Full URL Rule только в Firefox. |
+| Термин             | Однозначное значение                                                                                      |
+| ------------------ | --------------------------------------------------------------------------------------------------------- |
+| Target scheme      | Протокол целевого URL: `http`, `https`, `ws` или `wss`.                                                   |
+| Proxy transport    | Протокол соединения браузера с proxy server: `HTTP` или `HTTPS`. Не равен target scheme.                  |
+| Proxy profile      | Именованная конфигурация endpoints, credentials и диагностических метаданных.                             |
+| Origin target      | Нормализованная строка `scheme://hostname[:port]/` без path/query/fragment/credentials.                   |
+| Full URL target    | URL сетевого запроса с scheme/host/port/path/query, но без fragment.                                      |
+| Rule               | Matcher плюс действие `DIRECT` или `PROXY(profileId)`.                                                    |
+| First match        | Первое сверху совместимое, enabled и не временно отключённое совпавшее правило завершает поиск.           |
+| Effective route    | Итог resolver с источником решения, действием и proxy profile.                                            |
+| Routing snapshot   | Иммутабельная, валидированная, нормализованная конфигурация для resolver/адаптера/PAC.                    |
+| Temporary override | Session-only действие для origin с приоритетом выше постоянных правил.                                    |
+| Fail-closed        | Ошибка назначенного прокси завершает запрос ошибкой; прямой/system/другой proxy fallback не используется. |
+| Permanent disabled | `enabled=false`, сохранено в обычной конфигурации.                                                        |
+| Temporary disabled | Отдельное session/expiry-состояние; не меняет `enabled`.                                                  |
+| Compatible rule    | Origin Rule везде; Full URL Rule только в Firefox.                                                        |
 
 ## 9. Поддерживаемые браузеры
 
-| Цель | Сборка | Routing API | Уровень поддержки |
-|---|---|---|---|
-| Google Chrome | Chromium MV3 ZIP | `chrome.proxy` + inline PAC | основной |
-| Chromium | Chromium MV3 ZIP | совместимый `chrome.proxy` | основной |
-| Microsoft Edge | Chromium MV3 ZIP | совместимый `chrome.proxy` | release verification |
-| Яндекс Браузер | Chromium MV3 ZIP | совместимый `chrome.proxy` | release verification |
-| Mozilla Firefox | Firefox MV3 ZIP | `browser.proxy.onRequest` | основной, с явными отличиями |
+| Цель            | Сборка           | Routing API                 | Уровень поддержки            |
+| --------------- | ---------------- | --------------------------- | ---------------------------- |
+| Google Chrome   | Chromium MV3 ZIP | `chrome.proxy` + inline PAC | основной                     |
+| Chromium        | Chromium MV3 ZIP | совместимый `chrome.proxy`  | основной                     |
+| Microsoft Edge  | Chromium MV3 ZIP | совместимый `chrome.proxy`  | release verification         |
+| Яндекс Браузер  | Chromium MV3 ZIP | совместимый `chrome.proxy`  | release verification         |
+| Mozilla Firefox | Firefox MV3 ZIP  | `browser.proxy.onRequest`   | основной, с явными отличиями |
 
 - `COMPAT-002`: Full URL Rule исполняется только Firefox; Chromium пропускает его и продолжает поиск.
 - `COMPAT-003`: Edge и Яндекс Браузер используют неизменённый Chromium ZIP.
@@ -159,22 +159,22 @@ Global proxy default отсутствует. Resolver проверяет rules �
 
 ## 12. Routing decision table
 
-| Mode | Applicable temporary override | First compatible rule | No match | Proxy failure |
-|---|---|---|---|---|
-| `DIRECT` | игнорируется | игнорируется | `DIRECT` | не применимо |
-| `PROXY` | override action | rule action | active global proxy | ошибка, без fallback |
-| `RULES` | override action | rule action | `DIRECT` | ошибка, без fallback |
+| Mode     | Applicable temporary override | First compatible rule | No match            | Proxy failure        |
+| -------- | ----------------------------- | --------------------- | ------------------- | -------------------- |
+| `DIRECT` | игнорируется                  | игнорируется          | `DIRECT`            | не применимо         |
+| `PROXY`  | override action               | rule action           | active global proxy | ошибка, без fallback |
+| `RULES`  | override action               | rule action           | `DIRECT`            | ошибка, без fallback |
 
 Дополнительные строки:
 
-| Состояние | Решение |
-|---|---|
-| Full URL Rule в Chromium | incompatible → продолжить со следующим rule |
-| Disabled/temporarily disabled rule | пропустить |
-| Rule с удалённым `profileId` совпал | configuration error, не `DIRECT` |
-| Override с удалённым `profileId` | invalid override удаляется/диагностируется; затем normal resolution, никогда скрытая замена action |
-| Несуществующий global profile в `PROXY` | configuration error; конфигурация не применяется |
-| Extension/internal URL | bypass domain resolver согласно internal request policy |
+| Состояние                               | Решение                                                                                            |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Full URL Rule в Chromium                | incompatible → продолжить со следующим rule                                                        |
+| Disabled/temporarily disabled rule      | пропустить                                                                                         |
+| Rule с удалённым `profileId` совпал     | configuration error, не `DIRECT`                                                                   |
+| Override с удалённым `profileId`        | invalid override удаляется/диагностируется; затем normal resolution, никогда скрытая замена action |
+| Несуществующий global profile в `PROXY` | configuration error; конфигурация не применяется                                                   |
+| Extension/internal URL                  | bypass domain resolver согласно internal request policy                                            |
 
 ```mermaid
 flowchart TD
@@ -321,13 +321,13 @@ Controls: segmented `DIRECT / PROXY / RULES`, global profile selector, `Use Prox
 
 Badge:
 
-| Состояние | Text | Цвет |
-|---|---|---|
-| `DIRECT` | `D` | нейтральный |
-| `PROXY` | profile short name | profile color |
-| `RULES`, proxy route active tab | `R` | effective profile color |
-| `RULES`, direct active tab | `R` | нейтральный |
-| актуальная proxy error | `!` | error color |
+| Состояние                       | Text               | Цвет                    |
+| ------------------------------- | ------------------ | ----------------------- |
+| `DIRECT`                        | `D`                | нейтральный             |
+| `PROXY`                         | profile short name | profile color           |
+| `RULES`, proxy route active tab | `R`                | effective profile color |
+| `RULES`, direct active tab      | `R`                | нейтральный             |
+| актуальная proxy error          | `!`                | error color             |
 
 Имя/short name всегда доступно рядом с profile color: цвет не единственный идентификатор.
 
@@ -528,17 +528,17 @@ sequenceDiagram
 
 - `COMPAT-011`: browser-specific branches разрешены только в entrypoint/build config/platform adapter.
 - `COMPAT-012`: Chromium PAC включает Origin Rules, separate endpoints и first-match; Full URL Rules отсутствуют.
-- `COMPAT-013`: Firefox `proxy.onRequest` возвращает single proxy plus terminal `null` для предотвращения documented browser-defined fallback; точная форма и direct semantics подтверждаются spike/integration.
+- `COMPAT-013`: Firefox `proxy.onRequest` для proxy action возвращает один `ProxyInfo`; массив используется только для явно разрешённой цепочки proxy fallback и в v1 не применяется. `undefined` означает отсутствие per-request override и оставляет browser-defined fallback; `null` является terminal DIRECT. `type: direct` сам может перейти к browser-defined manual proxy. V1 возвращает `null` для DIRECT и подтверждает `proxy.settings.proxyType = none` перед routing snapshot, чтобы отказ назначенного proxy не перешёл к manual/system proxy.
 - `FR-075`: PAC response для proxy action не содержит `DIRECT`, second proxy или system fallback.
 
 ## 26. Storage model
 
-| Store | Данные | Политика |
-|---|---|---|
-| `storage.local` | config envelope, profiles, groups, rules, general/appearance, migrations/backups | versioned, atomic repository |
-| `storage.session`/эквивалент | overrides, temporary disables, auth attempts/recovery marker, transient errors | очищается/reconciles на restart |
-| IndexedDB | максимум 1000 persistent log entries | ring buffer, batch, indexes |
-| Memory | private logs и read caches | не источник истины |
+| Store                        | Данные                                                                           | Политика                        |
+| ---------------------------- | -------------------------------------------------------------------------------- | ------------------------------- |
+| `storage.local`              | config envelope, profiles, groups, rules, general/appearance, migrations/backups | versioned, atomic repository    |
+| `storage.session`/эквивалент | overrides, temporary disables, auth attempts/recovery marker, transient errors   | очищается/reconciles на restart |
+| IndexedDB                    | максимум 1000 persistent log entries                                             | ring buffer, batch, indexes     |
+| Memory                       | private logs и read caches                                                       | не источник истины              |
 
 - `FR-076`: каждая schema имеет version и ordered migrations.
 - `FR-077`: перед migration создаётся bounded backup; marker позволяет распознать interrupted migration.
@@ -674,17 +674,18 @@ Preset groups: `Work`, `Russian Sites`, `International Sites`, `Social Networks`
 
 Предварительный набор подтверждается spikes и store review:
 
-| Permission | Обоснование |
-|---|---|
-| `proxy` | применить PAC/route и читать control status |
-| `storage` | profiles/rules/settings/session state |
-| `webRequest` | diagnostics, lifecycle, errors и auth correlation |
-| `webRequestAuthProvider` (MV3) | ответ на proxy auth challenge |
-| host permissions для `http/https/ws/wss` | routing listener/auth/diagnostics; точный синтаксис per browser |
-| `tabs` или достаточные host permissions | current tab, badge, tab-close cleanup, best-effort error page |
-| `notifications` | download failure |
-| `downloads` только если spike докажет необходимость | download correlation; не добавлять по предположению |
-| `alarms` | expiry/reconciliation temporary states при suspended worker |
+| Permission                               | Обоснование                                                                            |
+| ---------------------------------------- | -------------------------------------------------------------------------------------- |
+| `proxy`                                  | применить PAC/route и читать control status                                            |
+| `storage`                                | profiles/rules/settings/session state                                                  |
+| `webRequest`                             | diagnostics, lifecycle, errors и auth correlation                                      |
+| `webRequestAuthProvider` (MV3)           | ответ на proxy auth challenge                                                          |
+| host permissions для `http/https/ws/wss` | routing listener/auth/diagnostics; точный синтаксис per browser                        |
+| `tabs` или достаточные host permissions  | current tab, badge, tab-close cleanup, best-effort error page                          |
+| `notifications`                          | download failure                                                                       |
+| `downloads`                              | download failure correlation и безопасное notification                                 |
+| `scripting`                              | JSON из временной inactive check-вкладки после явного Check; вкладка сразу закрывается |
+| `alarms`                                 | expiry/reconciliation temporary states при suspended worker                            |
 
 - `SEC-016`: optional permissions используются там, где capability не нужна для базовой маршрутизации и UX остаётся честным.
 - `COMPAT-014`: Firefox `proxy` permission и `strict_min_version` соответствуют актуальной API policy.
@@ -693,15 +694,15 @@ Preset groups: `Work`, `Russian Sites`, `International Sites`, `Social Networks`
 
 Thresholds являются release acceptance bounds; targets — направления оптимизации. Spikes фиксируют benchmark environment и при необходимости уточняют цифры до implementation baseline, не ослабляя UX.
 
-| Сценарий | Target | Обязательный threshold |
-|---|---|---|
-| Warm popup до usable state | ≤ 250 ms p95 | ≤ 750 ms p95 |
-| Cold popup/service worker | ≤ 600 ms p95 | ≤ 1 500 ms p95 |
-| Resolve одного URL на 1000 Origin Rules | ≤ 20 ms p95 | ≤ 100 ms p95 |
-| Persist + compile + apply ordinary rule edit | ≤ 500 ms p95 | ≤ 2 s p95, без stale apply |
-| Tester 1000 строк | progressive result/cancel | UI task не блокируется >100 ms подряд |
-| Logs | batches ≤ 250 ms/50 entries | не писать весь массив на событие |
-| Log view | first page only | не загружать 1000 DOM rows без pagination/virtualization |
+| Сценарий                                     | Target                      | Обязательный threshold                                   |
+| -------------------------------------------- | --------------------------- | -------------------------------------------------------- |
+| Warm popup до usable state                   | ≤ 250 ms p95                | ≤ 750 ms p95                                             |
+| Cold popup/service worker                    | ≤ 600 ms p95                | ≤ 1 500 ms p95                                           |
+| Resolve одного URL на 1000 Origin Rules      | ≤ 20 ms p95                 | ≤ 100 ms p95                                             |
+| Persist + compile + apply ordinary rule edit | ≤ 500 ms p95                | ≤ 2 s p95, без stale apply                               |
+| Tester 1000 строк                            | progressive result/cancel   | UI task не блокируется >100 ms подряд                    |
+| Logs                                         | batches ≤ 250 ms/50 entries | не писать весь массив на событие                         |
+| Log view                                     | first page only             | не загружать 1000 DOM rows без pagination/virtualization |
 
 - `NFR-002`: PAC regeneration debounce/coalescing и monotonic revision обязательны.
 - `NFR-003`: 1000 Origin Rules остаются editable/testable/routable в threshold.
@@ -763,8 +764,8 @@ E2E:
 1. Chromium PAC не имеет надёжного tab ID: `Once` может затронуть другие вкладки того же origin до закрытия source tab.
 2. Full URL matching Chromium не поддерживается архитектурно; rule пропускается.
 3. Доступность path/query и точное представление `http/https/ws/wss` URL внутри Chromium PAC подтверждаются spike; v1 полагается только на переносимый normalized Origin contract.
-4. Firefox документирует browser-defined proxy fallback, если response `proxy.onRequest` не завершён `null`; terminal `null` используется и тестируется.
-5. Firefox `type: direct` может не перекрывать user-defined manual proxy; реальный `DIRECT` требует проверки/контроля settings и честного conflict UI.
+4. Firefox после отказа единственного возвращённого `ProxyInfo` может перейти к browser-defined settings; массивы означают явный proxy failover и в production не используются. Поэтому routing snapshot применяется только после `proxy.settings.proxyType = none`.
+5. Firefox `undefined` оставляет выбор browser-defined settings, `{type: direct}` может не перекрыть user-defined manual proxy, а terminal `null` выполняет DIRECT без proxy. Production использует `null` для DIRECT и честный conflict UI при невозможности отключить fallback для proxy actions.
 6. Proxy failure event не даёт гарантированной атомарной замены native main-frame error; custom error page best effort.
 7. Browser API обычно не предоставляет proxy TCP connect duration; показывается `Not available`.
 8. Actual proxy info доступна не для каждого request/browser; UI отличает planned от actual/unknown.
@@ -775,20 +776,20 @@ E2E:
 
 ## 36. Risks
 
-| ID | Риск | Mitigation / gate |
-|---|---|---|
-| R-01 | PAC semantics/size/RegExp отличаются от background JS | spikes, restricted regex flags, parity harness, size limit |
-| R-02 | Browser допускает direct/system fallback | explicit PAC result, Firefox terminal `null`, unavailable-proxy integration gate |
-| R-03 | Auth API/permissions различаются в MV3 | per-browser prototype, one-attempt store, store-policy review |
-| R-04 | Inactive Chromium check оставит temporary PAC | serialization, recovery marker, `finally`, startup recovery, safe UX fallback |
-| R-05 | Error page redirect races/loops | best-effort labeling, main-frame only, correlation + loop guard |
-| R-06 | Regex DoS | strict length/flags/analyzer, worker/time budget, no raw PAC injection |
-| R-07 | Storage migration interrupted | backup, marker, idempotent migrations, atomic commit |
-| R-08 | Control conflict creates false active UI | read control state, applied revision, disable controls, no fighting |
-| R-09 | External provider privacy/availability changes | manual only, visible/replaceable/disableable provider, pre-release review |
-| R-10 | Firefox MV3/E2E capabilities change | version spike, integration/smoke/manual fallback, no false parity claim |
-| R-11 | Broad permissions harm store acceptance | permission traceability, minimal set, store disclosure |
-| R-12 | Proxy brand conflict | centralized branding; legal/store name check before submission |
+| ID   | Риск                                                  | Mitigation / gate                                                                                     |
+| ---- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| R-01 | PAC semantics/size/RegExp отличаются от background JS | spikes, restricted regex flags, parity harness, size limit                                            |
+| R-02 | Browser допускает direct/system fallback              | explicit PAC result, single Firefox `ProxyInfo`, settings-control gate, unavailable-proxy integration |
+| R-03 | Auth API/permissions различаются в MV3                | per-browser prototype, one-attempt store, store-policy review                                         |
+| R-04 | Inactive Chromium check оставит temporary PAC         | serialization, recovery marker, `finally`, startup recovery, safe UX fallback                         |
+| R-05 | Error page redirect races/loops                       | best-effort labeling, main-frame only, correlation + loop guard                                       |
+| R-06 | Regex DoS                                             | strict length/flags/analyzer, worker/time budget, no raw PAC injection                                |
+| R-07 | Storage migration interrupted                         | backup, marker, idempotent migrations, atomic commit                                                  |
+| R-08 | Control conflict creates false active UI              | read control state, applied revision, disable controls, no fighting                                   |
+| R-09 | External provider privacy/availability changes        | manual only, visible/replaceable/disableable provider, pre-release review                             |
+| R-10 | Firefox MV3/E2E capabilities change                   | version spike, integration/smoke/manual fallback, no false parity claim                               |
+| R-11 | Broad permissions harm store acceptance               | permission traceability, minimal set, store disclosure                                                |
+| R-12 | Proxy brand conflict                                  | centralized branding; legal/store name check before submission                                        |
 
 ## 37. Acceptance criteria
 
@@ -837,7 +838,7 @@ Product acceptance requires:
 
 - [Chrome `proxy` API](https://developer.chrome.com/docs/extensions/reference/api/proxy): режимы, PAC и control через `ChromeSetting`.
 - [Chrome `webRequest` API](https://developer.chrome.com/docs/extensions/reference/api/webRequest): `webRequestAuthProvider`, `asyncBlocking`, request lifecycle.
-- [Firefox `proxy.onRequest`](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/proxy/onRequest): request-time route и terminal `null` для запрета browser-defined fallback.
+- [Firefox `proxy.onRequest`](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/proxy/onRequest): request-time route; один `ProxyInfo` с browser-defined fallback, массив для явного failover, `undefined` для отсутствия override и terminal `null` для DIRECT.
 - [Firefox `ProxyInfo`](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/proxy/ProxyInfo): proxy types и failover behavior.
 - [Playwright extensions](https://playwright.dev/docs/chrome-extensions): официальный extension flow ограничен Chromium persistent context.
 - [WXT configuration/build guide](https://wxt.dev/guide/): Vue module, per-browser config, `wxt build/zip` и Firefox target.

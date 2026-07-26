@@ -1,0 +1,23 @@
+{
+  "mode": "patterns",
+  "sync": false,
+  "proxy-one": {
+    "active": "true",
+    "title": "Legacy HTTP",
+    "color": "#225588",
+    "type": 1,
+    "address": "legacy.example",
+    "port": 3128,
+    "username": "",
+    "password": "",
+    "whitePatterns": [],
+    "blackPatterns": [],
+    "index": 0
+  },
+  "proxy-two": {
+    "active": true,
+    "title": "Legacy direct",
+    "type": 5,
+    "index": 1
+  }
+}

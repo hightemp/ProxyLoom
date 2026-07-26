@@ -1,0 +1,39 @@
+{
+  "mode": "pattern",
+  "sync": false,
+  "data": [
+    {
+      "active": true,
+      "title": "Office HTTP",
+      "color": "#336699",
+      "type": "http",
+      "hostname": "proxy.example",
+      "port": "8080",
+      "username": "sample-user",
+      "password": "sample-password",
+      "include": [{ "type": "wildcard", "pattern": "*://example.com/*" }],
+      "exclude": []
+    },
+    {
+      "active": true,
+      "title": "Secure gateway",
+      "color": "#663399",
+      "type": "https",
+      "hostname": "secure-proxy.example",
+      "port": 8443,
+      "username": "",
+      "password": "",
+      "include": [],
+      "exclude": []
+    },
+    {
+      "active": true,
+      "title": "Unsupported SOCKS",
+      "type": "socks5",
+      "hostname": "socks.example",
+      "port": "1080"
+    }
+  ],
+  "container": {},
+  "commands": {}
+}

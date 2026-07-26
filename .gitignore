@@ -1,0 +1,10 @@
+.output/
+.wxt/
+coverage/
+node_modules/
+playwright-report/
+test-results*/
+*.log
+.env
+.env.*
+!.env.example
