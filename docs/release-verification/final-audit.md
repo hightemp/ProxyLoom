@@ -8,9 +8,8 @@ Current disposition: **NOT RELEASE APPROVED**
 - Strict typecheck, lint and formatting: pass.
 - A clean temporary Git snapshot with no dependencies/build output was cloned and passed frozen
   install, the complete regression/package sequence and a zero-diff post-run check.
-- The final current-tree repetition at isolated commit
-  `dcd6f201a4c32daf5c5bfa2c24721a33dd206690` passed all 35 E2E tests and every package gate with
-  an empty post-run Git status.
+- The final current-tree repetition in an isolated clean repository passed all 36 E2E tests and
+  every package gate with an empty post-run Git status.
 - Unit, parity, performance, local integration and Chromium extension E2E: pass on the recorded
   candidate state.
 - Chromium and Firefox MV3 builds, manifest/CSP validation and artifact secret scan: available as
@@ -40,6 +39,8 @@ Current disposition: **NOT RELEASE APPROVED**
   target manifests; the reviewed English warning sets are recorded and Chromium is a release gate.
 - English README, user guide, privacy disclosure, store copy, permission rationale and
   dimension-validated candidate listing assets: present.
+- About/Diagnostics accepts centralized public support/privacy HTTPS URLs and rejects credentials,
+  fragments or insecure schemes; this candidate omits both links instead of inventing placeholders.
 - Public provider/store policy documentation was rechecked on 2026-07-26. The default provider's
   live schema/CORS gate passed without recording returned IP/country values.
 - The Firefox source archive now carries explicit AMO reviewer instructions and reproducibly
@@ -51,7 +52,9 @@ Current disposition: **NOT RELEASE APPROVED**
   DOM-node, listener or process-count growth; renderer heap and whole-profile PSS remained within
   their recorded budgets.
 - GitHub Actions build both targets and create checksummed GitHub release artifacts only; no store
-  credentials or publication action exists.
+  credentials or publication action exists. The publisher locally proves first-create and
+  idempotent same-release refresh paths, rejects draft/prerelease collisions, downloads the
+  published assets and verifies their portable SHA-256 manifest.
 - A clean local repository tagged `v0.1.0` completed the release build/package/checksum/source
   rebuild dry-run with an empty post-run Git status. Creating and retrying the hosted GitHub
   Release remains PL-112.
@@ -60,8 +63,9 @@ Current disposition: **NOT RELEASE APPROVED**
 
 1. PL-107 and PL-108 require hosted GitHub pass/fail runs. This workspace has no configured remote
    and its GitHub CLI authentication is invalid, so a local workflow parser cannot claim them.
-2. PL-112 requires a real hosted tag, one GitHub Release and an idempotent retry. The local PL-111
-   tagged dry-run deliberately stopped before any external release action.
+2. PL-112 still requires a real hosted tag, one GitHub Release and a repeated hosted run. Its
+   create/refresh/failure/download verification paths are locally regression-tested, but this
+   workspace deliberately cannot substitute those tests for the external GitHub action.
 3. PL-115 and PL-116 require final brand/legal ownership, a real Firefox extension ID, public
    support/privacy URLs and authenticated store-portal validation. Placeholder IDs or invented
    URLs are not acceptable.

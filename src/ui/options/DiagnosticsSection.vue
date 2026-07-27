@@ -2,6 +2,8 @@
 import { computed, shallowRef } from 'vue'
 
 import type { AppRuntimeState } from '../../application/runtime/contracts'
+import { PRODUCT } from '../../config/product'
+import { productResourceLinks } from '../../config/product-resources'
 import { t } from '../../i18n/messages'
 
 const props = defineProps<{
@@ -9,6 +11,7 @@ const props = defineProps<{
 }>()
 
 const copied = shallowRef(false)
+const resourceLinks = productResourceLinks(PRODUCT)
 const safeDiagnostics = computed(() => ({
   appVersion: props.state.diagnostics.appVersion,
   appliedRevision: props.state.diagnostics.appliedRevision,
@@ -96,6 +99,17 @@ const copy = async (): Promise<void> => {
         <li>{{ t('boundaryErrorPage') }}</li>
         <li>{{ t('boundaryFailClosed') }}</li>
         <li>{{ t('boundaryWebSocket') }}</li>
+      </ul>
+    </article>
+
+    <article v-if="resourceLinks.length > 0" class="surface card">
+      <h3>{{ t('productResources') }}</h3>
+      <ul>
+        <li v-for="link in resourceLinks" :key="link.kind">
+          <a :href="link.url" target="_blank" rel="noopener noreferrer">
+            {{ link.kind === 'SUPPORT' ? t('supportLink') : t('privacyPolicyLink') }}
+          </a>
+        </li>
       </ul>
     </article>
   </div>

@@ -91,7 +91,7 @@ jobs:
       - run: pnpm package:artifacts
       - run: pnpm validate:packages
       - run: pnpm validate:source-rebuild
-      - run: sha256sum .output/ProxyLoom-*.zip > .output/SHA256SUMS
+      - run: cd .output && sha256sum ProxyLoom-*.zip > SHA256SUMS
       - uses: actions/upload-artifact@v7
         with:
           name: proxyloom-${{ github.sha }}

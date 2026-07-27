@@ -31,6 +31,7 @@
     "validate:workflows": "node scripts/validate-workflows.mjs",
     "validate:store-assets": "node scripts/validate-store-assets.mjs",
     "validate:traceability": "node scripts/validate-traceability.mjs",
+    "publish:github-release": "node scripts/publish-github-release.mjs",
     "capture:store-assets": "node scripts/capture-store-assets.mjs",
     "scan:artifacts": "node scripts/scan-artifacts.mjs",
     "scan:test-artifacts": "node scripts/scan-artifacts.mjs --inspect-archives test-results",

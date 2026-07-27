@@ -50,6 +50,7 @@ for (const required of [
   'SOURCE_CODE_REVIEW.md',
   'package.json',
   'pnpm-lock.yaml',
+  'scripts/publish-github-release.mjs',
   'scripts/validate-source-rebuild.mjs',
   'wxt.config.ts',
 ]) {

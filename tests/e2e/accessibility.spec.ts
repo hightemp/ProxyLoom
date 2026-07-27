@@ -100,6 +100,12 @@ test('all options sections expose named native controls and a logical heading st
   }
 })
 
+test('About omits placeholder support and privacy links', async ({ extensionPage }) => {
+  await extensionPage.getByRole('button', { name: /^About \/ Diagnostics/ }).click()
+  await expect(extensionPage.getByRole('link', { name: 'Support' })).toHaveCount(0)
+  await expect(extensionPage.getByRole('link', { name: 'Privacy policy' })).toHaveCount(0)
+})
+
 test('editor focus enters predictably and returns to the activating control', async ({
   extensionPage,
 }) => {

@@ -63,6 +63,7 @@ requiredRuns(ci.value, 'packages', [
 ])
 
 const release = await readWorkflow('.github/workflows/release.yml')
+const releasePublisher = await readFile('scripts/publish-github-release.mjs', 'utf8')
 requireValue(release.value.permissions?.contents === 'write', 'Release needs contents: write only')
 requireValue(
   JSON.stringify(release.value.on?.push?.tags) === JSON.stringify(['v*']),
@@ -79,8 +80,20 @@ requiredRuns(release.value, 'release', [
   'pnpm validate:permission-warnings',
   'pnpm validate:packages',
   'sha256sum',
-  'gh release create',
+  'pnpm publish:github-release',
 ])
+for (const invariant of [
+  "'release',\n    'create'",
+  "'release', 'upload'",
+  "'--clobber'",
+  "'release', 'download'",
+  'verifyReleaseAssets',
+]) {
+  requireValue(
+    releasePublisher.includes(invariant),
+    `Release publisher is missing idempotency invariant: ${invariant}`,
+  )
+}
 requireValue(
   !/(?:chromewebstore|addons\.mozilla|edge\.microsoft|yandex).*(?:publish|upload)/iu.test(
     release.source,

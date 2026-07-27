@@ -155,6 +155,15 @@
   "knownPlatformBoundaries": {
     "message": "Known platform boundaries"
   },
+  "productResources": {
+    "message": "Product resources"
+  },
+  "supportLink": {
+    "message": "Support"
+  },
+  "privacyPolicyLink": {
+    "message": "Privacy policy"
+  },
   "boundaryFullUrl": {
     "message": "Full URL path/query routing is Firefox-only; Chromium PAC receives origins."
   },

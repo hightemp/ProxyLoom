@@ -8,7 +8,7 @@ Google Chrome 150.0.7871.128 Stable, Yandex Browser 26.4.1.1110 Stable, Playwrig
 
 ```text
 pnpm test:e2e
-31 scenarios
+36 scenarios
 
 pnpm test:integration
 Firefox MV3 temporary BiDi install: browser manual proxy on/off, single/array fallback,

@@ -75,12 +75,12 @@ pnpm zip:firefox
 pnpm package:artifacts
 pnpm validate:packages
 pnpm validate:source-rebuild
-sha256sum .output/ProxyLoom-*.zip > .output/SHA256SUMS
-sha256sum --check .output/SHA256SUMS
+(cd .output && sha256sum ProxyLoom-*.zip > SHA256SUMS)
+(cd .output && sha256sum --check SHA256SUMS)
 ```
 
 All network integration uses loopback origin/proxy fixtures. The Firefox API gate temporarily
-installs an MV3 test extension through `web-ext`. Separate headed smokes exercised the final
+installs MV3 test extensions through WebDriver BiDi. Separate headed smokes exercised the final
 product builds in official Firefox 153 Stable, Google Chrome 150 Stable, Microsoft Edge 150 Stable
 and Yandex Browser 26 Stable. Firefox and Edge include real private routing, memory-only log
 isolation and DIRECT restoration; Firefox also includes an MV3 idle-wake check. See the
