@@ -203,7 +203,29 @@ test('semantic color tokens meet text contrast and focus is visibly styled in bo
   }
 })
 
-test('popup and options reflow without document-level horizontal overflow at 200% equivalent', async ({
+test('popup exposes a stable intrinsic width while Chromium measures the action surface', async ({
+  extensionContext,
+  extensionId,
+}) => {
+  const popup = await extensionContext.newPage()
+  await popup.setViewportSize({ height: 600, width: 40 })
+  await popup.goto(`chrome-extension://${extensionId}/popup.html`)
+  await expect(popup.getByRole('button', { name: 'Open Settings' })).toBeAttached()
+
+  const sizing = await popup.evaluate(() => ({
+    documentWidth: document.documentElement.scrollWidth,
+    popupWidth: Math.round(
+      document.querySelector<HTMLElement>('.popup')!.getBoundingClientRect().width,
+    ),
+  }))
+  expect(sizing).toEqual({
+    documentWidth: 390,
+    popupWidth: 390,
+  })
+  await popup.close()
+})
+
+test('popup and options fit without horizontal overflow at 200% browser zoom', async ({
   extensionContext,
   extensionId,
   extensionPage,
@@ -212,7 +234,8 @@ test('popup and options reflow without document-level horizontal overflow at 200
   await assertNoHorizontalOverflow(extensionPage)
 
   const popup = await extensionContext.newPage()
-  await popup.setViewportSize({ height: 300, width: 195 })
+  // 390 CSS pixels remain below Chromium's 800-device-pixel action-popup cap at 200% zoom.
+  await popup.setViewportSize({ height: 600, width: 390 })
   await popup.goto(`chrome-extension://${extensionId}/popup.html`)
   await expect(popup.getByRole('button', { name: 'Open Settings' })).toBeVisible()
   await assertNoHorizontalOverflow(popup)

@@ -1,6 +1,6 @@
 # Automated test report
 
-Date: 2026-07-26  
+Date: 2026-07-27
 OS: Linux 7.0.0-28-generic x86_64  
 Node: 22.16.0  
 pnpm: 10.32.1
@@ -19,7 +19,7 @@ pnpm: 10.32.1
 | Release performance budgets                    | 5 pass across unit and browser E2E                                 |
 | Five-minute Chromium memory soak               | 752 cycles; heap +0.96 MiB, PSS +55.15 MiB; all budgets pass       |
 | Local network and Firefox API integration      | 6 pass in 2 files                                                  |
-| Chromium extension E2E                         | 36 pass                                                            |
+| Chromium extension E2E                         | 37 pass                                                            |
 | Headed Orca/AT-SPI accessibility               | Keyboard speech output and actual 200% zoom pass                   |
 | Docs, spelling, workflow and traceability      | 124 tasks and 150 requirements covered                             |
 | Store asset dimensions                         | 300×300, 440×280 and 1280×800 PNG candidates pass                  |
@@ -45,7 +45,7 @@ random external service.
 
 The final current tree was copied into an isolated Git repository with no dependencies or
 generated output. From an empty Git status it passed frozen installation, strict quality, 205 unit
-tests, 4 parity tests, 211 coverage tests, performance, 6 integration tests, all 36 E2E tests,
+tests, 4 parity tests, 211 coverage tests, performance, 6 integration tests, all 37 E2E tests,
 dependency audit, dual builds, permission-warning/canary gates, all three ZIP packages, exact
 Firefox source rebuild and deep archive scanning. Git status was still empty afterward; the
 disposable clone was then moved to trash.

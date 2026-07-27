@@ -1,6 +1,6 @@
 # Final release audit
 
-Date: 2026-07-26  
+Date: 2026-07-27
 Current disposition: **NOT RELEASE APPROVED**
 
 ## Automated candidate status
@@ -8,7 +8,7 @@ Current disposition: **NOT RELEASE APPROVED**
 - Strict typecheck, lint and formatting: pass.
 - A clean temporary Git snapshot with no dependencies/build output was cloned and passed frozen
   install, the complete regression/package sequence and a zero-diff post-run check.
-- The final current-tree repetition in an isolated clean repository passed all 36 E2E tests and
+- The final current-tree repetition in an isolated clean repository passed all 37 E2E tests and
   every package gate with an empty post-run Git status.
 - Unit, parity, performance, local integration and Chromium extension E2E: pass on the recorded
   candidate state.

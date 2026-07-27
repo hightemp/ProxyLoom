@@ -260,7 +260,6 @@ onMounted(() => {
   display: grid;
   gap: 14px;
   width: 390px;
-  max-width: 100%;
   max-height: 600px;
   overflow-y: auto;
   padding: 18px;
@@ -305,10 +304,6 @@ onMounted(() => {
 }
 
 @media (max-width: 420px) {
-  .popup {
-    width: 100%;
-  }
-
   .popup-header {
     flex-wrap: wrap;
     align-items: flex-start;
