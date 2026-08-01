@@ -33,6 +33,13 @@ the HTTPS endpoint.
 - system/light/dark themes and localized English UI;
 - local-only storage, no analytics, telemetry, accounts, ads, remote config, or remote code.
 
+## Screenshots
+
+![ProxyLoom global routing settings](screenshots/2026-08-01_16-16_1.png)
+![ProxyLoom proxy profiles](screenshots/2026-08-01_16-16_2.png)
+![ProxyLoom ordered routing rules](screenshots/2026-08-01_16-16_3.png)
+![](screenshots/2026-08-01_16-16.png)
+
 ## Development
 
 Requirements: Node 22 or newer and pnpm 10.32.1.
