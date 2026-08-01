@@ -42,6 +42,7 @@ complete acceptance evidence exists.
 | PL-124        | M      | `docs/release-verification/final-audit.md`                                                                                        | PL-121…PL-123 plus human release-owner approval                    |
 | PL-125        | A      | Schema-v2 migration, simplified Rules UI, native-import compatibility and unit/E2E regressions                                    | None beyond aggregate release gates                                |
 | PL-126        | A      | Explicit per-rule profile routes, IDN suffix template, resolver/PAC/Firefox and two-proxy Chromium E2E                            | None beyond aggregate release gates                                |
+| PL-127        | A      | Populated Russian/Social named templates, schema-v1/v2 placeholder migration, regex-safety unit and Chromium persistence E2E      | None beyond aggregate release gates                                |
 
 ## Product requirement evidence
 

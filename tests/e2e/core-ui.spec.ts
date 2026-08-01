@@ -290,6 +290,40 @@ test('starts with an empty ordered rule list and no group management', async ({
   await expect(extensionPage.getByLabel('Group')).toHaveCount(0)
 })
 
+test('fills editable Russian Sites and Social Networks example rules', async ({
+  extensionPage,
+}) => {
+  await resetExtension(extensionPage)
+  await extensionPage.getByRole('button', { name: /Rules/ }).click()
+
+  await extensionPage.getByRole('button', { name: 'Add rule' }).click()
+  await extensionPage.getByLabel('Template', { exact: true }).selectOption('RUSSIAN_DOMAINS')
+  await extensionPage.getByRole('button', { name: 'Generate editable pattern' }).click()
+  await expect(extensionPage.getByLabel('Name', { exact: true })).toHaveValue(
+    'Russian Sites example',
+  )
+  await expect(extensionPage.getByLabel('Regular expression')).toHaveValue(/xn--p1ai/)
+  await expect(extensionPage.getByLabel('URLs, one per line')).toHaveValue(/yandex\.ru/)
+  await extensionPage.getByLabel('Route via').selectOption('DIRECT')
+  await extensionPage.getByRole('button', { name: 'Save rule' }).click()
+
+  await extensionPage.getByRole('button', { name: 'Add rule' }).click()
+  await extensionPage.getByLabel('Template', { exact: true }).selectOption('SOCIAL_NETWORKS')
+  await extensionPage.getByRole('button', { name: 'Generate editable pattern' }).click()
+  await expect(extensionPage.getByLabel('Name', { exact: true })).toHaveValue(
+    'Social Networks example',
+  )
+  await expect(extensionPage.getByLabel('Regular expression')).toHaveValue(/instagram\\\.com/)
+  await expect(extensionPage.getByLabel('URLs, one per line')).toHaveValue(/vk\.com/)
+  await extensionPage.getByLabel('Route via').selectOption('DIRECT')
+  await extensionPage.getByRole('button', { name: 'Save rule' }).click()
+
+  await extensionPage.reload()
+  await extensionPage.getByRole('button', { name: /Rules/ }).click()
+  await expect(extensionPage.getByText('Russian Sites example', { exact: true })).toBeVisible()
+  await expect(extensionPage.getByText('Social Networks example', { exact: true })).toBeVisible()
+})
+
 test('creates Once and Always routes from the real action popup and opens the matched rule', async ({
   extensionContext,
   extensionId,

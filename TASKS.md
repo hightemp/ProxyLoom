@@ -1313,8 +1313,8 @@
     глобальный порядок rules.
   - **Требования:** FR-030, FR-034, FR-069, FR-076–FR-078.
   - **Действия:** удалить groups/groupId из schema v2, runtime commands, Rules UI, seed и native
-    export; мигрировать schema v1 с удалением untouched preset demos; принимать старые native
-    backups.
+    export; мигрировать schema v1 с удалением obsolete untouched preset demos; принимать старые
+    native backups. Два полезных named examples позднее уточнены в PL-127.
   - **Модули:** domain config/rules, storage migration, native import/export, Rules UI, locale/docs.
   - **Зависимости:** PL-025, PL-033, PL-051, PL-058, PL-080–PL-083.
   - **Критерии приёмки:** fresh install имеет пустой rules list; user-created/edited rules сохраняют
@@ -1342,6 +1342,22 @@
     persistence и two-local-proxy routing E2E, Chromium/Firefox production builds.
   - **Готово, когда:** `.ru/.рф → Proxy 1` и `.de → Proxy 2` сохраняются и реально маршрутизируются
     разными endpoints без schema migration или hidden fallback.
+
+- [x] **PL-127 — Заполнить Russian Sites и Social Networks examples**
+  - **Цель:** заменить тестовые `.example` заглушки полезными, но явными и редактируемыми наборами.
+  - **Требования:** FR-039, SEC-002, NFR-001.
+  - **Действия:** добавить named templates для `.ru/.рф/.su` и основных social-network/service
+    domains; заполнять name/description/test URLs/pattern без автоматического route; обновлять две
+    legacy-заглушки при schema-v1/v2 migration; устранить нелинейный self-check regex analyzer.
+  - **Модули:** domain rule templates/regex validation, Rules UI, locale, migration, docs.
+  - **Зависимости:** PL-125–PL-126.
+  - **Критерии приёмки:** российский пример совпадает с `.ru/.рф/.su`, но не `.ru.com`; social
+    example совпадает только с перечисленными базовыми domains и subdomains; route остаётся
+    обязательным выбором пользователя; fresh install остаётся пустым.
+  - **Тесты:** template/negative/regex-safety unit, schema-v1/v2 migration и Chromium UI persistence
+    E2E.
+  - **Готово, когда:** оба examples создаются из Rules editor, сохраняются после explicit route и
+    старые `russian.example`/`social.example` больше не остаются действующими заглушками.
 
 ---
 

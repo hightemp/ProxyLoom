@@ -8,7 +8,11 @@ import {
   type RoutingTestResult,
 } from '../../application/routing-tester/routing-tester'
 import { buildRoutingSnapshot } from '../../domain/routing/snapshot'
-import { generateRuleTemplate, type RuleTemplateId } from '../../domain/rules/templates'
+import {
+  generateRuleTemplate,
+  NAMED_RULE_TEMPLATE_PRESETS,
+  type RuleTemplateId,
+} from '../../domain/rules/templates'
 import type { MatcherType, Rule } from '../../domain/types/entities'
 import { t } from '../../i18n/messages'
 import { createRegexWorker } from '../runtime/regex-worker-factory'
@@ -220,6 +224,12 @@ const applyTemplate = (): void => {
     draft.matcherType = generated.matcherType
     draft.pattern = generated.pattern
     draft.flags = generated.flags
+    const preset = NAMED_RULE_TEMPLATE_PRESETS[templateId.value]
+    if (preset !== undefined) {
+      draft.name = preset.name
+      draft.description = preset.description
+      testLines.value = preset.testUrls.join('\n')
+    }
     testerStatus.value = t('templateApplied')
   } catch (error) {
     testerStatus.value =
@@ -494,6 +504,8 @@ watch(() => props.busy, restoreFocus)
             <option value="EXACT_HOSTNAME">{{ t('exactHostname') }}</option>
             <option value="DOMAIN_AND_SUBDOMAINS">{{ t('domainSubdomains') }}</option>
             <option value="DOMAIN_SUFFIXES">{{ t('domainSuffixes') }}</option>
+            <option value="RUSSIAN_DOMAINS">{{ t('russianSitesExample') }}</option>
+            <option value="SOCIAL_NETWORKS">{{ t('socialNetworksExample') }}</option>
             <option value="EXACT_ORIGIN">{{ t('exactOrigin') }}</option>
             <option value="HTTP_ONLY">{{ t('httpOnly') }}</option>
             <option value="HTTPS_ONLY">{{ t('httpsOnly') }}</option>
@@ -504,11 +516,17 @@ watch(() => props.busy, restoreFocus)
             <option value="FIREFOX_QUERY_PARAMETER">{{ t('firefoxQueryParameter') }}</option>
           </select>
         </label>
-        <label v-if="templateId !== 'DOMAIN_SUFFIXES'">
+        <label
+          v-if="
+            templateId !== 'DOMAIN_SUFFIXES' &&
+            templateId !== 'RUSSIAN_DOMAINS' &&
+            templateId !== 'SOCIAL_NETWORKS'
+          "
+        >
           {{ t('templateHostname') }}
           <input v-model="templateHost" />
         </label>
-        <label v-else>
+        <label v-else-if="templateId === 'DOMAIN_SUFFIXES'">
           {{ t('domainSuffixes') }}
           <textarea
             v-model="templateDomainSuffixes"

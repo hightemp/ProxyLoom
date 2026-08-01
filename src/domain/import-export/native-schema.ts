@@ -3,7 +3,10 @@ import { z } from 'zod'
 import type { AppConfig } from '../types/entities'
 import { err, ok, type Result } from '../types/result'
 import { parseAppConfig } from '../config/schema'
-import { removeGroupsFromVersionOne } from '../config/remove-groups-migration'
+import {
+  removeGroupsFromVersionOne,
+  upgradeLegacyExamplesFromVersionTwo,
+} from '../config/remove-groups-migration'
 import { parseSafeJson, type SafeJsonErrorCode } from './safe-json'
 
 export const NATIVE_EXPORT_FORMAT = 'proxyloom-config'
@@ -119,10 +122,14 @@ export const parseNativeExportText = (
       },
     })),
   }
-  const migratedCandidate =
+  const versionTwoCandidate =
     configCandidate.schemaVersion === 1
       ? removeGroupsFromVersionOne(configCandidate)
       : configCandidate
+  const migratedCandidate =
+    configCandidate.schemaVersion === 1 || configCandidate.schemaVersion === 2
+      ? upgradeLegacyExamplesFromVersionTwo(versionTwoCandidate)
+      : versionTwoCandidate
   const config = parseAppConfig(migratedCandidate)
   if (!config.ok) {
     return err({

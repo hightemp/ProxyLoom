@@ -35,12 +35,16 @@ Current disposition: **NOT RELEASE APPROVED**
   Focused regression tests and repeated branded-browser runs cover both defects.
 - Machine-checked traceability covers all 126 tasks and all 150 PRD requirement identifiers.
 - Schema v2 removes rule groups from storage, import/export and UI. The v1 migration and native
-  import compatibility discard obsolete group metadata and untouched built-in demos while
-  preserving user-created or edited rules, actions and relative global order; fresh installs start
-  with an empty rule list.
+  import compatibility discard obsolete group metadata and non-useful untouched demos, upgrade
+  the Russian/Social placeholders, and preserve user-created or edited rules, actions and relative
+  global order. Schema v3 also repairs exact placeholders already stored in v2; fresh installs
+  start with an empty rule list.
 - Rules now require one explicit direct or proxy-profile route. Domain-suffix templates normalize
   IDNs locally, and Chromium/Firefox/PAC regressions plus two live local proxies prove distinct
   per-rule profile selection without schema changes or fallback chains.
+- The Rules editor offers populated, editable Russian Sites (`.ru/.рф/.su`) and Social Networks
+  examples without auto-selecting a route or changing the empty first-run config. Schema-v1/v2
+  migration upgrades the former `russian.example` and `social.example` placeholders.
 - Dependency audit: no known vulnerabilities.
 - Privacy, permission, PAC/regex and import/storage engineering reviews: completed and recorded
   under `docs/security/`, including branded-browser console/network/storage canary inspection.

@@ -40,6 +40,12 @@ editable pattern, and select `Proxy · Proxy 1`; a second `.de` rule can select 
 Suffixes are matched only at the end of normalized hostnames, and internationalized suffixes are
 converted to Punycode locally. This is an explicit suffix list, not an automatic country database.
 
+For a faster start, **Russian Sites example** fills `.ru`, `.рф`, and `.su`. **Social Networks
+example** fills the main and common supporting domains for VK, OK, Facebook, Instagram, Threads,
+X/Twitter, TikTok, LinkedIn, Reddit, Pinterest, Snapchat, Telegram, Discord, and YouTube. Both
+examples fill the rule name, description, local test URLs, and an editable expression. They never
+select **Route via** or save themselves; review the generated list and choose the intended route.
+
 Rules apply in both PROXY and RULES modes. When no rule matches, PROXY uses the selected global
 profile and RULES goes direct. A rule assigned to an unavailable proxy never falls back to direct
 or another proxy.
@@ -72,8 +78,10 @@ credentials, logs, or private state.
 Native export includes profiles, rules, general settings, and appearance. Credentials are
 absent by default; including them requires an explicit plaintext warning. Import validates hostile
 JSON before preview, then supports merge or confirmed replace with a local recovery backup.
-Older schema v1 backups remain importable. Obsolete group metadata and untouched built-in demo
-rules are discarded; user-created or edited rules retain their relative global order.
+Older schema v1/v2 backups remain importable. Obsolete group metadata and non-useful untouched
+demos are discarded. Legacy `russian.example` and `social.example` placeholders are upgraded to
+the populated editable examples; user-created or edited rules retain their action and relative
+global order.
 
 FoxyProxy import accepts supported HTTP/HTTPS profiles from known 6–9 JSON variants. Patterns,
 rules, subscriptions, PAC, direct, and SOCKS entries are reported but not imported.

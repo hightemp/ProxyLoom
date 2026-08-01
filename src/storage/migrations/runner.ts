@@ -1,10 +1,13 @@
 import type { AppConfig } from '../../domain/types/entities'
 import { err, type Result } from '../../domain/types/result'
-import { removeGroupsFromVersionOne } from '../../domain/config/remove-groups-migration'
+import {
+  removeGroupsFromVersionOne,
+  upgradeLegacyExamplesFromVersionTwo,
+} from '../../domain/config/remove-groups-migration'
 import { createDefaultConfig } from '../seed/create-default-config'
 import { parseAppConfig, type ConfigSchemaError } from '../../domain/config/schema'
 
-export const CURRENT_SCHEMA_VERSION = 2
+export const CURRENT_SCHEMA_VERSION = 3
 
 export interface MigrationError {
   readonly code: 'UNSUPPORTED_SCHEMA_VERSION' | 'INVALID_LEGACY_CONFIG'
@@ -86,6 +89,16 @@ export const migrateConfig = (
         })
       }
       migrated = removeGroupsFromVersionOne(currentRecord)
+    } else if (currentVersion === 2) {
+      const currentRecord = asRecord(migrated)
+      if (currentRecord === null) {
+        return err({
+          code: 'INVALID_LEGACY_CONFIG',
+          issues: [],
+          version: currentVersion,
+        })
+      }
+      migrated = upgradeLegacyExamplesFromVersionTwo(currentRecord)
     }
   }
 

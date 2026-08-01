@@ -252,8 +252,10 @@ Matcher Firefox-only. Target включает scheme, hostname, explicit/non-def
 
 - `FR-038`: regex helper объясняет anchors, escaped dots, optional ports, subdomains, schemes, различия Origin/Full URL и Firefox-only path matching.
 - `FR-039`: templates: exact hostname; domain + subdomains; editable domain suffix list with
-  IDN/Punycode normalization; exact origin; HTTP only; HTTPS only; custom port; localhost; private
-  IPv4; Firefox-only path; Firefox-only query parameter.
+  IDN/Punycode normalization; populated Russian Sites (`.ru`, `.рф`, `.su`) and Social Networks
+  examples; exact origin; HTTP only; HTTPS only; custom port; localhost; private IPv4; Firefox-only
+  path; Firefox-only query parameter. Named examples fill name, description, test URLs and an
+  editable expression, but never choose a route for the user.
 - `FR-040`: template только генерирует editable expression; сохранение проходит обычную validation.
 - `COMPAT-006`: нельзя обещать Chromium Full URL routing через post-selection `webRequest`.
 
@@ -646,8 +648,9 @@ LogEntry
   httpStatus?, totalDurationMs?, errorCode?, authFailure, platform
 ```
 
-Первая установка создаёт пустой список rules. Демонстрационные rules, категории и реальные domain
-lists не поставляются.
+Первая установка создаёт пустой список rules; категории и автоматически активные domain lists не
+поставляются. Редактор предлагает только явные, локальные и редактируемые Russian Sites и Social
+Networks templates. Они не создают rule и не выбирают route до действия пользователя.
 
 ## 28. Security
 

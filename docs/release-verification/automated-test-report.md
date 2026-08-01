@@ -11,17 +11,17 @@ pnpm: 10.32.1
 | ---------------------------------------------- | ------------------------------------------------------------------ |
 | Isolated clean Git snapshot and frozen install | Pass; status clean before and after all gates                      |
 | Formatting, ESLint and strict Vue/TypeScript   | Pass                                                               |
-| Unit tests                                     | 214 pass in 37 files                                               |
+| Unit tests                                     | 222 pass in 37 files                                               |
 | Resolver/PAC parity and fuzz                   | 5 pass                                                             |
-| Coverage suite                                 | 221 pass in 39 files                                               |
-| Coverage                                       | 89.16% statements, 79.77% branches, 93.16% functions, 89.46% lines |
+| Coverage suite                                 | 229 pass in 39 files                                               |
+| Coverage                                       | 89.43% statements, 80.40% branches, 93.37% functions, 89.93% lines |
 | Idempotent GitHub Release publisher            | 6 local create/retry/failure/checksum regressions pass             |
 | Release performance budgets                    | 5 pass across unit and browser E2E                                 |
 | Five-minute Chromium memory soak               | 752 cycles; heap +0.96 MiB, PSS +55.15 MiB; all budgets pass       |
 | Local network and Firefox API integration      | 6 pass in 2 files                                                  |
-| Chromium extension E2E                         | 40 pass                                                            |
+| Chromium extension E2E                         | 41 pass                                                            |
 | Headed Orca/AT-SPI accessibility               | Keyboard speech output and actual 200% zoom pass                   |
-| Docs, spelling, workflow and traceability      | 126 tasks and 150 requirements covered                             |
+| Docs, spelling, workflow and traceability      | 127 tasks and 150 requirements covered                             |
 | Store asset dimensions                         | 300×300, 440×280 and 1280×800 PNG candidates pass                  |
 | Dependency audit                               | No known vulnerabilities                                           |
 | Production builds                              | Chromium MV3 and Firefox MV3 pass                                  |
@@ -34,8 +34,9 @@ pnpm: 10.32.1
 
 The E2E suite covers the visible options, popup and error surfaces; the standalone Settings-tab
 contract; profile/rule operations; explicit per-rule profile assignment; `.ru`/`.рф`/`.de` suffix
-routes through two local proxies; empty first-run rules without group management; Once and Always
-popup actions; applied routing; fail-closed behavior; proxy authentication; distinct HTTP/HTTPS
+routes through two local proxies; populated editable Russian Sites and Social Networks examples;
+empty first-run rules without group management; Once and Always popup actions; applied routing;
+fail-closed behavior; proxy authentication; distinct HTTP/HTTPS
 endpoints; HTTP and HTTPS proxy transports; WS/WSS; downloads; manual proxy check and cancellation;
 Firefox browser-manual fallback, second-extension precedence/recovery and locked enterprise policy;
 import/export; themes; accessibility; drag/keyboard ordering; native import replacement; local logs;
@@ -44,12 +45,12 @@ incognito help; another real Chromium proxy extension; and cold/warm performance
 All integration targets and proxies run on loopback. The test suite does not use a public proxy or
 random external service.
 
-The final current tree was copied into an isolated Git repository with no dependencies or
-generated output. From an empty Git status it passed frozen installation, strict quality, 214 unit
-tests, 5 parity tests, 221 coverage tests, performance, 6 integration tests, all 40 E2E tests,
-dependency audit, dual builds, permission-warning/canary gates, all three ZIP packages, exact
-Firefox source rebuild and deep archive scanning. Git status was still empty afterward; the
-disposable clone was then moved to trash.
+The current preset and schema-v3 migration change passed the strict quality gate, 222 unit tests,
+5 parity tests, 229 coverage tests, all 41 Chromium E2E tests and validated Chromium/Firefox
+production builds. The preceding release baseline was also copied into an isolated Git repository
+with no dependencies or generated output; from an empty Git status it passed frozen installation,
+performance, integration, dependency, packaging, source-rebuild and artifact-scan gates before the
+disposable clone was moved to trash.
 
 That run exposed a test-harness cleanup issue rather than a product defect: terminating `web-ext`
 could leave its autogenerated Firefox profile outside the spike directory. Twenty older profiles

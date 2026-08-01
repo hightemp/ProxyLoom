@@ -144,7 +144,7 @@ test('preserves local configuration and clears normal/private session state afte
       .toEqual({
         localMode: 'DIRECT',
         proxyMode: 'direct',
-        schemaVersion: 2,
+        schemaVersion: 3,
         session: { 'session.overrides': [] },
       })
   } finally {

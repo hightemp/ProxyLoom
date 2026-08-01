@@ -546,6 +546,8 @@
   "template": { "message": "Template" },
   "domainSuffixes": { "message": "Domain suffixes" },
   "domainSuffixesPlaceholder": { "message": ".ru, .рф, .de" },
+  "russianSitesExample": { "message": "Russian Sites example (.ru, .рф, .su)" },
+  "socialNetworksExample": { "message": "Social Networks example" },
   "exactOrigin": { "message": "Exact origin" },
   "httpOnly": { "message": "HTTP only" },
   "httpsOnly": { "message": "HTTPS only" },

@@ -104,7 +104,7 @@ export const appConfigSchema = z
     profiles: z.array(profileSchema).max(10_000),
     revision: z.number().int().nonnegative(),
     rules: z.array(ruleSchema).max(10_000),
-    schemaVersion: z.literal(2),
+    schemaVersion: z.literal(3),
   })
   .strict()
 

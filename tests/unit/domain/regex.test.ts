@@ -6,7 +6,12 @@ import {
   matchesRegex,
   validateRegex,
 } from '../../../src/domain/regex/validate'
-import { generateRuleTemplate, type RuleTemplateId } from '../../../src/domain/rules/templates'
+import {
+  generateRuleTemplate,
+  NAMED_RULE_TEMPLATE_PRESETS,
+  SOCIAL_NETWORK_DOMAINS,
+  type RuleTemplateId,
+} from '../../../src/domain/rules/templates'
 
 describe('regular expression validation', () => {
   it('defaults to case-insensitive matching', () => {
@@ -28,8 +33,14 @@ describe('regular expression validation', () => {
     expect(canonicalizeFlags('ii').ok).toBe(false)
   })
 
+  it('does not treat escaped quantifiers or character classes as nested repetition', () => {
+    expect(validateRegex('^(?:a\\+)+$').ok).toBe(true)
+    expect(validateRegex('^(?:[+*])+$').ok).toBe(true)
+  })
+
   it.each([
     ['(a+)+$', 'UNSAFE_PATTERN'],
+    ['(?:foo|foobar)+$', 'UNSAFE_PATTERN'],
     ['(a)\\1', 'BACKREFERENCE_UNSUPPORTED'],
     ['[', 'INVALID_SYNTAX'],
     ['x'.repeat(MAX_PATTERN_LENGTH + 1), 'PATTERN_TOO_LONG'],
@@ -54,6 +65,8 @@ describe('rule templates', () => {
     ['EXACT_HOSTNAME', { hostname: 'example.com' }, 'https://example.com/'],
     ['DOMAIN_AND_SUBDOMAINS', { hostname: 'example.com' }, 'https://a.example.com/'],
     ['DOMAIN_SUFFIXES', { domainSuffixes: '.ru, .рф, .de' }, 'https://sub.example.xn--p1ai/'],
+    ['RUSSIAN_DOMAINS', {}, 'https://sub.example.xn--p1ai/'],
+    ['SOCIAL_NETWORKS', {}, 'https://www.instagram.com/'],
     ['EXACT_ORIGIN', { hostname: 'example.com', scheme: 'https' }, 'https://example.com/'],
     ['HTTP_ONLY', {}, 'http://example.com/'],
     ['HTTPS_ONLY', {}, 'https://example.com/'],
@@ -94,4 +107,29 @@ describe('rule templates', () => {
       expect(() => generateRuleTemplate('DOMAIN_SUFFIXES', { domainSuffixes: value })).toThrow()
     },
   )
+
+  it('fills the Russian Sites example with Russian country-code domains only', () => {
+    const generated = generateRuleTemplate('RUSSIAN_DOMAINS')
+    const expression = new RegExp(generated.pattern, generated.flags)
+
+    expect(NAMED_RULE_TEMPLATE_PRESETS.RUSSIAN_DOMAINS?.name).toBe('Russian Sites example')
+    expect(expression.test('https://yandex.ru/')).toBe(true)
+    expect(expression.test('https://sub.example.su/')).toBe(true)
+    expect(expression.test('https://xn--e1afmkfd.xn--p1ai/')).toBe(true)
+    expect(expression.test('https://example.ru.com/')).toBe(false)
+    expect(expression.test('https://belarus.by/')).toBe(false)
+  })
+
+  it('fills the Social Networks example with exact base domains and their subdomains', () => {
+    const generated = generateRuleTemplate('SOCIAL_NETWORKS')
+    const expression = new RegExp(generated.pattern, generated.flags)
+
+    expect(NAMED_RULE_TEMPLATE_PRESETS.SOCIAL_NETWORKS?.name).toBe('Social Networks example')
+    for (const domain of SOCIAL_NETWORK_DOMAINS) {
+      expect(expression.test(`https://${domain}/`), domain).toBe(true)
+      expect(expression.test(`wss://api.${domain}:443/`), `api.${domain}`).toBe(true)
+    }
+    expect(expression.test('https://notfacebook.com/')).toBe(false)
+    expect(expression.test('https://facebook.com.example/')).toBe(false)
+  })
 })

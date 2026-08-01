@@ -2,6 +2,8 @@ export type RuleTemplateId =
   | 'EXACT_HOSTNAME'
   | 'DOMAIN_AND_SUBDOMAINS'
   | 'DOMAIN_SUFFIXES'
+  | 'RUSSIAN_DOMAINS'
+  | 'SOCIAL_NETWORKS'
   | 'EXACT_ORIGIN'
   | 'HTTP_ONLY'
   | 'HTTPS_ONLY'
@@ -24,6 +26,74 @@ export interface GeneratedRuleTemplate {
   readonly matcherType: 'ORIGIN' | 'FULL_URL'
   readonly pattern: string
   readonly flags: 'i'
+}
+
+export interface NamedRuleTemplatePreset {
+  readonly description: string
+  readonly name: string
+  readonly testUrls: readonly string[]
+}
+
+export const RUSSIAN_DOMAIN_SUFFIXES = '.ru, .рф, .su'
+
+export const SOCIAL_NETWORK_DOMAINS = [
+  'vk.com',
+  'vk.ru',
+  'vk.me',
+  'userapi.com',
+  'ok.ru',
+  'odnoklassniki.ru',
+  'facebook.com',
+  'fb.com',
+  'fb.me',
+  'fbcdn.net',
+  'messenger.com',
+  'instagram.com',
+  'cdninstagram.com',
+  'threads.net',
+  'x.com',
+  'twitter.com',
+  't.co',
+  'twimg.com',
+  'tiktok.com',
+  'tiktokcdn.com',
+  'tiktokv.com',
+  'linkedin.com',
+  'licdn.com',
+  'reddit.com',
+  'redd.it',
+  'redditstatic.com',
+  'pinterest.com',
+  'pinimg.com',
+  'snapchat.com',
+  'sc-cdn.net',
+  'telegram.org',
+  'telegram.me',
+  't.me',
+  'discord.com',
+  'discord.gg',
+  'discordapp.com',
+  'discordapp.net',
+  'youtube.com',
+  'youtu.be',
+  'ytimg.com',
+  'googlevideo.com',
+] as const
+
+export const NAMED_RULE_TEMPLATE_PRESETS: Readonly<
+  Partial<Record<RuleTemplateId, NamedRuleTemplatePreset>>
+> = {
+  RUSSIAN_DOMAINS: {
+    description: 'Matches Russian country-code domains (.ru, .рф, and .su), including subdomains.',
+    name: 'Russian Sites example',
+    testUrls: ['https://yandex.ru/', 'https://пример.рф/', 'https://example.ru.com/'],
+  },
+  SOCIAL_NETWORKS: {
+    description:
+      'Matches major social-network websites and their common supporting domains. Review the editable pattern as services change.',
+    name: 'Social Networks example',
+    testUrls: ['https://vk.com/', 'https://www.instagram.com/', 'https://example.com/'],
+  },
 }
 
 export const escapeRegex = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -68,6 +138,11 @@ const requiredDomainSuffixes = (input: RuleTemplateInput): readonly string[] => 
   return suffixes
 }
 
+const domainAndSubdomainsPattern = (domains: readonly string[]): string => {
+  const alternatives = domains.map((domain) => escapeRegex(domain)).join('|')
+  return `^(?:https?|wss?)://(?:[^./:]+\\.)*(?:${alternatives})(?::\\d+)?/$`
+}
+
 export const generateRuleTemplate = (
   id: RuleTemplateId,
   input: RuleTemplateInput = {},
@@ -97,6 +172,16 @@ export const generateRuleTemplate = (
         pattern: `^(?:https?|wss?)://(?:[^./:]+\\.)+(?:${suffixes})(?::\\d+)?/$`,
       }
     }
+    case 'RUSSIAN_DOMAINS':
+      return generateRuleTemplate('DOMAIN_SUFFIXES', {
+        domainSuffixes: RUSSIAN_DOMAIN_SUFFIXES,
+      })
+    case 'SOCIAL_NETWORKS':
+      return {
+        flags: 'i',
+        matcherType: 'ORIGIN',
+        pattern: domainAndSubdomainsPattern(SOCIAL_NETWORK_DOMAINS),
+      }
     case 'EXACT_ORIGIN': {
       const scheme = input.scheme ?? 'https'
       const host = escapeRegex(requiredHostname(input))

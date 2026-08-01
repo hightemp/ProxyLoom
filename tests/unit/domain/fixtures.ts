@@ -92,6 +92,6 @@ export const config = (options: Partial<AppConfig> = {}): AppConfig => ({
   profiles: [],
   revision: 1,
   rules: [],
-  schemaVersion: 2,
+  schemaVersion: 3,
   ...options,
 })

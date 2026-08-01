@@ -155,7 +155,7 @@ describe('NativeImportService', () => {
     })
   })
 
-  it('imports version one backups by discarding group metadata only', () => {
+  it('imports version one backups by discarding group metadata', () => {
     const service = new NativeImportService(ids)
     const legacy = JSON.parse(exported(config({ rules: [rule('legacy-rule', 0)] }))) as Record<
       string,
@@ -170,11 +170,34 @@ describe('NativeImportService', () => {
     const preview = service.preview(JSON.stringify(legacy), config())
     expect(preview.ok).toBe(true)
     if (!preview.ok) return
-    expect(preview.value.document.config.schemaVersion).toBe(2)
+    expect(preview.value.document.config.schemaVersion).toBe(3)
     expect(preview.value.document.config).not.toHaveProperty('groups')
     expect(preview.value.document.config.rules[0]).not.toHaveProperty('groupId')
     expect(preview.value.document.config.rules[0]?.id).toBe('legacy-rule')
     expect(preview.value.document.config.rules[0]?.position).toBe(0)
+  })
+
+  it('imports version two backups and repairs exact social placeholders', () => {
+    const service = new NativeImportService(ids)
+    const legacy = JSON.parse(
+      exported(
+        config({
+          rules: [
+            rule('demo-social-networks', 0, {
+              name: 'Social Networks example',
+              pattern: '^https://social\\.example/$',
+            }),
+          ],
+        }),
+      ),
+    ) as { config: { schemaVersion: number } }
+    legacy.config.schemaVersion = 2
+
+    const preview = service.preview(JSON.stringify(legacy), config())
+    expect(preview.ok).toBe(true)
+    if (!preview.ok) return
+    expect(preview.value.document.config.schemaVersion).toBe(3)
+    expect(preview.value.document.config.rules[0]?.pattern).toContain('instagram\\.com')
   })
 
   it('round-trips credential-free exports with empty endpoint credentials', () => {

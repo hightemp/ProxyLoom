@@ -22,7 +22,7 @@ describe('default configuration', () => {
     const value = createDefaultConfig()
     expect(value.rules).toEqual([])
     expect(value).not.toHaveProperty('groups')
-    expect(value.schemaVersion).toBe(2)
+    expect(value.schemaVersion).toBe(3)
     expect(value.general.mode).toBe('DIRECT')
   })
 })
@@ -165,14 +165,14 @@ describe('configuration migrations', () => {
     const result = migrateConfig(legacy)
     expect(result.ok).toBe(true)
     if (result.ok) {
-      expect(result.value.schemaVersion).toBe(2)
+      expect(result.value.schemaVersion).toBe(3)
       expect(result.value.revision).toBe(4)
       expect(result.value.appearance.theme).toBe('SYSTEM')
       expect(result.value.general.loggingEnabled).toBe(true)
     }
   })
 
-  it('removes untouched preset demos while preserving edited and user rules in global order', () => {
+  it('upgrades useful legacy examples and removes other untouched demos in global order', () => {
     const legacyRule = { ...rule('legacy-rule', 3), groupId: 'legacy-group' }
     const untouchedDemo = {
       ...rule('demo-work', 0),
@@ -190,14 +190,23 @@ describe('configuration migrations', () => {
       name: 'Russian Sites example',
       pattern: '^https://russian\\.example/$',
     }
+    const socialDemo = {
+      ...rule('demo-social-networks', 2),
+      description: 'Disabled example for the Social Networks group. You can edit or delete it.',
+      enabled: false,
+      groupId: 'social-networks',
+      name: 'Social Networks example',
+      pattern: '^https://social\\.example/$',
+    }
     const result = migrateConfig({
       ...createDefaultConfig(),
       groups: [
         { id: 'work', isPreset: true, name: 'Work', position: 0 },
         { id: 'russian-sites', isPreset: true, name: 'Russian Sites', position: 1 },
-        { id: 'legacy-group', isPreset: false, name: 'Legacy', position: 2 },
+        { id: 'social-networks', isPreset: true, name: 'Social Networks', position: 2 },
+        { id: 'legacy-group', isPreset: false, name: 'Legacy', position: 3 },
       ],
-      rules: [legacyRule, untouchedDemo, editedDemo],
+      rules: [legacyRule, untouchedDemo, editedDemo, socialDemo],
       schemaVersion: 1,
     })
     expect(result.ok).toBe(true)
@@ -205,9 +214,42 @@ describe('configuration migrations', () => {
     expect(result.value).not.toHaveProperty('groups')
     expect(result.value.rules.map(({ id, position }) => ({ id, position }))).toEqual([
       { id: 'demo-russian-sites', position: 0 },
-      { id: 'legacy-rule', position: 1 },
+      { id: 'demo-social-networks', position: 1 },
+      { id: 'legacy-rule', position: 2 },
     ])
     expect(result.value.rules.every((candidate) => !('groupId' in candidate))).toBe(true)
+    const russian = result.value.rules.find((candidate) => candidate.id === 'demo-russian-sites')
+    const social = result.value.rules.find((candidate) => candidate.id === 'demo-social-networks')
+    expect(russian?.pattern).toContain('xn--p1ai')
+    expect(social?.pattern).toContain('instagram\\.com')
+    expect(russian?.description).toContain('Russian country-code domains')
+    expect(social?.description).toContain('social-network websites')
+  })
+
+  it('repairs exact example placeholders already stored in schema version two', () => {
+    const placeholder = {
+      ...rule('demo-social-networks', 0),
+      action: { targetProxyProfileId: null, type: 'DIRECT' },
+      name: 'Social Networks example',
+      pattern: '^https://social\\.example/$',
+    }
+    const custom = {
+      ...rule('custom', 1),
+      name: 'Custom social rule',
+      pattern: '^https://social\\.example/$',
+    }
+    const result = migrateConfig({
+      ...createDefaultConfig(),
+      rules: [placeholder, custom],
+      schemaVersion: 2,
+    })
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.value.schemaVersion).toBe(3)
+    expect(result.value.rules[0]?.pattern).toContain('instagram\\.com')
+    expect(result.value.rules[0]?.action).toEqual(placeholder.action)
+    expect(result.value.rules[1]?.pattern).toBe('^https://social\\.example/$')
   })
 
   it('rejects unknown future versions', () => {

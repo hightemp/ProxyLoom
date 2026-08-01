@@ -1,3 +1,9 @@
+import {
+  generateRuleTemplate,
+  NAMED_RULE_TEMPLATE_PRESETS,
+  type RuleTemplateId,
+} from '../rules/templates'
+
 type UnknownRecord = Record<string, unknown>
 
 interface PresetDemoSignature {
@@ -81,6 +87,39 @@ const isUntouchedPresetDemo = (value: unknown): boolean => {
   )
 }
 
+const upgradedLegacyExamples = new Map<
+  string,
+  { readonly oldPattern: string; readonly templateId: RuleTemplateId }
+>([
+  [
+    'demo-russian-sites',
+    { oldPattern: '^https://russian\\.example/$', templateId: 'RUSSIAN_DOMAINS' },
+  ],
+  [
+    'demo-social-networks',
+    { oldPattern: '^https://social\\.example/$', templateId: 'SOCIAL_NETWORKS' },
+  ],
+])
+
+const upgradeLegacyExample = (value: unknown): unknown => {
+  const source = asRecord(value)
+  if (source === null || typeof source.id !== 'string') return value
+  const upgrade = upgradedLegacyExamples.get(source.id)
+  if (upgrade === undefined || source.pattern !== upgrade.oldPattern) return value
+  const preset = NAMED_RULE_TEMPLATE_PRESETS[upgrade.templateId]
+  if (preset === undefined || source.name !== preset.name) return value
+  const generated = generateRuleTemplate(upgrade.templateId)
+  return {
+    ...source,
+    description: preset.description,
+    flags: generated.flags,
+    matcherType: generated.matcherType,
+    name: preset.name,
+    pattern: generated.pattern,
+    validity: 'VALID',
+  }
+}
+
 const withoutRuleGroup = (value: unknown): unknown => {
   const source = asRecord(value)
   if (source === null) return value
@@ -96,6 +135,7 @@ const positionOf = (value: unknown): number => {
 
 const migrateRules = (rules: readonly unknown[]): readonly unknown[] =>
   rules
+    .map(upgradeLegacyExample)
     .filter((rule) => !isUntouchedPresetDemo(rule))
     .toSorted((left, right) => positionOf(left) - positionOf(right))
     .map((value, position) => {
@@ -109,4 +149,14 @@ export const removeGroupsFromVersionOne = (input: Readonly<UnknownRecord>): unkn
   migrated.rules = Array.isArray(input.rules) ? migrateRules(input.rules) : input.rules
   migrated.schemaVersion = 2
   return migrated
+}
+
+export const upgradeLegacyExamplesFromVersionTwo = (input: unknown): unknown => {
+  const source = asRecord(input)
+  if (source === null) return input
+  return {
+    ...source,
+    rules: Array.isArray(source.rules) ? source.rules.map(upgradeLegacyExample) : source.rules,
+    schemaVersion: 3,
+  }
 }
