@@ -34,6 +34,16 @@ URL Rules include path/query without fragment and work only in Firefox. Use the 
 and local tester before saving. When search or a filter is active, reordering is disabled to avoid
 changing a hidden global order.
 
+Every rule requires an explicit **Route via** selection: **Direct connection** or one existing
+proxy profile. For example, choose the **Domain suffixes** template, enter `.ru, .рф`, generate the
+editable pattern, and select `Proxy · Proxy 1`; a second `.de` rule can select `Proxy · Proxy 2`.
+Suffixes are matched only at the end of normalized hostnames, and internationalized suffixes are
+converted to Punycode locally. This is an explicit suffix list, not an automatic country database.
+
+Rules apply in both PROXY and RULES modes. When no rule matches, PROXY uses the selected global
+profile and RULES goes direct. A rule assigned to an unavailable proxy never falls back to direct
+or another proxy.
+
 ## 4. Current-site actions
 
 The popup separates global controls from site controls. Choose Exact hostname or Domain +

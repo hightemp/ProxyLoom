@@ -1325,6 +1325,24 @@
   - **Готово, когда:** repository search находит group fields только в backward migration,
     historical task/evidence text и явно исключённом FoxyProxy metadata.
 
+- [x] **PL-126 — Сделать назначение proxy profile правилу явным**
+  - **Цель:** дать каждому rule понятный обязательный маршрут direct или один выбранный proxy
+    profile и упростить создание правил для доменных зон.
+  - **Требования:** FR-015–FR-020, FR-035, FR-039, FR-053–FR-054, FR-075, FR-079–FR-080,
+    NFR-016.
+  - **Действия:** заменить раздельные action/profile controls единым `Route via`, добавить profile
+    filter и явный route label, сохранить actionable missing-profile state, добавить editable
+    domain-suffix template с IDN/Punycode normalization и исправить routing mode help.
+  - **Модули:** Rules UI, domain rule templates, locale/docs, resolver/PAC/Firefox/E2E regressions.
+  - **Зависимости:** PL-032–PL-033, PL-051–PL-054, PL-103–PL-105, PL-125.
+  - **Критерии приёмки:** два rules могут назначать разные существующие profiles; новый rule нельзя
+    сохранить без explicit route; deleted profile нельзя сохранить повторно без выбора доступного
+    route; suffix template различает `.ru`/`.рф`/`.de` и `.ru.com`.
+  - **Тесты:** template unit/negative corpus, resolver/PAC parity, Firefox adapter unit, Chromium UI
+    persistence и two-local-proxy routing E2E, Chromium/Firefox production builds.
+  - **Готово, когда:** `.ru/.рф → Proxy 1` и `.de → Proxy 2` сохраняются и реально маршрутизируются
+    разными endpoints без schema migration или hidden fallback.
+
 ---
 
 # Release checklist

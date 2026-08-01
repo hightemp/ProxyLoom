@@ -1,6 +1,6 @@
 # Requirements and task traceability
 
-Date: 2026-07-26
+Date: 2026-08-01
 
 This document distinguishes implementation evidence from acceptance evidence. `A` means the
 implementation and its repository-local automated acceptance evidence are present. `B` means the
@@ -41,6 +41,7 @@ complete acceptance evidence exists.
 | PL-121…PL-123 | M      | Candidate checklists plus Chrome/Firefox/Edge/Yandex branded runtime smokes                                                       | Signed full Chrome, Firefox, Edge and Yandex matrices              |
 | PL-124        | M      | `docs/release-verification/final-audit.md`                                                                                        | PL-121…PL-123 plus human release-owner approval                    |
 | PL-125        | A      | Schema-v2 migration, simplified Rules UI, native-import compatibility and unit/E2E regressions                                    | None beyond aggregate release gates                                |
+| PL-126        | A      | Explicit per-rule profile routes, IDN suffix template, resolver/PAC/Firefox and two-proxy Chromium E2E                            | None beyond aggregate release gates                                |
 
 ## Product requirement evidence
 

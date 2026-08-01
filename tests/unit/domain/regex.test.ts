@@ -53,6 +53,7 @@ describe('rule templates', () => {
   const cases: readonly [RuleTemplateId, Parameters<typeof generateRuleTemplate>[1], string][] = [
     ['EXACT_HOSTNAME', { hostname: 'example.com' }, 'https://example.com/'],
     ['DOMAIN_AND_SUBDOMAINS', { hostname: 'example.com' }, 'https://a.example.com/'],
+    ['DOMAIN_SUFFIXES', { domainSuffixes: '.ru, .рф, .de' }, 'https://sub.example.xn--p1ai/'],
     ['EXACT_ORIGIN', { hostname: 'example.com', scheme: 'https' }, 'https://example.com/'],
     ['HTTP_ONLY', {}, 'http://example.com/'],
     ['HTTPS_ONLY', {}, 'https://example.com/'],
@@ -72,4 +73,25 @@ describe('rule templates', () => {
     expect(validateRegex(generated.pattern, generated.flags).ok).toBe(true)
     expect(new RegExp(generated.pattern, generated.flags).test(target)).toBe(true)
   })
+
+  it('matches only explicitly entered domain suffixes after IDN normalization', () => {
+    const generated = generateRuleTemplate('DOMAIN_SUFFIXES', {
+      domainSuffixes: '.ru, рф, de, .ru',
+    })
+    const expression = new RegExp(generated.pattern, generated.flags)
+
+    expect(expression.test('https://example.ru/')).toBe(true)
+    expect(expression.test('wss://sub.example.ru:8443/')).toBe(true)
+    expect(expression.test('https://example.xn--p1ai/')).toBe(true)
+    expect(expression.test('https://example.de/')).toBe(true)
+    expect(expression.test('https://example.ru.com/')).toBe(false)
+    expect(expression.test('https://notru/')).toBe(false)
+  })
+
+  it.each(['', '., ,', 'ru/path', 'ru:443', '-ru'])(
+    'rejects invalid domain suffix list %s',
+    (value) => {
+      expect(() => generateRuleTemplate('DOMAIN_SUFFIXES', { domainSuffixes: value })).toThrow()
+    },
+  )
 })

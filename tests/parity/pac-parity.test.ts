@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import { buildRoutingSnapshot } from '../../src/domain/routing/snapshot'
 import { resolveRoute } from '../../src/domain/routing/resolver'
+import { generateRuleTemplate } from '../../src/domain/rules/templates'
 import { compilePac } from '../../src/platform/chromium/pac/compiler'
 import { config, override, profile, rule } from '../unit/domain/fixtures'
 
@@ -16,6 +17,56 @@ const evaluatePac = (script: string, url: string): string =>
   ) as string
 
 describe('resolver and generated PAC parity', () => {
+  it('keeps two per-rule proxy selections distinct', () => {
+    const proxy1 = profile('proxy-1', {
+      httpEndpoint: { ...profile('proxy-1').httpEndpoint, port: 9001 },
+    })
+    const proxy2 = profile('proxy-2', {
+      httpEndpoint: { ...profile('proxy-2').httpEndpoint, port: 9002 },
+    })
+    const russianSuffix = generateRuleTemplate('DOMAIN_SUFFIXES', { domainSuffixes: '.ru, .рф' })
+    const germanSuffix = generateRuleTemplate('DOMAIN_SUFFIXES', { domainSuffixes: '.de' })
+    const snapshot = buildRoutingSnapshot(
+      config({
+        profiles: [proxy1, proxy2],
+        rules: [
+          rule('russian', 0, {
+            action: { targetProxyProfileId: proxy1.id, type: 'PROXY' },
+            flags: russianSuffix.flags,
+            pattern: russianSuffix.pattern,
+          }),
+          rule('german', 1, {
+            action: { targetProxyProfileId: proxy2.id, type: 'PROXY' },
+            flags: germanSuffix.flags,
+            pattern: germanSuffix.pattern,
+          }),
+        ],
+      }),
+      [],
+      now,
+    )
+    expect(snapshot.ok).toBe(true)
+    if (!snapshot.ok) return
+    const compiled = compilePac(snapshot.value)
+    expect(compiled.ok).toBe(true)
+    if (!compiled.ok) return
+
+    for (const [url, profileId, port] of [
+      ['http://example.ru/', proxy1.id, proxy1.httpEndpoint.port],
+      ['http://example.de/', proxy2.id, proxy2.httpEndpoint.port],
+    ] as const) {
+      const decision = resolveRoute(snapshot.value, {
+        incognito: false,
+        now,
+        platform: 'CHROMIUM',
+        tabId: 1,
+        url,
+      })
+      expect(decision).toMatchObject({ action: 'PROXY', profileId, source: 'RULE' })
+      expect(evaluatePac(compiled.value.script, url)).toBe(`PROXY 127.0.0.1:${String(port)}`)
+    }
+  })
+
   it('returns the same direct/proxy decisions for routes and schemes', () => {
     const global = profile('global')
     const special = profile('special')

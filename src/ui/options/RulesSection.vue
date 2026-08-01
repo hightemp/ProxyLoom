@@ -9,7 +9,7 @@ import {
 } from '../../application/routing-tester/routing-tester'
 import { buildRoutingSnapshot } from '../../domain/routing/snapshot'
 import { generateRuleTemplate, type RuleTemplateId } from '../../domain/rules/templates'
-import type { MatcherType, Rule, RuleActionType } from '../../domain/types/entities'
+import type { MatcherType, Rule } from '../../domain/types/entities'
 import { t } from '../../i18n/messages'
 import { createRegexWorker } from '../runtime/regex-worker-factory'
 
@@ -28,30 +28,41 @@ interface RuleDraft {
   matcherType: MatcherType
   pattern: string
   flags: string
-  actionType: RuleActionType
-  targetProxyProfileId: string
+  routeTarget: RuleRouteTarget
 }
 
+const PROFILE_ROUTE_PREFIX = 'PROFILE:'
+type RuleRouteTarget = '' | 'DIRECT' | `PROFILE:${string}`
+
+const profileRouteTarget = (profileId: string): RuleRouteTarget =>
+  `${PROFILE_ROUTE_PREFIX}${profileId}`
+
+const profileIdFromRouteTarget = (routeTarget: RuleRouteTarget): string | null =>
+  routeTarget.startsWith(PROFILE_ROUTE_PREFIX)
+    ? routeTarget.slice(PROFILE_ROUTE_PREFIX.length)
+    : null
+
 const blankRule = (): RuleDraft => ({
-  actionType: 'DIRECT',
   description: '',
   enabled: true,
   flags: 'i',
   matcherType: 'ORIGIN',
   name: '',
   pattern: '^https://example\\.com/$',
-  targetProxyProfileId: '',
+  routeTarget: '',
 })
 
 const copyRule = (rule: Rule): RuleDraft => ({
-  actionType: rule.action.type,
   description: rule.description,
   enabled: rule.enabled,
   flags: rule.flags,
   matcherType: rule.matcherType,
   name: rule.name,
   pattern: rule.pattern,
-  targetProxyProfileId: rule.action.targetProxyProfileId ?? '',
+  routeTarget:
+    rule.action.type === 'DIRECT' || rule.action.targetProxyProfileId === null
+      ? 'DIRECT'
+      : profileRouteTarget(rule.action.targetProxyProfileId),
 })
 
 const editingId = shallowRef<string | null>(null)
@@ -60,11 +71,13 @@ const draft = reactive<RuleDraft>(blankRule())
 const editorNameInput = shallowRef<HTMLInputElement | null>(null)
 const search = shallowRef('')
 const actionFilter = shallowRef('')
+const profileFilter = shallowRef('')
 const enabledFilter = shallowRef('')
 const compatibilityFilter = shallowRef('')
 const dragId = shallowRef<string | null>(null)
 const templateId = shallowRef<RuleTemplateId>('EXACT_HOSTNAME')
 const templateHost = shallowRef('example.com')
+const templateDomainSuffixes = shallowRef('.ru, .рф, .de')
 const testLines = shallowRef('https://example.com/path\nhttps://other.example/')
 const testRows = shallowRef<
   readonly {
@@ -85,8 +98,22 @@ const filtersActive = computed(
   () =>
     search.value.trim() !== '' ||
     actionFilter.value !== '' ||
+    profileFilter.value !== '' ||
     enabledFilter.value !== '' ||
     compatibilityFilter.value !== '',
+)
+
+const selectedRouteProfileId = computed(() => profileIdFromRouteTarget(draft.routeTarget))
+const selectedRouteProfileExists = computed(
+  () =>
+    selectedRouteProfileId.value !== null &&
+    props.state.config.profiles.some((profile) => profile.id === selectedRouteProfileId.value),
+)
+const routeSelectionMissing = computed(
+  () => selectedRouteProfileId.value !== null && !selectedRouteProfileExists.value,
+)
+const routeSelectionValid = computed(
+  () => draft.routeTarget === 'DIRECT' || selectedRouteProfileExists.value,
 )
 
 const filteredRules = computed(() => {
@@ -99,6 +126,7 @@ const filteredRules = computed(() => {
           rule.name.toLocaleLowerCase('en-US').includes(query) ||
           rule.pattern.toLocaleLowerCase('en-US').includes(query)) &&
         (actionFilter.value === '' || rule.action.type === actionFilter.value) &&
+        (profileFilter.value === '' || rule.action.targetProxyProfileId === profileFilter.value) &&
         (enabledFilter.value === '' || String(rule.enabled) === enabledFilter.value) &&
         (compatibilityFilter.value === '' ||
           (compatibilityFilter.value === 'FIREFOX_ONLY'
@@ -106,6 +134,14 @@ const filteredRules = computed(() => {
             : rule.matcherType === 'ORIGIN')),
     )
 })
+
+const ruleRouteLabel = (rule: Rule): string => {
+  if (rule.action.type === 'DIRECT') return t('directConnection')
+  const profile = props.state.config.profiles.find(
+    (candidate) => candidate.id === rule.action.targetProxyProfileId,
+  )
+  return profile === undefined ? t('missingProxyRoute') : t('viaProxy', profile.name)
+}
 
 const replaceDraft = (next: RuleDraft): void => {
   Object.assign(draft, next)
@@ -140,6 +176,7 @@ const edit = (rule: Rule, event: MouseEvent): void => {
 }
 
 const save = (): void => {
+  if (!routeSelectionValid.value) return
   if (
     draft.matcherType === 'FULL_URL' &&
     props.state.diagnostics.platform === 'CHROMIUM' &&
@@ -149,13 +186,14 @@ const save = (): void => {
   }
   emit('command', {
     input: {
-      action: {
-        targetProxyProfileId:
-          draft.actionType === 'PROXY'
-            ? (draft.targetProxyProfileId as Rule['action']['targetProxyProfileId'])
-            : null,
-        type: draft.actionType,
-      },
+      action:
+        draft.routeTarget === 'DIRECT'
+          ? { targetProxyProfileId: null, type: 'DIRECT' }
+          : {
+              targetProxyProfileId:
+                selectedRouteProfileId.value as Rule['action']['targetProxyProfileId'],
+              type: 'PROXY',
+            },
       description: draft.description,
       enabled: draft.enabled,
       flags: draft.flags,
@@ -172,6 +210,7 @@ const save = (): void => {
 const applyTemplate = (): void => {
   try {
     const generated = generateRuleTemplate(templateId.value, {
+      domainSuffixes: templateDomainSuffixes.value,
       hostname: templateHost.value,
       path: 'private',
       port: 8443,
@@ -183,7 +222,12 @@ const applyTemplate = (): void => {
     draft.flags = generated.flags
     testerStatus.value = t('templateApplied')
   } catch (error) {
-    testerStatus.value = error instanceof Error ? error.message : String(error)
+    testerStatus.value =
+      templateId.value === 'DOMAIN_SUFFIXES'
+        ? t('invalidDomainSuffixes')
+        : error instanceof Error
+          ? error.message
+          : String(error)
   }
 }
 
@@ -244,6 +288,7 @@ const drop = (target: Rule): void => {
 const clearFilters = (): void => {
   search.value = ''
   actionFilter.value = ''
+  profileFilter.value = ''
   enabledFilter.value = ''
   compatibilityFilter.value = ''
 }
@@ -274,15 +319,24 @@ watch(() => props.busy, restoreFocus)
         </label>
         <label>
           {{ t('action') }}
-          <select v-model="actionFilter">
+          <select v-model="actionFilter" :aria-label="t('action')">
             <option value="">{{ t('allActions') }}</option>
             <option value="DIRECT">{{ t('directLabel') }}</option>
             <option value="PROXY">{{ t('proxyLabel') }}</option>
           </select>
         </label>
         <label>
+          {{ t('proxyProfile') }}
+          <select v-model="profileFilter" :aria-label="t('proxyProfile')">
+            <option value="">{{ t('allProxyProfiles') }}</option>
+            <option v-for="profile in state.config.profiles" :key="profile.id" :value="profile.id">
+              {{ profile.name }}
+            </option>
+          </select>
+        </label>
+        <label>
           {{ t('enabled') }}
-          <select v-model="enabledFilter">
+          <select v-model="enabledFilter" :aria-label="t('enabled')">
             <option value="">{{ t('anyState') }}</option>
             <option value="true">{{ t('enabled') }}</option>
             <option value="false">{{ t('disabled') }}</option>
@@ -290,7 +344,7 @@ watch(() => props.busy, restoreFocus)
         </label>
         <label>
           {{ t('compatibility') }}
-          <select v-model="compatibilityFilter">
+          <select v-model="compatibilityFilter" :aria-label="t('compatibility')">
             <option value="">{{ t('all') }}</option>
             <option value="PORTABLE">{{ t('chromeFirefox') }}</option>
             <option value="FIREFOX_ONLY">{{ t('firefoxOnly') }}</option>
@@ -333,16 +387,7 @@ watch(() => props.busy, restoreFocus)
           </div>
           <code>{{ rule.pattern }}</code>
           <small>
-            {{ rule.action.type }}
-            {{
-              rule.action.targetProxyProfileId
-                ? `· ${
-                    state.config.profiles.find(
-                      (profile) => profile.id === rule.action.targetProxyProfileId,
-                    )?.name ?? t('missingProfile')
-                  }`
-                : ''
-            }}
+            {{ ruleRouteLabel(rule) }}
           </small>
         </div>
         <label class="switch-label">
@@ -445,9 +490,10 @@ watch(() => props.busy, restoreFocus)
       <div class="form-grid">
         <label>
           {{ t('template') }}
-          <select v-model="templateId">
+          <select v-model="templateId" :aria-label="t('template')">
             <option value="EXACT_HOSTNAME">{{ t('exactHostname') }}</option>
             <option value="DOMAIN_AND_SUBDOMAINS">{{ t('domainSubdomains') }}</option>
+            <option value="DOMAIN_SUFFIXES">{{ t('domainSuffixes') }}</option>
             <option value="EXACT_ORIGIN">{{ t('exactOrigin') }}</option>
             <option value="HTTP_ONLY">{{ t('httpOnly') }}</option>
             <option value="HTTPS_ONLY">{{ t('httpsOnly') }}</option>
@@ -458,32 +504,42 @@ watch(() => props.busy, restoreFocus)
             <option value="FIREFOX_QUERY_PARAMETER">{{ t('firefoxQueryParameter') }}</option>
           </select>
         </label>
-        <label>
+        <label v-if="templateId !== 'DOMAIN_SUFFIXES'">
           {{ t('templateHostname') }}
           <input v-model="templateHost" />
+        </label>
+        <label v-else>
+          {{ t('domainSuffixes') }}
+          <textarea
+            v-model="templateDomainSuffixes"
+            rows="2"
+            :placeholder="t('domainSuffixesPlaceholder')"
+          />
         </label>
         <button type="button" @click="applyTemplate">
           {{ t('generateEditablePattern') }}
         </button>
       </div>
-      <div class="form-grid">
-        <label>
-          {{ t('action') }}
-          <select v-model="draft.actionType">
-            <option value="DIRECT">{{ t('directLabel') }}</option>
-            <option value="PROXY">{{ t('proxyLabel') }}</option>
-          </select>
-        </label>
-        <label v-if="draft.actionType === 'PROXY'">
-          {{ t('proxyProfile') }}
-          <select v-model="draft.targetProxyProfileId" required>
-            <option value="" disabled>{{ t('selectProfile') }}</option>
-            <option v-for="profile in state.config.profiles" :key="profile.id" :value="profile.id">
-              {{ profile.name }}
-            </option>
-          </select>
-        </label>
-      </div>
+      <label>
+        {{ t('routeVia') }}
+        <select v-model="draft.routeTarget" required>
+          <option value="" disabled>{{ t('selectRoute') }}</option>
+          <option value="DIRECT">{{ t('directConnection') }}</option>
+          <option v-if="routeSelectionMissing" :value="draft.routeTarget" disabled>
+            {{ t('missingProxyRoute') }}
+          </option>
+          <option
+            v-for="profile in state.config.profiles"
+            :key="profile.id"
+            :value="profileRouteTarget(profile.id)"
+          >
+            {{ t('proxyRouteOption', profile.name) }}
+          </option>
+        </select>
+      </label>
+      <p v-if="routeSelectionMissing" class="notice danger-text" role="alert">
+        {{ t('chooseAvailableRoute') }}
+      </p>
       <label class="check-row">
         <input v-model="draft.enabled" type="checkbox" />
         <span>{{ t('enabled') }}</span>
@@ -518,7 +574,7 @@ watch(() => props.busy, restoreFocus)
       </details>
 
       <div class="button-row">
-        <button class="primary" type="submit" :disabled="busy">
+        <button class="primary" type="submit" :disabled="busy || !routeSelectionValid">
           {{ t('saveRule') }}
         </button>
         <button type="button" @click="closeEditor">

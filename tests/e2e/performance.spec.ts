@@ -77,6 +77,7 @@ test('an ordinary rule edit persists and applies below the 2 second threshold', 
   await extensionPage
     .getByRole('textbox', { name: 'Name', exact: true })
     .fill('Performance budget rule')
+  await extensionPage.getByLabel('Route via').selectOption('DIRECT')
   const startedAt = performance.now()
   await extensionPage.getByRole('button', { name: 'Save rule' }).click()
   await expect(extensionPage.getByRole('status')).toContainText('Saved and applied.')

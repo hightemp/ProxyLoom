@@ -8,7 +8,7 @@ Current disposition: **NOT RELEASE APPROVED**
 - Strict typecheck, lint and formatting: pass.
 - A clean temporary Git snapshot with no dependencies/build output was cloned and passed frozen
   install, the complete regression/package sequence and a zero-diff post-run check.
-- The final current-tree repetition in an isolated clean repository passed all 38 E2E tests and
+- The final current-tree repetition in an isolated clean repository passed all 40 E2E tests and
   every package gate with an empty post-run Git status.
 - Unit, parity, performance, local integration and Chromium extension E2E: pass on the recorded
   candidate state.
@@ -33,11 +33,14 @@ Current disposition: **NOT RELEASE APPROVED**
 - The Firefox Stable run found and fixed late MV3 event-listener registration. The Edge Stable run
   found and fixed Chromium private-log classification when `webRequest` omits `incognito`.
   Focused regression tests and repeated branded-browser runs cover both defects.
-- Machine-checked traceability covers all 125 tasks and all 150 PRD requirement identifiers.
+- Machine-checked traceability covers all 126 tasks and all 150 PRD requirement identifiers.
 - Schema v2 removes rule groups from storage, import/export and UI. The v1 migration and native
   import compatibility discard obsolete group metadata and untouched built-in demos while
   preserving user-created or edited rules, actions and relative global order; fresh installs start
   with an empty rule list.
+- Rules now require one explicit direct or proxy-profile route. Domain-suffix templates normalize
+  IDNs locally, and Chromium/Firefox/PAC regressions plus two live local proxies prove distinct
+  per-rule profile selection without schema changes or fallback chains.
 - Dependency audit: no known vulnerabilities.
 - Privacy, permission, PAC/regex and import/storage engineering reviews: completed and recorded
   under `docs/security/`, including branded-browser console/network/storage canary inspection.

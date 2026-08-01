@@ -186,7 +186,7 @@
     "message": "Global routing"
   },
   "globalRoutingDescription": {
-    "message": "Choose the fallback policy. Site rules are evaluated only in Rules mode."
+    "message": "Rules are evaluated in Proxy and Rules modes. Unmatched traffic uses the selected global profile in Proxy mode and goes direct in Rules mode."
   },
   "globalRoutingMode": {
     "message": "Global routing mode"
@@ -514,6 +514,7 @@
   "search": { "message": "Search" },
   "nameOrPattern": { "message": "Name or pattern" },
   "allActions": { "message": "All actions" },
+  "allProxyProfiles": { "message": "All proxy profiles" },
   "enabled": { "message": "Enabled" },
   "disabled": { "message": "Disabled" },
   "anyState": { "message": "Any state" },
@@ -527,6 +528,7 @@
   },
   "rulesGlobalOrder": { "message": "Rules in global priority order" },
   "missingProfile": { "message": "Missing profile" },
+  "missingProxyRoute": { "message": "Missing proxy profile" },
   "enable": { "message": "Enable" },
   "move": { "message": "Move" },
   "up": { "message": "up" },
@@ -542,6 +544,8 @@
     "message": "Anchor with ^/$, escape dots as \\., and account for optional ports. Origin targets end in /. Full URL includes path/query but no fragment and works in Firefox only."
   },
   "template": { "message": "Template" },
+  "domainSuffixes": { "message": "Domain suffixes" },
+  "domainSuffixesPlaceholder": { "message": ".ru, .рф, .de" },
   "exactOrigin": { "message": "Exact origin" },
   "httpOnly": { "message": "HTTP only" },
   "httpsOnly": { "message": "HTTPS only" },
@@ -551,7 +555,24 @@
   "firefoxUrlPath": { "message": "Firefox URL path" },
   "firefoxQueryParameter": { "message": "Firefox query parameter" },
   "templateHostname": { "message": "Template hostname" },
+  "invalidDomainSuffixes": {
+    "message": "Enter one or more valid domain suffixes separated by commas, for example .ru, .рф, .de."
+  },
   "generateEditablePattern": { "message": "Generate editable pattern" },
+  "routeVia": { "message": "Route via" },
+  "selectRoute": { "message": "Select a route" },
+  "directConnection": { "message": "Direct connection" },
+  "proxyRouteOption": {
+    "message": "Proxy · $PROFILE$",
+    "placeholders": { "profile": { "content": "$1" } }
+  },
+  "viaProxy": {
+    "message": "Via $PROFILE$",
+    "placeholders": { "profile": { "content": "$1" } }
+  },
+  "chooseAvailableRoute": {
+    "message": "The assigned proxy profile no longer exists. Choose an available route before saving."
+  },
   "singleMultipleTester": { "message": "Single and multiple URL tester" },
   "testerPrivacyDescription": {
     "message": "No URL leaves the extension. At most 1000 lines run in a cancellable worker."

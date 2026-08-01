@@ -238,6 +238,59 @@ test.describe('actual Chromium proxy routing', () => {
     await page.close()
   })
 
+  test('routes different rule matches through their assigned proxy profiles', async ({
+    extensionContext,
+    extensionPage,
+  }) => {
+    const russianProxy = await startHttpProxy({ marker: 'russian-route' })
+    const germanProxy = await startHttpProxy({ marker: 'german-route' })
+    proxies.push(russianProxy, germanProxy)
+    const page = await extensionContext.newPage()
+    const config = baseConfig()
+    const russianOrigin = origin.origin.replace('127.0.0.1', 'site.ru.proxyloom.test')
+    const germanOrigin = origin.origin.replace('127.0.0.1', 'site.de.proxyloom.test')
+
+    await applyConfig(extensionPage, {
+      ...config,
+      general: { ...config.general, mode: 'RULES' },
+      profiles: [profile('proxy-1', russianProxy.port), profile('proxy-2', germanProxy.port)],
+      revision: 4,
+      rules: [
+        originRule('russian-domains', 0, russianOrigin, {
+          targetProxyProfileId: asProxyProfileId('proxy-1'),
+          type: 'PROXY',
+        }),
+        originRule('german-domains', 1, germanOrigin, {
+          targetProxyProfileId: asProxyProfileId('proxy-2'),
+          type: 'PROXY',
+        }),
+      ],
+    })
+
+    await page.goto(`${russianOrigin}/through-proxy-1`)
+    await page.goto(`${germanOrigin}/through-proxy-2`)
+
+    expect(requestCountFor(russianProxy, russianOrigin)).toBeGreaterThan(0)
+    expect(requestCountFor(russianProxy, germanOrigin)).toBe(0)
+    expect(requestCountFor(germanProxy, germanOrigin)).toBeGreaterThan(0)
+    expect(requestCountFor(germanProxy, russianOrigin)).toBe(0)
+    expect(
+      origin.requests.some(
+        (request) =>
+          request.path === '/through-proxy-1' &&
+          request.headers['x-proxyloom-test-proxy'] === 'russian-route',
+      ),
+    ).toBe(true)
+    expect(
+      origin.requests.some(
+        (request) =>
+          request.path === '/through-proxy-2' &&
+          request.headers['x-proxyloom-test-proxy'] === 'german-route',
+      ),
+    ).toBe(true)
+    await page.close()
+  })
+
   test('fails closed when the selected proxy drops the connection', async ({
     extensionContext,
     extensionPage,

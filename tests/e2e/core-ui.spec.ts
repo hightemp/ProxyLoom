@@ -50,6 +50,8 @@ test('creates and persists a profile, global route, and ordered rule through the
   await extensionPage.getByRole('button', { name: 'Add rule' }).click()
   await extensionPage.getByLabel('Name', { exact: true }).fill('Example direct')
   await extensionPage.getByLabel('Regular expression').fill('^https://example\\.com/$')
+  await expect(extensionPage.getByRole('button', { name: 'Save rule' })).toBeDisabled()
+  await extensionPage.getByLabel('Route via').selectOption('DIRECT')
   await extensionPage.getByRole('button', { name: 'Save rule' }).click()
   await expect(extensionPage.getByText('Example direct', { exact: true })).toBeVisible()
 
@@ -79,6 +81,7 @@ test('supports drag, keyboard sorting, and blocks filtered reordering', async ({
     await extensionPage
       .getByLabel('Regular expression')
       .fill(`^https://${name.startsWith('First') ? 'first' : 'second'}\\.example/$`)
+    await extensionPage.getByLabel('Route via').selectOption('DIRECT')
     await extensionPage.getByRole('button', { name: 'Save rule' }).click()
   }
 
@@ -123,6 +126,7 @@ test('runs local pattern and global routing testers and supports duplicate, disa
   await extensionPage.getByRole('button', { name: 'Add rule' }).click()
   await extensionPage.getByLabel('Name', { exact: true }).fill('Tester route')
   await extensionPage.getByLabel('Regular expression').fill('^https://example\\.com/$')
+  await extensionPage.getByLabel('Route via').selectOption('DIRECT')
 
   await extensionPage.getByText('Single and multiple URL tester').click()
   await extensionPage
@@ -139,7 +143,7 @@ test('runs local pattern and global routing testers and supports duplicate, disa
   await expect(extensionPage.getByText('Tester route copy', { exact: true })).toBeVisible()
 
   await extensionPage.getByLabel('Enable Tester route', { exact: true }).uncheck()
-  await extensionPage.locator('.filter-grid select').nth(1).selectOption('false')
+  await extensionPage.getByLabel('Enabled', { exact: true }).selectOption('false')
   await expect(extensionPage.getByText('Tester route', { exact: true })).toBeVisible()
   await expect(extensionPage.getByText('Tester route copy', { exact: true })).toHaveCount(0)
   await extensionPage.getByRole('button', { name: 'Clear filters' }).click()
@@ -172,9 +176,7 @@ test('duplicates a profile and safely invalidates referring routes when deleting
   await extensionPage.getByRole('button', { name: /Rules/ }).click()
   await extensionPage.getByRole('button', { name: 'Add rule' }).click()
   await extensionPage.getByLabel('Name', { exact: true }).fill('Referring route')
-  const editor = extensionPage.locator('.editor')
-  await editor.locator('select').nth(2).selectOption('PROXY')
-  await editor.locator('select').nth(3).selectOption({ label: 'Impact proxy' })
+  await extensionPage.getByLabel('Route via').selectOption({ label: 'Proxy · Impact proxy' })
   await extensionPage.getByRole('button', { name: 'Save rule' }).click()
 
   await extensionPage.getByRole('button', { name: /Proxies/ }).click()
@@ -201,6 +203,80 @@ test('duplicates a profile and safely invalidates referring routes when deleting
   await expect(
     extensionPage.getByRole('listitem').filter({ hasText: 'Referring route' }),
   ).toContainText('INVALID REFERENCE')
+  await extensionPage
+    .getByRole('listitem')
+    .filter({ hasText: 'Referring route' })
+    .getByRole('button', { name: 'Edit' })
+    .click()
+  await expect(extensionPage.getByRole('alert')).toContainText('no longer exists')
+  await expect(extensionPage.getByRole('button', { name: 'Save rule' })).toBeDisabled()
+})
+
+test('assigns domain suffix rules to different proxy profiles and persists the routes', async ({
+  extensionPage,
+}) => {
+  await resetExtension(extensionPage)
+
+  for (const [name, port] of [
+    ['Proxy 1', '9001'],
+    ['Proxy 2', '9002'],
+  ] as const) {
+    await extensionPage.getByRole('button', { name: /Proxies/ }).click()
+    await extensionPage.getByRole('button', { name: 'Add profile' }).click()
+    await extensionPage.getByLabel('Name', { exact: true }).fill(name)
+    await extensionPage.getByLabel('Host', { exact: true }).fill('127.0.0.1')
+    await extensionPage.getByLabel('Port', { exact: true }).fill(port)
+    await extensionPage.getByRole('button', { name: 'Save profile' }).click()
+  }
+
+  await extensionPage.getByRole('button', { name: /Rules/ }).click()
+  for (const [name, suffixes, proxy] of [
+    ['Russian domains', '.ru, .рф', 'Proxy 1'],
+    ['German domains', '.de', 'Proxy 2'],
+  ] as const) {
+    await extensionPage.getByRole('button', { name: 'Add rule' }).click()
+    await extensionPage.getByLabel('Name', { exact: true }).fill(name)
+    await expect(extensionPage.locator('.editor').getByLabel('Action')).toHaveCount(0)
+    await extensionPage.getByLabel('Template', { exact: true }).selectOption('DOMAIN_SUFFIXES')
+    await extensionPage.getByLabel('Domain suffixes').fill(suffixes)
+    await extensionPage.getByRole('button', { name: 'Generate editable pattern' }).click()
+    await extensionPage.getByLabel('Route via').selectOption({ label: `Proxy · ${proxy}` })
+    await extensionPage.getByRole('button', { name: 'Save rule' }).click()
+  }
+
+  await expect(
+    extensionPage.getByRole('listitem').filter({ hasText: 'Russian domains' }),
+  ).toContainText('Via Proxy 1')
+  await expect(
+    extensionPage.getByRole('listitem').filter({ hasText: 'German domains' }),
+  ).toContainText('Via Proxy 2')
+
+  await extensionPage.getByLabel('Proxy profile').selectOption({ label: 'Proxy 1' })
+  await expect(extensionPage.getByText('Russian domains', { exact: true })).toBeVisible()
+  await expect(extensionPage.getByText('German domains', { exact: true })).toHaveCount(0)
+  await extensionPage.getByRole('button', { name: 'Clear filters' }).click()
+
+  await extensionPage.getByRole('button', { name: /General/ }).click()
+  await expect(
+    extensionPage.getByText(/Rules are evaluated in Proxy and Rules modes/),
+  ).toBeVisible()
+  await extensionPage.getByRole('button', { name: 'RULES', exact: true }).click()
+  await extensionPage.getByRole('button', { name: /Rules/ }).click()
+  await extensionPage.getByLabel('URL', { exact: true }).fill('https://example.ru/')
+  await extensionPage.getByRole('button', { name: 'Resolve route' }).click()
+  await expect(extensionPage.locator('.route-result')).toContainText('PROXY · RULE · Proxy 1')
+  await extensionPage.getByLabel('URL', { exact: true }).fill('https://example.de/')
+  await extensionPage.getByRole('button', { name: 'Resolve route' }).click()
+  await expect(extensionPage.locator('.route-result')).toContainText('PROXY · RULE · Proxy 2')
+
+  await extensionPage.reload()
+  await extensionPage.getByRole('button', { name: /Rules/ }).click()
+  await expect(
+    extensionPage.getByRole('listitem').filter({ hasText: 'Russian domains' }),
+  ).toContainText('Via Proxy 1')
+  await expect(
+    extensionPage.getByRole('listitem').filter({ hasText: 'German domains' }),
+  ).toContainText('Via Proxy 2')
 })
 
 test('starts with an empty ordered rule list and no group management', async ({

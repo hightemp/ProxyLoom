@@ -22,8 +22,8 @@ the HTTPS endpoint.
 ## Features
 
 - separate HTTP and HTTPS proxy endpoints, including proxy authentication;
-- globally ordered first-match rules, templates, search, filters, drag-and-drop and keyboard
-  ordering;
+- globally ordered first-match rules with an explicit direct or proxy-profile route, domain-suffix
+  templates, search, filters, drag-and-drop and keyboard ordering;
 - local regex and full routing testers with no network requests;
 - Once/Always site actions and private-session isolation;
 - redacted local routing logs and a best-effort main-frame error page;

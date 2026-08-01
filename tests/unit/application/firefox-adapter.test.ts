@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { buildRoutingSnapshot } from '../../../src/domain/routing/snapshot'
 import { FirefoxProxyAdapter } from '../../../src/platform/firefox/adapter'
 import { asProxyProfileId } from '../../../src/domain/types/brand'
-import { config, profile } from '../domain/fixtures'
+import { config, profile, rule } from '../domain/fixtures'
 
 const mocks = vi.hoisted(() => ({
   onRequestAdd: vi.fn(),
@@ -122,6 +122,47 @@ describe('FirefoxProxyAdapter event-page lifecycle', () => {
         url: 'http://example.com/',
       }),
     ).toBeNull()
+  })
+
+  it('returns the proxy profile assigned to each matching rule', async () => {
+    const proxy1 = profile('proxy-1', {
+      httpEndpoint: { ...profile('proxy-1').httpEndpoint, port: 9001 },
+    })
+    const proxy2 = profile('proxy-2', {
+      httpEndpoint: { ...profile('proxy-2').httpEndpoint, port: 9002 },
+    })
+    const snapshot = buildRoutingSnapshot(
+      config({
+        profiles: [proxy1, proxy2],
+        rules: [
+          rule('russian', 0, {
+            action: { targetProxyProfileId: proxy1.id, type: 'PROXY' },
+            pattern: '^http://example\\.ru/$',
+          }),
+          rule('german', 1, {
+            action: { targetProxyProfileId: proxy2.id, type: 'PROXY' },
+            pattern: '^http://example\\.de/$',
+          }),
+        ],
+      }),
+      [],
+      new Date(),
+    )
+    expect(snapshot.ok).toBe(true)
+    if (!snapshot.ok) return
+    const adapter = new FirefoxProxyAdapter()
+    await expect(adapter.applySnapshot(snapshot.value)).resolves.toEqual({ ok: true, value: 1 })
+
+    expect(listener()({ tabId: 1, url: 'http://example.ru/' })).toEqual({
+      host: '127.0.0.1',
+      port: 9001,
+      type: 'http',
+    })
+    expect(listener()({ tabId: 1, url: 'http://example.de/' })).toEqual({
+      host: '127.0.0.1',
+      port: 9002,
+      type: 'http',
+    })
   })
 
   it('fails closed when restoring Firefox proxy settings fails', async () => {

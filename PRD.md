@@ -251,7 +251,9 @@ Matcher Firefox-only. Target включает scheme, hostname, explicit/non-def
 Решение UX: в Chromium создание Full URL Rule доступно в advanced section редактора, но до выбора пользователь видит warning `Full URL rules work in Firefox only.` и должен явно подтвердить. Это лучше полного скрытия: конфигурацию можно заранее подготовить и переносить, но случайное создание затруднено.
 
 - `FR-038`: regex helper объясняет anchors, escaped dots, optional ports, subdomains, schemes, различия Origin/Full URL и Firefox-only path matching.
-- `FR-039`: templates: exact hostname; domain + subdomains; exact origin; HTTP only; HTTPS only; custom port; localhost; private IPv4; Firefox-only path; Firefox-only query parameter.
+- `FR-039`: templates: exact hostname; domain + subdomains; editable domain suffix list with
+  IDN/Punycode normalization; exact origin; HTTP only; HTTPS only; custom port; localhost; private
+  IPv4; Firefox-only path; Firefox-only query parameter.
 - `FR-040`: template только генерирует editable expression; сохранение проходит обычную validation.
 - `COMPAT-006`: нельзя обещать Chromium Full URL routing через post-selection `webRequest`.
 
@@ -347,7 +349,8 @@ CRUD/duplicate/delete, color, endpoints, credentials notice, manual check, last 
 ### Rules
 
 Ordered list, DnD, enable, temporary disable, duplicate/edit/delete, invalid state, search и filters
-по action/profile/compatibility/enabled. Filtered view read/review-only для order.
+по action/profile/compatibility/enabled. Редактор использует один обязательный `Route via` selector:
+explicit direct или один существующий proxy profile. Filtered view read/review-only для order.
 
 ### Logs
 

@@ -1,6 +1,7 @@
 export type RuleTemplateId =
   | 'EXACT_HOSTNAME'
   | 'DOMAIN_AND_SUBDOMAINS'
+  | 'DOMAIN_SUFFIXES'
   | 'EXACT_ORIGIN'
   | 'HTTP_ONLY'
   | 'HTTPS_ONLY'
@@ -12,6 +13,7 @@ export type RuleTemplateId =
 
 export interface RuleTemplateInput {
   readonly hostname?: string
+  readonly domainSuffixes?: string
   readonly scheme?: 'http' | 'https' | 'ws' | 'wss'
   readonly port?: number
   readonly path?: string
@@ -34,6 +36,38 @@ const requiredHostname = (input: RuleTemplateInput): string => {
   return hostname.toLowerCase()
 }
 
+const normalizeDomainSuffix = (value: string): string => {
+  const suffix = value.trim().replace(/^\.+/u, '')
+  if (suffix.length === 0 || suffix.endsWith('.') || /[/:@?#[\]\\]/u.test(suffix)) {
+    throw new Error('Enter valid domain suffixes separated by commas.')
+  }
+
+  let hostname: string
+  try {
+    hostname = new URL(`https://${suffix}/`).hostname.toLowerCase()
+  } catch {
+    throw new Error('Enter valid domain suffixes separated by commas.')
+  }
+
+  const dnsName =
+    /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)(?:\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?))*$/u
+  if (hostname.length > 253 || !dnsName.test(hostname)) {
+    throw new Error('Enter valid domain suffixes separated by commas.')
+  }
+  return hostname
+}
+
+const requiredDomainSuffixes = (input: RuleTemplateInput): readonly string[] => {
+  const values = input.domainSuffixes?.split(/[,\n]/u) ?? []
+  const suffixes = [
+    ...new Set(values.filter((value) => value.trim().length > 0).map(normalizeDomainSuffix)),
+  ]
+  if (suffixes.length === 0) {
+    throw new Error('Enter at least one domain suffix.')
+  }
+  return suffixes
+}
+
 export const generateRuleTemplate = (
   id: RuleTemplateId,
   input: RuleTemplateInput = {},
@@ -53,6 +87,14 @@ export const generateRuleTemplate = (
         flags: 'i',
         matcherType: 'ORIGIN',
         pattern: `^(?:https?|wss?)://(?:[^./]+\\.)*${domain}(?::\\d+)?/$`,
+      }
+    }
+    case 'DOMAIN_SUFFIXES': {
+      const suffixes = requiredDomainSuffixes(input).map(escapeRegex).join('|')
+      return {
+        flags: 'i',
+        matcherType: 'ORIGIN',
+        pattern: `^(?:https?|wss?)://(?:[^./:]+\\.)+(?:${suffixes})(?::\\d+)?/$`,
       }
     }
     case 'EXACT_ORIGIN': {
