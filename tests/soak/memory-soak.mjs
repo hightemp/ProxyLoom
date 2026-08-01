@@ -7,15 +7,19 @@ import { chromium } from '@playwright/test'
 const MEBIBYTE = 1_024 * 1_024
 const durationMs = Number(process.env.PROXYLOOM_SOAK_DURATION_MS ?? 300_000)
 const sampleIntervalMs = Number(process.env.PROXYLOOM_SOAK_SAMPLE_INTERVAL_MS ?? 30_000)
+const warmupMs = Number(process.env.PROXYLOOM_SOAK_WARMUP_MS ?? 60_000)
 if (
   !Number.isSafeInteger(durationMs) ||
   durationMs < 30_000 ||
   durationMs > 3_600_000 ||
   !Number.isSafeInteger(sampleIntervalMs) ||
   sampleIntervalMs < 5_000 ||
-  sampleIntervalMs > durationMs
+  sampleIntervalMs > durationMs ||
+  !Number.isSafeInteger(warmupMs) ||
+  warmupMs < 10_000 ||
+  warmupMs > 600_000
 ) {
-  throw new Error('Invalid soak duration or sample interval')
+  throw new Error('Invalid soak duration, sample interval, or warm-up duration')
 }
 
 const extensionPath = resolve('.output/chrome-mv3')
@@ -108,12 +112,18 @@ try {
     }
   }
 
-  for (let iteration = 0; iteration < 5; iteration += 1) await exercise(iteration)
-  const samples = [await sample(0, 5)]
+  let iteration = 0
+  const warmupStartedAt = Date.now()
+  while (Date.now() - warmupStartedAt < warmupMs) {
+    await exercise(iteration)
+    iteration += 1
+  }
+  const actualWarmupMs = Date.now() - warmupStartedAt
+  const warmupIterations = iteration
+  const samples = [await sample(0, iteration)]
   process.stdout.write(`${JSON.stringify(samples[0])}\n`)
 
   const startedAt = Date.now()
-  let iteration = 5
   let nextSampleAt = sampleIntervalMs
   while (Date.now() - startedAt < durationMs) {
     await exercise(iteration)
@@ -154,7 +164,14 @@ try {
     pssBytes: 64 * MEBIBYTE,
   }
   process.stdout.write(
-    `${JSON.stringify({ durationMs: finalElapsedMs, growth, iterations: iteration, limits })}\n`,
+    `${JSON.stringify({
+      durationMs: finalElapsedMs,
+      growth,
+      iterations: iteration - warmupIterations,
+      limits,
+      warmupIterations,
+      warmupMs: actualWarmupMs,
+    })}\n`,
   )
   for (const [metric, limit] of Object.entries(limits)) {
     if (growth[metric] > limit) {

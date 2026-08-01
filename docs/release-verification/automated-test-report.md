@@ -17,7 +17,7 @@ pnpm: 10.32.1
 | Coverage                                       | 89.43% statements, 80.40% branches, 93.37% functions, 89.93% lines |
 | Idempotent GitHub Release publisher            | 6 local create/retry/failure/checksum regressions pass             |
 | Release performance budgets                    | 5 pass across unit and browser E2E                                 |
-| Five-minute Chromium memory soak               | 752 cycles; heap +0.96 MiB, PSS +55.15 MiB; all budgets pass       |
+| Warmed five-minute Chromium memory soak        | 764 cycles; heap +0.17 MiB, PSS +25.28 MiB; all budgets pass       |
 | Local network and Firefox API integration      | 6 pass in 2 files                                                  |
 | Chromium extension E2E                         | 41 pass                                                            |
 | Headed Orca/AT-SPI accessibility               | Keyboard speech output and actual 200% zoom pass                   |
@@ -88,5 +88,6 @@ automation evidence, not a hosted GitHub Release claim.
   passed; see `yandex-26-stable-linux-smoke.md`.
 
 This report is automated candidate evidence supplemented by recorded Chrome, Firefox, Edge and
-Yandex runtime smokes, an isolated real-Orca walkthrough and a five-minute Chromium memory soak.
+Yandex runtime smokes, an isolated real-Orca walkthrough and a warmed five-minute Chromium memory
+soak.
 It does not sign the full package-install/update or store-portal manual matrices.

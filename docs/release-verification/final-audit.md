@@ -61,9 +61,9 @@ Current disposition: **NOT RELEASE APPROVED**
 - Headed Chromium with Orca 46.1/AT-SPI completed a keyboard-only speech-output walkthrough. Actual
   200% browser zoom passed; a headed-only narrow-Popup overflow found by this gate was fixed and
   regression-tested.
-- A five-minute Chromium memory soak completed 752 full Options/Popup cycles with zero document,
-  DOM-node, listener or process-count growth; renderer heap and whole-profile PSS remained within
-  their recorded budgets.
+- After a one-minute Chromium warm-up, a five-minute memory soak completed 764 full Options/Popup
+  cycles with zero document, DOM-node, listener or process-count growth; renderer heap grew 0.17
+  MiB and whole-profile PSS grew 25.28 MiB within the unchanged budgets.
 - GitHub Actions build both targets and create checksummed GitHub release artifacts only; no store
   credentials or publication action exists. The publisher locally proves first-create and
   idempotent same-release refresh paths, rejects draft/prerelease collisions, downloads the
