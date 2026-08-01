@@ -30,6 +30,9 @@ for (const target of targets) {
   if (!(manifest.host_permissions ?? []).includes('<all_urls>')) {
     throw new Error(`${target.directory}: routing host permission missing`)
   }
+  if (manifest.options_ui?.page !== 'options.html' || manifest.options_ui?.open_in_tab !== true) {
+    throw new Error(`${target.directory}: options must open in a standalone tab`)
+  }
   for (const size of ['16', '32', '48', '128']) {
     const icon = manifest.icons?.[size]
     const actionIcon = manifest.action?.default_icon?.[size]

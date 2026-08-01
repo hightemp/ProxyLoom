@@ -8,12 +8,14 @@ Current disposition: **NOT RELEASE APPROVED**
 - Strict typecheck, lint and formatting: pass.
 - A clean temporary Git snapshot with no dependencies/build output was cloned and passed frozen
   install, the complete regression/package sequence and a zero-diff post-run check.
-- The final current-tree repetition in an isolated clean repository passed all 37 E2E tests and
+- The final current-tree repetition in an isolated clean repository passed all 38 E2E tests and
   every package gate with an empty post-run Git status.
 - Unit, parity, performance, local integration and Chromium extension E2E: pass on the recorded
   candidate state.
 - Chromium and Firefox MV3 builds, manifest/CSP validation and artifact secret scan: available as
   reproducible commands.
+- Both target manifests require `options_ui.open_in_tab: true`, and Chromium E2E verifies that
+  Settings opens as a standalone extension tab rather than an extensions-page dialog.
 - Google Chrome 150.0.7871.128 Official Stable passed clean-profile GUI sideload, core UI,
   `chrome.proxy` ownership and real incognito-window lifecycle smoke; this is recorded evidence,
   not the release owner's signed PL-121 matrix.
