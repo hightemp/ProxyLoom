@@ -135,7 +135,7 @@ Vue 3 Composition API, `<script setup lang="ts">`, typed props/emits/composables
 1. `DIRECT` игнорирует rules, auth и overrides, не удаляя их.
 2. `PROXY`: override → first rule → global proxy.
 3. `RULES`: override → first rule → `DIRECT`.
-4. Rules проверяются строго по global position; group/specificity не меняют priority.
+4. Rules проверяются строго по global position; категории/specificity не меняют priority.
 5. Disabled, unexpired temporary-disabled и incompatible rules пропускаются.
 6. Full URL Rule — Firefox-only; Chromium сохраняет и пропускает его с visible reason.
 7. Invalid/deleted proxy reference не превращается в `DIRECT`.

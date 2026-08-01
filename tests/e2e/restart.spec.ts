@@ -39,7 +39,7 @@ test('preserves local configuration and clears normal/private session state afte
   try {
     firstContext = await launch(userDataDirectory)
     const first = await openOptions(firstContext)
-    const config = createDefaultConfig(new Date('2026-07-26T12:00:00.000Z'))
+    const config = createDefaultConfig()
     const beforeRestart = await first.page.evaluate(async (persistedConfig) => {
       const extensionApi = (
         globalThis as unknown as {
@@ -144,7 +144,7 @@ test('preserves local configuration and clears normal/private session state afte
       .toEqual({
         localMode: 'DIRECT',
         proxyMode: 'direct',
-        schemaVersion: 1,
+        schemaVersion: 2,
         session: { 'session.overrides': [] },
       })
   } finally {

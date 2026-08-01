@@ -1,17 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { GeneralSettingsService } from '../../../src/application/config/general-settings-service'
-import { GroupApplicationService } from '../../../src/application/groups/group-service'
 import { ProfileApplicationService } from '../../../src/application/profiles/profile-service'
 import { RuleApplicationService } from '../../../src/application/rules/rule-service'
-import {
-  asProxyProfileId,
-  asRuleGroupId,
-  asRuleId,
-  type IdGenerator,
-} from '../../../src/domain/types/brand'
+import { asProxyProfileId, asRuleId, type IdGenerator } from '../../../src/domain/types/brand'
 import type { Clock, ProxyProfile, Rule } from '../../../src/domain/types/entities'
-import { config, endpoint, groupId, profile, rule } from '../domain/fixtures'
+import { config, endpoint, profile, rule } from '../domain/fixtures'
 
 class SequenceIds implements IdGenerator {
   #index = 0
@@ -57,7 +51,6 @@ const editableRule = (
   description: '',
   enabled: true,
   flags: 'i',
-  groupId,
   matcherType: 'ORIGIN' as const,
   name: 'Example',
   pattern: '^https://example\\.com/$',
@@ -139,7 +132,7 @@ describe('profile application service', () => {
   })
 })
 
-describe('rule and group application services', () => {
+describe('rule application service', () => {
   it('keeps one global order across create, duplicate, reorder, and delete', () => {
     const rules = new RuleApplicationService(new SequenceIds(['created', 'duplicated']), clock)
     const initial = config({ rules: [rule('existing', 0)] })
@@ -181,61 +174,7 @@ describe('rule and group application services', () => {
     expect(rules.delete(moved.value.config, middleRule.id)).toMatchObject({ ok: true })
   })
 
-  it('renames and deletes groups without changing global rule positions', () => {
-    const groups = new GroupApplicationService(new SequenceIds(['custom']))
-    const created = groups.create(config(), 'Custom')
-    expect(created.ok).toBe(true)
-    if (!created.ok) {
-      return
-    }
-    const customId = created.value.group.id
-    const withRule = {
-      ...created.value.config,
-      rules: [rule('custom-rule', 0, { groupId: customId })],
-    }
-    expect(groups.delete(withRule, customId, groupId, false)).toMatchObject({
-      error: { code: 'CONFIRMATION_REQUIRED' },
-      ok: false,
-    })
-    const deleted = groups.delete(withRule, customId, groupId, true)
-    expect(deleted).toMatchObject({
-      ok: true,
-      value: { config: { rules: [{ groupId, position: 0 }] } },
-    })
-  })
-
-  it('returns typed failures for invalid group and rule mutations', () => {
-    const groups = new GroupApplicationService(new SequenceIds(['invalid-group']))
-    expect(groups.create(config(), '')).toMatchObject({
-      error: { code: 'GROUP_INVALID', field: 'name' },
-      ok: false,
-    })
-    expect(groups.rename(config(), asRuleGroupId('missing'), 'Renamed')).toEqual({
-      error: { code: 'GROUP_NOT_FOUND', groupId: 'missing' },
-      ok: false,
-    })
-    expect(groups.rename(config(), groupId, '')).toMatchObject({
-      error: { code: 'GROUP_INVALID', field: 'name' },
-      ok: false,
-    })
-    expect(groups.rename(config(), groupId, 'Renamed')).toMatchObject({
-      ok: true,
-      value: { config: { groups: [{ name: 'Renamed' }] } },
-    })
-    expect(groups.delete(config(), asRuleGroupId('missing'), null, true)).toEqual({
-      error: { code: 'GROUP_NOT_FOUND', groupId: 'missing' },
-      ok: false,
-    })
-    expect(groups.delete(config(), groupId, null, true)).toMatchObject({
-      ok: true,
-      value: { config: { groups: [] } },
-    })
-    const withRule = config({ rules: [rule('owned', 0)] })
-    expect(groups.delete(withRule, groupId, groupId, true)).toEqual({
-      error: { code: 'DESTINATION_GROUP_NOT_FOUND', groupId },
-      ok: false,
-    })
-
+  it('returns typed failures for invalid rule mutations', () => {
     const rules = new RuleApplicationService(new SequenceIds(['invalid']), clock)
     expect(rules.create(config(), editableRule({ name: '' }))).toMatchObject({
       error: { code: 'RULE_INVALID', field: 'name' },

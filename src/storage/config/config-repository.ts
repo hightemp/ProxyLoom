@@ -63,7 +63,7 @@ export class ConfigRepository {
     }
     const stored = values[CONFIG_KEY]
     if (stored === undefined) {
-      const initial = createDefaultConfig(this.now())
+      const initial = createDefaultConfig()
       try {
         await this.storage.set({ [CONFIG_KEY]: initial })
         return ok(initial)
@@ -76,7 +76,7 @@ export class ConfigRepository {
     if (current.ok) {
       return current
     }
-    const migrated = migrateConfig(stored, this.now())
+    const migrated = migrateConfig(stored)
     if (!migrated.ok) {
       return migrated
     }

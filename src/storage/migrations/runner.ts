@@ -1,9 +1,10 @@
 import type { AppConfig } from '../../domain/types/entities'
 import { err, type Result } from '../../domain/types/result'
+import { removeGroupsFromVersionOne } from '../../domain/config/remove-groups-migration'
 import { createDefaultConfig } from '../seed/create-default-config'
 import { parseAppConfig, type ConfigSchemaError } from '../../domain/config/schema'
 
-export const CURRENT_SCHEMA_VERSION = 1
+export const CURRENT_SCHEMA_VERSION = 2
 
 export interface MigrationError {
   readonly code: 'UNSUPPORTED_SCHEMA_VERSION' | 'INVALID_LEGACY_CONFIG'
@@ -18,8 +19,8 @@ const asRecord = (value: unknown): MutableRecord | null =>
     ? { ...(value as Readonly<Record<string, unknown>>) }
     : null
 
-const migrateVersionZero = (input: MutableRecord, now: Date): unknown => {
-  const defaults = createDefaultConfig(now)
+const migrateVersionZero = (input: MutableRecord): unknown => {
+  const defaults = createDefaultConfig()
   const general = asRecord(input.general)
   const appearance = asRecord(input.appearance)
 
@@ -32,7 +33,7 @@ const migrateVersionZero = (input: MutableRecord, now: Date): unknown => {
       ...defaults.general,
       ...(general ?? {}),
     },
-    groups: Array.isArray(input.groups) ? input.groups : defaults.groups,
+    groups: Array.isArray(input.groups) ? input.groups : [],
     profiles: Array.isArray(input.profiles) ? input.profiles : defaults.profiles,
     revision:
       typeof input.revision === 'number' && Number.isInteger(input.revision) ? input.revision : 0,
@@ -43,7 +44,6 @@ const migrateVersionZero = (input: MutableRecord, now: Date): unknown => {
 
 export const migrateConfig = (
   input: unknown,
-  now: Date,
 ): Result<AppConfig, MigrationError | ConfigSchemaError> => {
   const record = asRecord(input)
   if (record === null) {
@@ -75,7 +75,17 @@ export const migrateConfig = (
           version: currentVersion,
         })
       }
-      migrated = migrateVersionZero(currentRecord, now)
+      migrated = migrateVersionZero(currentRecord)
+    } else if (currentVersion === 1) {
+      const currentRecord = asRecord(migrated)
+      if (currentRecord === null) {
+        return err({
+          code: 'INVALID_LEGACY_CONFIG',
+          issues: [],
+          version: currentVersion,
+        })
+      }
+      migrated = removeGroupsFromVersionOne(currentRecord)
     }
   }
 

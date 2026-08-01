@@ -40,6 +40,7 @@ complete acceptance evidence exists.
 | PL-120        | A      | Chromium console/export/auth/log checks plus Chrome, Firefox and Edge network/storage canary inspection                           | Store privacy form remains PL-115                                  |
 | PL-121…PL-123 | M      | Candidate checklists plus Chrome/Firefox/Edge/Yandex branded runtime smokes                                                       | Signed full Chrome, Firefox, Edge and Yandex matrices              |
 | PL-124        | M      | `docs/release-verification/final-audit.md`                                                                                        | PL-121…PL-123 plus human release-owner approval                    |
+| PL-125        | A      | Schema-v2 migration, simplified Rules UI, native-import compatibility and unit/E2E regressions                                    | None beyond aggregate release gates                                |
 
 ## Product requirement evidence
 
@@ -47,7 +48,7 @@ complete acceptance evidence exists.
 | --------------------- | ---------------------------------------------------------------------------------------------------- |
 | FR-001…FR-014         | General mode, profile/rule CRUD, diagnostics and localization UI; unit and core E2E                  |
 | FR-015…FR-024         | Shared resolver, endpoint mapping, control status and error coordination; parity/integration/E2E     |
-| FR-025…FR-040         | Ordered Origin/Full URL rules, groups, filters, templates and bounded regex tester                   |
+| FR-025…FR-040         | Ordered Origin/Full URL rules, filters, templates and bounded regex tester                           |
 | FR-041…FR-053         | Profile endpoint validation, checks, authentication and badge/status flows                           |
 | FR-054…FR-059         | Popup inspection, Once/Always/Edit/Retry and isolated session overrides                              |
 | FR-060…FR-072         | Logs, proxy check, native import/export and fixture-backed FoxyProxy import                          |

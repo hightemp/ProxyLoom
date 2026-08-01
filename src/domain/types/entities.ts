@@ -1,10 +1,4 @@
-import type {
-  IsoTimestamp,
-  ProxyProfileId,
-  RuleGroupId,
-  RuleId,
-  TemporaryOverrideId,
-} from './brand'
+import type { IsoTimestamp, ProxyProfileId, RuleId, TemporaryOverrideId } from './brand'
 
 export type GlobalMode = 'DIRECT' | 'PROXY' | 'RULES'
 export type ProxyTransport = 'HTTP' | 'HTTPS'
@@ -74,7 +68,6 @@ export interface Rule {
   readonly name: string
   readonly description: string
   readonly enabled: boolean
-  readonly groupId: RuleGroupId
   readonly position: number
   readonly matcherType: MatcherType
   readonly pattern: string
@@ -84,13 +77,6 @@ export interface Rule {
   readonly validity: RuleValidity
   readonly createdAt: IsoTimestamp
   readonly updatedAt: IsoTimestamp
-}
-
-export interface RuleGroup {
-  readonly id: RuleGroupId
-  readonly name: string
-  readonly position: number
-  readonly isPreset: boolean
 }
 
 export type OverrideScope = 'EXACT_HOSTNAME' | 'REGISTRABLE_DOMAIN'
@@ -131,7 +117,6 @@ export interface AppConfig {
   readonly schemaVersion: number
   readonly revision: number
   readonly profiles: readonly ProxyProfile[]
-  readonly groups: readonly RuleGroup[]
   readonly rules: readonly Rule[]
   readonly general: GeneralSettings
   readonly appearance: AppearanceSettings

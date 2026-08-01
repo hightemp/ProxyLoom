@@ -1,19 +1,18 @@
 import { describe, expect, it } from 'vitest'
 
-import { asIsoTimestamp, asProxyProfileId, asRuleGroupId } from '../../../src/domain/types/brand'
+import { asIsoTimestamp, asProxyProfileId, asRuleId } from '../../../src/domain/types/brand'
 import { EMPTY_RULE_FILTERS, filterRules } from '../../../src/domain/rules/filters'
 import {
   deriveRuleValidity,
-  validateGroup,
   validateOverride,
   validateRule,
 } from '../../../src/domain/rules/validate'
-import { groupId, override, profile, rule } from './fixtures'
+import { override, profile, rule } from './fixtures'
 
 describe('branded primitives and entity invariants', () => {
   it('rejects non-portable IDs and non-canonical timestamps', () => {
     expect(() => asProxyProfileId('')).toThrow(TypeError)
-    expect(() => asRuleGroupId('contains spaces')).toThrow(TypeError)
+    expect(() => asRuleId('contains spaces')).toThrow(TypeError)
     expect(() => asIsoTimestamp('2026-01-01')).toThrow(TypeError)
     expect(asIsoTimestamp('2026-01-01T00:00:00.000Z')).toBe('2026-01-01T00:00:00.000Z')
   })
@@ -21,7 +20,6 @@ describe('branded primitives and entity invariants', () => {
   it('validates action and reference invariants', () => {
     const proxy = profile('proxy-1')
     const references = {
-      groupIds: new Set([groupId]),
       profileIds: new Set([proxy.id]),
     }
     expect(
@@ -53,11 +51,7 @@ describe('branded primitives and entity invariants', () => {
     )
   })
 
-  it('validates groups and temporary overrides', () => {
-    expect(validateGroup({ id: groupId, isPreset: false, name: ' ', position: 0 })).toMatchObject({
-      error: { code: 'GROUP_NAME_REQUIRED' },
-      ok: false,
-    })
+  it('validates temporary overrides', () => {
     expect(validateOverride(override(), new Set()).ok).toBe(true)
     expect(
       validateOverride(

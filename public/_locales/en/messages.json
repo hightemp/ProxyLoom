@@ -357,7 +357,7 @@
   "portableBackup": { "message": "Portable backup" },
   "nativeExport": { "message": "Native export" },
   "nativeExportDescription": {
-    "message": "Includes profiles, groups, rules, general settings, and appearance. Logs, overrides, and other transient state are never exported."
+    "message": "Includes profiles, rules, general settings, and appearance. Logs, overrides, and other transient state are never exported."
   },
   "includeProxyCredentials": { "message": "Include proxy credentials" },
   "includeProxyCredentialsDescription": {
@@ -376,7 +376,6 @@
   "nativeJsonFile": { "message": "Native JSON file" },
   "validatePreview": { "message": "Validate and preview" },
   "profilesCountLabel": { "message": "profiles" },
-  "groupsCountLabel": { "message": "groups" },
   "rulesCountLabel": { "message": "rules" },
   "credentials": { "message": "Credentials:" },
   "presentInFile": { "message": "present in file" },
@@ -386,7 +385,7 @@
   "replace": { "message": "Replace" },
   "apply": { "message": "Apply" },
   "replaceImportWarning": {
-    "message": "Replace all profiles, groups, rules, and settings with this file? A recovery backup is kept locally."
+    "message": "Replace all profiles, rules, and settings with this file? A recovery backup is kept locally."
   },
   "nativeImportCommitted": { "message": "Native import committed and applied." },
   "profilesOnly": { "message": "Profiles only" },
@@ -509,13 +508,11 @@
   "firstMatchWins": { "message": "First match wins" },
   "orderedRules": { "message": "Ordered rules" },
   "orderedRulesDescription": {
-    "message": "Groups organize rules but never change their global priority."
+    "message": "Rules are evaluated from top to bottom. The first matching enabled rule wins."
   },
   "addRule": { "message": "Add rule" },
   "search": { "message": "Search" },
   "nameOrPattern": { "message": "Name or pattern" },
-  "group": { "message": "Group" },
-  "allGroups": { "message": "All groups" },
   "allActions": { "message": "All actions" },
   "enabled": { "message": "Enabled" },
   "disabled": { "message": "Disabled" },
@@ -529,7 +526,6 @@
     "message": "Create a rule or clear filters. Unmatched traffic follows the selected mode."
   },
   "rulesGlobalOrder": { "message": "Rules in global priority order" },
-  "missingGroup": { "message": "Missing group" },
   "missingProfile": { "message": "Missing profile" },
   "enable": { "message": "Enable" },
   "move": { "message": "Move" },
@@ -574,25 +570,6 @@
   "testingLocally": { "message": "Testing locally…" },
   "linesLabel": { "message": "line(s)" },
   "noNetworkRequest": { "message": "No network request was made." },
-  "organization": { "message": "Organization" },
-  "groups": { "message": "Groups" },
-  "groupsPriorityDescription": { "message": "Groups do not change rule priority." },
-  "rename": { "message": "Rename" },
-  "saveName": { "message": "Save name" },
-  "rulesCountSuffix": { "message": "rule(s)" },
-  "preset": { "message": "Preset" },
-  "moveRulesTo": { "message": "Move rules to" },
-  "selectGroup": { "message": "Select group" },
-  "newGroupName": { "message": "New group name" },
-  "addGroup": { "message": "Add group" },
-  "chooseDestinationGroup": {
-    "message": "Choose a destination group before deleting a group that contains rules."
-  },
-  "deleteGroupPrefix": { "message": "Delete the group" },
-  "deleteGroupMovePrefix": { "message": "and move" },
-  "deleteGroupMoveSuffix": {
-    "message": "rule(s) to the selected group? Rule priority will not change."
-  },
   "authoritativeResolver": { "message": "Authoritative resolver" },
   "globalRoutingTester": { "message": "Global routing tester" },
   "url": { "message": "URL" },

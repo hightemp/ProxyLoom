@@ -46,7 +46,6 @@ export interface AppRuntimeState {
 
 export interface NativeImportPreviewView {
   readonly profiles: number
-  readonly groups: number
   readonly rules: number
   readonly includesCredentials: boolean
   readonly idConflicts: number
@@ -115,17 +114,6 @@ export type RuntimeRequest =
       readonly ruleId: string
       readonly toPosition: number
       readonly filtersActive: boolean
-    }
-  | {
-      readonly type: 'SAVE_GROUP'
-      readonly groupId: string | null
-      readonly name: string
-    }
-  | {
-      readonly type: 'DELETE_GROUP'
-      readonly groupId: string
-      readonly destinationGroupId: string | null
-      readonly confirmed: boolean
     }
   | {
       readonly type: 'CREATE_OVERRIDE'

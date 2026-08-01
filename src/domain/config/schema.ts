@@ -68,7 +68,6 @@ const ruleSchema = z
     description: z.string().max(4_096),
     enabled: z.boolean(),
     flags: z.string().max(8),
-    groupId: id,
     id,
     matcherType: z.enum(['ORIGIN', 'FULL_URL']),
     name: z.string().min(1).max(256),
@@ -77,15 +76,6 @@ const ruleSchema = z
     temporaryDisable: temporaryDisableSchema.nullable(),
     updatedAt: timestamp,
     validity: z.enum(['VALID', 'INVALID_REFERENCE', 'INVALID_PATTERN']),
-  })
-  .strict()
-
-const groupSchema = z
-  .object({
-    id,
-    isPreset: z.boolean(),
-    name: z.string().min(1).max(256),
-    position: z.number().int().nonnegative(),
   })
   .strict()
 
@@ -111,11 +101,10 @@ export const appConfigSchema = z
         proxyCheckTimeoutMs: z.number().int().min(1_000).max(120_000),
       })
       .strict(),
-    groups: z.array(groupSchema).max(10_000),
     profiles: z.array(profileSchema).max(10_000),
     revision: z.number().int().nonnegative(),
     rules: z.array(ruleSchema).max(10_000),
-    schemaVersion: z.literal(1),
+    schemaVersion: z.literal(2),
   })
   .strict()
 

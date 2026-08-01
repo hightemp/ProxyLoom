@@ -139,7 +139,7 @@ test('runs local pattern and global routing testers and supports duplicate, disa
   await expect(extensionPage.getByText('Tester route copy', { exact: true })).toBeVisible()
 
   await extensionPage.getByLabel('Enable Tester route', { exact: true }).uncheck()
-  await extensionPage.locator('.filter-grid select').nth(2).selectOption('false')
+  await extensionPage.locator('.filter-grid select').nth(1).selectOption('false')
   await expect(extensionPage.getByText('Tester route', { exact: true })).toBeVisible()
   await expect(extensionPage.getByText('Tester route copy', { exact: true })).toHaveCount(0)
   await extensionPage.getByRole('button', { name: 'Clear filters' }).click()
@@ -173,8 +173,8 @@ test('duplicates a profile and safely invalidates referring routes when deleting
   await extensionPage.getByRole('button', { name: 'Add rule' }).click()
   await extensionPage.getByLabel('Name', { exact: true }).fill('Referring route')
   const editor = extensionPage.locator('.editor')
-  await editor.locator('select').nth(3).selectOption('PROXY')
-  await editor.locator('select').nth(4).selectOption({ label: 'Impact proxy' })
+  await editor.locator('select').nth(2).selectOption('PROXY')
+  await editor.locator('select').nth(3).selectOption({ label: 'Impact proxy' })
   await extensionPage.getByRole('button', { name: 'Save rule' }).click()
 
   await extensionPage.getByRole('button', { name: /Proxies/ }).click()
@@ -203,44 +203,15 @@ test('duplicates a profile and safely invalidates referring routes when deleting
   ).toContainText('INVALID REFERENCE')
 })
 
-test('creates, renames, and deletes a group with explicit rule reassignment', async ({
+test('starts with an empty ordered rule list and no group management', async ({
   extensionPage,
 }) => {
   await resetExtension(extensionPage)
   await extensionPage.getByRole('button', { name: /Rules/ }).click()
-
-  await extensionPage.getByLabel('New group name').fill('Custom')
-  await extensionPage.getByRole('button', { name: 'Add group' }).click()
-  await expect(
-    extensionPage.locator('.group-row strong').filter({ hasText: /^Custom$/ }),
-  ).toBeVisible()
-
-  await extensionPage.getByRole('button', { name: 'Add rule' }).click()
-  await extensionPage.getByLabel('Name', { exact: true }).fill('Custom route')
-  await extensionPage.locator('.editor select').first().selectOption({ label: 'Custom' })
-  await extensionPage.getByLabel('Regular expression').fill('^https://custom\\.example/$')
-  await extensionPage.getByRole('button', { name: 'Save rule' }).click()
-
-  await extensionPage.getByRole('button', { name: 'Rename Custom' }).click()
-  await extensionPage.getByLabel('Rename Custom').fill('Private')
-  await extensionPage.getByRole('button', { name: 'Save name' }).click()
-  await expect(
-    extensionPage.locator('.group-row strong').filter({ hasText: /^Private$/ }),
-  ).toBeVisible()
-
-  const privateGroup = extensionPage.locator('.group-row').filter({
-    has: extensionPage.locator('strong').filter({ hasText: /^Private$/ }),
-  })
-  await privateGroup.getByLabel('Move rules to').selectOption({ label: 'Work' })
-  extensionPage.once('dialog', (dialog) => dialog.accept())
-  await privateGroup.getByRole('button', { name: 'Delete Private' }).click()
-
-  await expect(
-    extensionPage.locator('.group-row strong').filter({ hasText: /^Private$/ }),
-  ).toHaveCount(0)
-  await expect(
-    extensionPage.getByRole('listitem').filter({ hasText: 'Custom route' }),
-  ).toContainText('Work · DIRECT')
+  await expect(extensionPage.getByText('No matching rules')).toBeVisible()
+  await expect(extensionPage.getByRole('button', { name: 'Add rule' })).toBeEnabled()
+  await expect(extensionPage.getByText('Groups', { exact: true })).toHaveCount(0)
+  await expect(extensionPage.getByLabel('Group')).toHaveCount(0)
 })
 
 test('creates Once and Always routes from the real action popup and opens the matched rule', async ({

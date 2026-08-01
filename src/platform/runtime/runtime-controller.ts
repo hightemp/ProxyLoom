@@ -2,7 +2,6 @@ import { browser, type Browser } from 'wxt/browser'
 
 import { GeneralSettingsService } from '../../application/config/general-settings-service'
 import type { ErrorCorrelationStore } from '../../application/errors/error-correlation-store'
-import { GroupApplicationService } from '../../application/groups/group-service'
 import { FoxyProxyImporter } from '../../application/import-export/foxyproxy/importer'
 import { parseFoxyProxyExport } from '../../application/import-export/foxyproxy/parser'
 import { nativeExportFilename, serializeNativeExport } from '../../application/import-export/export'
@@ -30,7 +29,6 @@ import { buildRoutingSnapshot } from '../../domain/routing/snapshot'
 import {
   asIsoTimestamp,
   asProxyProfileId,
-  asRuleGroupId,
   asRuleId,
   asTemporaryOverrideId,
 } from '../../domain/types/brand'
@@ -89,7 +87,6 @@ export class RuntimeController {
   readonly #ids = { next: () => crypto.randomUUID() }
   readonly #profiles = new ProfileApplicationService(this.#ids, this.#clock)
   readonly #rules = new RuleApplicationService(this.#ids, this.#clock)
-  readonly #groups = new GroupApplicationService(this.#ids)
   readonly #general = new GeneralSettingsService()
   readonly #nativeImport = new NativeImportService(this.#ids)
   readonly #foxyImporter = new FoxyProxyImporter(this.#ids, this.#clock)
@@ -195,23 +192,6 @@ export class RuntimeController {
               request.filtersActive,
             ),
           )
-        case 'SAVE_GROUP':
-          return this.mutate((config) =>
-            request.groupId === null
-              ? this.#groups.create(config, request.name)
-              : this.#groups.rename(config, asRuleGroupId(request.groupId), request.name),
-          )
-        case 'DELETE_GROUP':
-          return this.mutate((config) =>
-            this.#groups.delete(
-              config,
-              asRuleGroupId(request.groupId),
-              request.destinationGroupId === null
-                ? null
-                : asRuleGroupId(request.destinationGroupId),
-              request.confirmed,
-            ),
-          )
         case 'CREATE_OVERRIDE':
           return this.createOverride(request.scope, request.action, request.tabId)
         case 'PREVIEW_SITE_ACTION':
@@ -251,7 +231,6 @@ export class RuntimeController {
           return {
             ok: true,
             value: {
-              groups: preview.value.groups,
               idConflicts: preview.value.idConflicts,
               includesCredentials: preview.value.includesCredentials,
               nameConflicts: preview.value.nameConflicts,
@@ -402,8 +381,6 @@ export class RuntimeController {
     action: Extract<RuntimeRequest, { type: 'CREATE_SITE_RULE' }>['action'],
     tabId?: number,
   ): Promise<RuntimeResponse<unknown>> {
-    const current = await this.options.configRepository.initialize()
-    if (!current.ok) return commandError(current.error)
     const tab = await this.targetTab(tabId)
     if (tab?.url === undefined) {
       return commandError({ code: 'NO_ACTIVE_TAB' })
@@ -414,10 +391,6 @@ export class RuntimeController {
       this.options.adapter.capabilities.platform,
     )
     if (!preview.ok) return commandError(preview.error)
-    const group = current.value.groups[0]
-    if (group === undefined) {
-      return commandError({ code: 'GROUP_NOT_FOUND' })
-    }
     let hostname = 'site'
     try {
       hostname = new URL(tab.url).hostname
@@ -430,7 +403,6 @@ export class RuntimeController {
         description: `Created from the popup for ${preview.value.originKey}.`,
         enabled: true,
         flags: 'i',
-        groupId: group.id,
         matcherType: 'ORIGIN',
         name: `${hostname} ${action.type === 'DIRECT' ? 'direct' : 'proxy'}`,
         pattern: preview.value.generatedPattern,

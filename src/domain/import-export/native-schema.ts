@@ -3,6 +3,7 @@ import { z } from 'zod'
 import type { AppConfig } from '../types/entities'
 import { err, ok, type Result } from '../types/result'
 import { parseAppConfig } from '../config/schema'
+import { removeGroupsFromVersionOne } from '../config/remove-groups-migration'
 import { parseSafeJson, type SafeJsonErrorCode } from './safe-json'
 
 export const NATIVE_EXPORT_FORMAT = 'proxyloom-config'
@@ -53,7 +54,7 @@ const configShape = z
   .object({
     appearance: z.unknown(),
     general: z.unknown(),
-    groups: z.array(z.unknown()).max(10_000),
+    groups: z.array(z.unknown()).max(10_000).optional(),
     profiles: z.array(exportProfileSchema).max(10_000),
     revision: z.number().int().nonnegative(),
     rules: z.array(z.unknown()).max(10_000),
@@ -118,7 +119,11 @@ export const parseNativeExportText = (
       },
     })),
   }
-  const config = parseAppConfig(configCandidate)
+  const migratedCandidate =
+    configCandidate.schemaVersion === 1
+      ? removeGroupsFromVersionOne(configCandidate)
+      : configCandidate
+  const config = parseAppConfig(migratedCandidate)
   if (!config.ok) {
     return err({
       code: 'CONFIG_INVALID',

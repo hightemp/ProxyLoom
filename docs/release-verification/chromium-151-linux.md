@@ -22,7 +22,7 @@ PL-121.
 - Origin-scoped Once disclosure and source-tab cleanup.
 - Popup Once and Always creation plus matched-rule navigation through visible UI.
 - Inactive profile Check through a temporary exact-origin snapshot, cancellation and restoration.
-- Profile/rule/group CRUD, import/export, theme persistence and error-surface smoke.
+- Profile/rule CRUD, import/export, theme persistence and error-surface smoke.
 - Accessibility, 200% equivalent reflow and warm Popup/rule-apply performance gates.
 
 Commands:

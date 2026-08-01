@@ -72,7 +72,6 @@ const originRule = (id: string, position: number, origin: string, action: Rule['
     description: '',
     enabled: true,
     flags: 'i',
-    groupId: 'work',
     id,
     matcherType: 'ORIGIN',
     name: id,
@@ -85,7 +84,7 @@ const originRule = (id: string, position: number, origin: string, action: Rule['
 }
 
 const baseConfig = (): AppConfig => ({
-  ...createDefaultConfig(new Date('2026-01-01T00:00:00.000Z')),
+  ...createDefaultConfig(),
   revision: 1,
   rules: [],
 })

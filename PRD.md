@@ -202,7 +202,8 @@ flowchart TD
 
 Resolver — чистая синхронная domain-функция без browser API, storage и clock access. Clock/platform/request facts передаются аргументами. Он возвращает structured decision: action, source, matchedRule, profile, normalizedTarget, compatibility и diagnostics.
 
-- `FR-030`: rules сортируются только по числовой глобальной позиции; group не влияет на priority.
+- `FR-030`: rules сортируются только по числовой глобальной позиции; категории, specificity и
+  скрытые tie-breakers отсутствуют.
 - `FR-031`: первое совпадение завершает evaluation; specificity и скрытые tie-breakers отсутствуют.
 - `FR-032`: учитываются `enabled`, temporary disable expiry, compatibility, validity и matcher.
 - `FR-033`: reorder выполняется атомарно и перенумеровывает глобальные позиции детерминированно.
@@ -345,7 +346,8 @@ CRUD/duplicate/delete, color, endpoints, credentials notice, manual check, last 
 
 ### Rules
 
-Ordered list, DnD, enable, temporary disable, duplicate/edit/delete, invalid state, search и filters по group/action/profile/compatibility/enabled. Filtered view read/review-only для order.
+Ordered list, DnD, enable, temporary disable, duplicate/edit/delete, invalid state, search и filters
+по action/profile/compatibility/enabled. Filtered view read/review-only для order.
 
 ### Logs
 
@@ -454,7 +456,10 @@ Provider interface отделяет request, timeout, schema validation и mappi
 
 ### 23.1 Native JSON
 
-Envelope: stable `format`, `schemaVersion`, `exportedAt`, `appVersion`, profiles, groups, rules, general settings, appearance. Не зависит от display product name.
+Envelope: stable `format`, `schemaVersion`, `exportedAt`, `appVersion`, profiles, rules, general
+settings, appearance. Не зависит от display product name. Импорт schema v1 удаляет старые group
+metadata и неизменённые встроенные demo rules, сохраняя пользовательские/изменённые rules и их
+относительный глобальный порядок.
 
 Workflow: size limit → parse as inert data → schema validation → migration in memory → duplicate analysis → preview → `Merge` или confirmed `Replace` → transactional write/rollback → report.
 
@@ -465,7 +470,10 @@ Workflow: size limit → parse as inert data → schema validation → migration
 
 ### 23.2 FoxyProxy
 
-Adapter parsers распознают только документированные/fixture-backed современные JSON variants и извлекают HTTP/HTTPS proxy profiles. Rules, patterns, groups, subscriptions, logs и vendor settings не импортируются. Preview показывает found profiles, unsupported/skipped entries и name collisions. Ноль импортированных profiles — failure.
+Adapter parsers распознают только документированные/fixture-backed современные JSON variants и
+извлекают HTTP/HTTPS proxy profiles. Rules, patterns, vendor grouping metadata, subscriptions, logs
+и vendor settings не импортируются. Preview показывает found profiles, unsupported/skipped entries
+и name collisions. Ноль импортированных profiles — failure.
 
 - `FR-071`: duplicate names получают deterministic suggested rename и user-confirmed resolution.
 - `FR-072`: обещание поддержки всех исторических форматов отсутствует.
@@ -533,12 +541,12 @@ sequenceDiagram
 
 ## 26. Storage model
 
-| Store                        | Данные                                                                           | Политика                        |
-| ---------------------------- | -------------------------------------------------------------------------------- | ------------------------------- |
-| `storage.local`              | config envelope, profiles, groups, rules, general/appearance, migrations/backups | versioned, atomic repository    |
-| `storage.session`/эквивалент | overrides, temporary disables, auth attempts/recovery marker, transient errors   | очищается/reconciles на restart |
-| IndexedDB                    | максимум 1000 persistent log entries                                             | ring buffer, batch, indexes     |
-| Memory                       | private logs и read caches                                                       | не источник истины              |
+| Store                        | Данные                                                                         | Политика                        |
+| ---------------------------- | ------------------------------------------------------------------------------ | ------------------------------- |
+| `storage.local`              | config envelope, profiles, rules, general/appearance, migrations/backups       | versioned, atomic repository    |
+| `storage.session`/эквивалент | overrides, temporary disables, auth attempts/recovery marker, transient errors | очищается/reconciles на restart |
+| IndexedDB                    | максимум 1000 persistent log entries                                           | ring buffer, batch, indexes     |
+| Memory                       | private logs и read caches                                                     | не источник истины              |
 
 - `FR-076`: каждая schema имеет version и ordered migrations.
 - `FR-077`: перед migration создаётся bounded backup; marker позволяет распознать interrupted migration.
@@ -554,7 +562,6 @@ AppConfig
   schemaVersion: integer
   revision: integer
   profiles: ProxyProfile[]
-  groups: RuleGroup[]
   rules: Rule[]
   general: GeneralSettings
   appearance: AppearanceSettings
@@ -586,7 +593,6 @@ Rule
   name: string
   description: string
   enabled: boolean
-  groupId: string
   position: integer
   matcherType: ORIGIN | FULL_URL
   pattern: string
@@ -597,12 +603,6 @@ Rule
   validity: VALID | INVALID_REFERENCE | INVALID_PATTERN
   createdAt: timestamp
   updatedAt: timestamp
-
-RuleGroup
-  id: string
-  name: string
-  position: integer
-  isPreset: boolean
 
 TemporaryOverride
   id: string
@@ -643,7 +643,8 @@ LogEntry
   httpStatus?, totalDurationMs?, errorCode?, authFailure, platform
 ```
 
-Preset groups: `Work`, `Russian Sites`, `International Sites`, `Social Networks`, `Local Network`. Каждая получает одно disabled demonstration Origin Rule на `.example`/зарезервированном test domain, не влияющее на routing и удаляемое пользователем. Реальные domain lists не поставляются.
+Первая установка создаёт пустой список rules. Демонстрационные rules, категории и реальные domain
+lists не поставляются.
 
 ## 28. Security
 

@@ -15,7 +15,6 @@ export type RuleCommandError =
   | { readonly code: 'FILTERED_REORDER_FORBIDDEN' | 'POSITION_OUT_OF_RANGE' }
 
 const referencesFor = (config: AppConfig) => ({
-  groupIds: new Set(config.groups.map((group) => group.id)),
   profileIds: new Set(config.profiles.map((profile) => profile.id)),
 })
 
@@ -97,7 +96,6 @@ export class RuleApplicationService {
       description: current.description,
       enabled: current.enabled,
       flags: current.flags,
-      groupId: current.groupId,
       matcherType: current.matcherType,
       name: `${current.name} copy`,
       pattern: current.pattern,

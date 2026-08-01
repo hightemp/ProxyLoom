@@ -7,7 +7,7 @@ upload, or remotely executed code. The extension does not sell or share data.
 
 ## Data stored locally
 
-- Profiles, endpoints, optional proxy credentials, rules, groups, preferences, and appearance are
+- Profiles, endpoints, optional proxy credentials, rules, preferences, and appearance are
   stored in browser-managed extension local storage.
 - Credentials are plaintext application data inside that browser storage boundary. ProxyLoom does
   not claim encryption or a master-password vault.

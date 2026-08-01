@@ -25,7 +25,6 @@ interface RuleDraft {
   name: string
   description: string
   enabled: boolean
-  groupId: string
   matcherType: MatcherType
   pattern: string
   flags: string
@@ -33,13 +32,11 @@ interface RuleDraft {
   targetProxyProfileId: string
 }
 
-const firstGroupId = (): string => props.state.config.groups[0]?.id ?? ''
 const blankRule = (): RuleDraft => ({
   actionType: 'DIRECT',
   description: '',
   enabled: true,
   flags: 'i',
-  groupId: firstGroupId(),
   matcherType: 'ORIGIN',
   name: '',
   pattern: '^https://example\\.com/$',
@@ -51,7 +48,6 @@ const copyRule = (rule: Rule): RuleDraft => ({
   description: rule.description,
   enabled: rule.enabled,
   flags: rule.flags,
-  groupId: rule.groupId,
   matcherType: rule.matcherType,
   name: rule.name,
   pattern: rule.pattern,
@@ -63,16 +59,10 @@ const formOpen = shallowRef(false)
 const draft = reactive<RuleDraft>(blankRule())
 const editorNameInput = shallowRef<HTMLInputElement | null>(null)
 const search = shallowRef('')
-const groupFilter = shallowRef('')
 const actionFilter = shallowRef('')
 const enabledFilter = shallowRef('')
 const compatibilityFilter = shallowRef('')
 const dragId = shallowRef<string | null>(null)
-const groupName = shallowRef('')
-const editingGroupId = shallowRef<string | null>(null)
-const editingGroupName = shallowRef('')
-const groupDestinations = reactive<Record<string, string>>({})
-const groupStatus = shallowRef('')
 const templateId = shallowRef<RuleTemplateId>('EXACT_HOSTNAME')
 const templateHost = shallowRef('example.com')
 const testLines = shallowRef('https://example.com/path\nhttps://other.example/')
@@ -94,7 +84,6 @@ const restoreEditorFocus = shallowRef(false)
 const filtersActive = computed(
   () =>
     search.value.trim() !== '' ||
-    groupFilter.value !== '' ||
     actionFilter.value !== '' ||
     enabledFilter.value !== '' ||
     compatibilityFilter.value !== '',
@@ -109,7 +98,6 @@ const filteredRules = computed(() => {
         (query === '' ||
           rule.name.toLocaleLowerCase('en-US').includes(query) ||
           rule.pattern.toLocaleLowerCase('en-US').includes(query)) &&
-        (groupFilter.value === '' || rule.groupId === groupFilter.value) &&
         (actionFilter.value === '' || rule.action.type === actionFilter.value) &&
         (enabledFilter.value === '' || String(rule.enabled) === enabledFilter.value) &&
         (compatibilityFilter.value === '' ||
@@ -171,7 +159,6 @@ const save = (): void => {
       description: draft.description,
       enabled: draft.enabled,
       flags: draft.flags,
-      groupId: draft.groupId as Rule['groupId'],
       matcherType: draft.matcherType,
       name: draft.name,
       pattern: draft.pattern,
@@ -256,60 +243,9 @@ const drop = (target: Rule): void => {
 
 const clearFilters = (): void => {
   search.value = ''
-  groupFilter.value = ''
   actionFilter.value = ''
   enabledFilter.value = ''
   compatibilityFilter.value = ''
-}
-
-const addGroup = (): void => {
-  emit('command', {
-    groupId: null,
-    name: groupName.value,
-    type: 'SAVE_GROUP',
-  })
-  groupName.value = ''
-}
-
-const beginGroupRename = (groupId: string, name: string): void => {
-  editingGroupId.value = groupId
-  editingGroupName.value = name
-}
-
-const saveGroupRename = (): void => {
-  if (editingGroupId.value === null) return
-  emit('command', {
-    groupId: editingGroupId.value,
-    name: editingGroupName.value,
-    type: 'SAVE_GROUP',
-  })
-  editingGroupId.value = null
-  editingGroupName.value = ''
-}
-
-const deleteGroup = (groupId: string, name: string): void => {
-  const ruleCount = props.state.config.rules.filter((rule) => rule.groupId === groupId).length
-  const destinationGroupId = groupDestinations[groupId] ?? null
-  if (ruleCount > 0 && destinationGroupId === null) {
-    groupStatus.value = t('chooseDestinationGroup')
-    return
-  }
-  if (
-    !window.confirm(
-      ruleCount === 0
-        ? `${t('deleteGroupPrefix')} “${name}”?`
-        : `${t('deleteGroupPrefix')} “${name}” ${t('deleteGroupMovePrefix')} ${String(ruleCount)} ${t('deleteGroupMoveSuffix')}`,
-    )
-  ) {
-    return
-  }
-  emit('command', {
-    confirmed: true,
-    destinationGroupId,
-    groupId,
-    type: 'DELETE_GROUP',
-  })
-  groupStatus.value = ''
 }
 
 watch(() => props.busy, restoreFocus)
@@ -325,12 +261,7 @@ watch(() => props.busy, restoreFocus)
         <h2>{{ t('orderedRules') }}</h2>
         <p>{{ t('orderedRulesDescription') }}</p>
       </div>
-      <button
-        class="primary"
-        type="button"
-        :disabled="busy || state.config.groups.length === 0"
-        @click="create($event)"
-      >
+      <button class="primary" type="button" :disabled="busy" @click="create($event)">
         {{ t('addRule') }}
       </button>
     </div>
@@ -340,15 +271,6 @@ watch(() => props.busy, restoreFocus)
         <label>
           {{ t('search') }}
           <input v-model="search" type="search" :placeholder="t('nameOrPattern')" />
-        </label>
-        <label>
-          {{ t('group') }}
-          <select v-model="groupFilter">
-            <option value="">{{ t('allGroups') }}</option>
-            <option v-for="group in state.config.groups" :key="group.id" :value="group.id">
-              {{ group.name }}
-            </option>
-          </select>
         </label>
         <label>
           {{ t('action') }}
@@ -411,11 +333,7 @@ watch(() => props.busy, restoreFocus)
           </div>
           <code>{{ rule.pattern }}</code>
           <small>
-            {{
-              state.config.groups.find((group) => group.id === rule.groupId)?.name ??
-              t('missingGroup')
-            }}
-            · {{ rule.action.type }}
+            {{ rule.action.type }}
             {{
               rule.action.targetProxyProfileId
                 ? `· ${
@@ -500,14 +418,6 @@ watch(() => props.busy, restoreFocus)
         <label>
           {{ t('name') }}
           <input ref="editorNameInput" v-model="draft.name" maxlength="256" required />
-        </label>
-        <label>
-          {{ t('group') }}
-          <select v-model="draft.groupId" required>
-            <option v-for="group in state.config.groups" :key="group.id" :value="group.id">
-              {{ group.name }}
-            </option>
-          </select>
         </label>
         <label>
           {{ t('matcherTarget') }}
@@ -616,101 +526,6 @@ watch(() => props.busy, restoreFocus)
         </button>
       </div>
     </form>
-
-    <article class="surface card stack">
-      <div>
-        <p class="eyebrow">
-          {{ t('organization') }}
-        </p>
-        <h3>{{ t('groups') }}</h3>
-        <p>{{ t('groupsPriorityDescription') }}</p>
-      </div>
-      <div class="stack">
-        <div v-for="group in state.config.groups" :key="group.id" class="surface group-row">
-          <form
-            v-if="editingGroupId === group.id"
-            class="inline-form"
-            @submit.prevent="saveGroupRename"
-          >
-            <label>
-              {{ t('rename') }} {{ group.name }}
-              <input v-model="editingGroupName" required />
-            </label>
-            <button type="submit" :disabled="busy">
-              {{ t('saveName') }}
-            </button>
-            <button type="button" @click="editingGroupId = null">
-              {{ t('cancel') }}
-            </button>
-          </form>
-          <template v-else>
-            <div>
-              <strong>{{ group.name }}</strong>
-              <small>
-                {{ state.config.rules.filter((rule) => rule.groupId === group.id).length }}
-                {{ t('rulesCountSuffix') }}
-                {{ group.isPreset ? `· ${t('preset')}` : '' }}
-              </small>
-            </div>
-            <div class="row-actions">
-              <button
-                type="button"
-                :disabled="busy"
-                :aria-label="`${t('rename')} ${group.name}`"
-                @click="beginGroupRename(group.id, group.name)"
-              >
-                {{ t('rename') }}
-              </button>
-              <label
-                v-if="state.config.rules.some((rule) => rule.groupId === group.id)"
-                class="destination-select"
-              >
-                {{ t('moveRulesTo') }}
-                <select v-model="groupDestinations[group.id]" :disabled="busy">
-                  <option value="" disabled>
-                    {{ t('selectGroup') }}
-                  </option>
-                  <option
-                    v-for="destination in state.config.groups.filter(
-                      (candidate) => candidate.id !== group.id,
-                    )"
-                    :key="destination.id"
-                    :value="destination.id"
-                  >
-                    {{ destination.name }}
-                  </option>
-                </select>
-              </label>
-              <button
-                class="danger-text"
-                type="button"
-                :disabled="
-                  busy ||
-                  (state.config.groups.length === 1 &&
-                    state.config.rules.some((rule) => rule.groupId === group.id))
-                "
-                :aria-label="`${t('delete')} ${group.name}`"
-                @click="deleteGroup(group.id, group.name)"
-              >
-                {{ t('delete') }}
-              </button>
-            </div>
-          </template>
-        </div>
-      </div>
-      <p v-if="groupStatus" class="notice danger" role="alert">
-        {{ groupStatus }}
-      </p>
-      <form class="inline-form" @submit.prevent="addGroup">
-        <label>
-          {{ t('newGroupName') }}
-          <input v-model="groupName" required />
-        </label>
-        <button type="submit" :disabled="busy">
-          {{ t('addGroup') }}
-        </button>
-      </form>
-    </article>
 
     <article class="surface card stack">
       <div>

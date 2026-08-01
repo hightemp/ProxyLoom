@@ -26,7 +26,8 @@ configuration error and never silently becomes direct.
 ## 3. Create rules
 
 Rules have one global numeric priority. The first enabled, compatible, non-expired match wins.
-Groups are organizational only and never change priority.
+Rules are evaluated strictly in their displayed global order. Categories and hidden specificity
+tie-breakers are not used.
 
 Origin Rules match normalized `scheme://hostname[:explicit-port]/` and work in all targets. Full
 URL Rules include path/query without fragment and work only in Firefox. Use the template generator
@@ -58,9 +59,11 @@ credentials, logs, or private state.
 
 ## 6. Import and export
 
-Native export includes profiles, groups, rules, general settings, and appearance. Credentials are
+Native export includes profiles, rules, general settings, and appearance. Credentials are
 absent by default; including them requires an explicit plaintext warning. Import validates hostile
 JSON before preview, then supports merge or confirmed replace with a local recovery backup.
+Older schema v1 backups remain importable. Obsolete group metadata and untouched built-in demo
+rules are discarded; user-created or edited rules retain their relative global order.
 
 FoxyProxy import accepts supported HTTP/HTTPS profiles from known 6–9 JSON variants. Patterns,
 rules, subscriptions, PAC, direct, and SOCKS entries are reported but not imported.

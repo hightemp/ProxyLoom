@@ -6,7 +6,6 @@ export type Brand<T, Name extends string> = T & {
 
 export type ProxyProfileId = Brand<string, 'ProxyProfileId'>
 export type RuleId = Brand<string, 'RuleId'>
-export type RuleGroupId = Brand<string, 'RuleGroupId'>
 export type TemporaryOverrideId = Brand<string, 'TemporaryOverrideId'>
 export type IsoTimestamp = Brand<string, 'IsoTimestamp'>
 
@@ -22,8 +21,6 @@ const assertId = (value: string): string => {
 export const asProxyProfileId = (value: string): ProxyProfileId => assertId(value) as ProxyProfileId
 
 export const asRuleId = (value: string): RuleId => assertId(value) as RuleId
-
-export const asRuleGroupId = (value: string): RuleGroupId => assertId(value) as RuleGroupId
 
 export const asTemporaryOverrideId = (value: string): TemporaryOverrideId =>
   assertId(value) as TemporaryOverrideId

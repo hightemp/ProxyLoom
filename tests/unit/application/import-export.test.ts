@@ -6,7 +6,6 @@ import {
 } from '../../../src/application/import-export/export'
 import { NativeImportService } from '../../../src/application/import-export/import'
 import { MAX_IMPORT_BYTES } from '../../../src/domain/import-export/native-schema'
-import { asRuleGroupId } from '../../../src/domain/types/brand'
 import { config, profile, rule } from '../domain/fixtures'
 
 const now = new Date('2026-07-26T12:00:00.000Z')
@@ -87,7 +86,6 @@ describe('NativeImportService', () => {
     expect(preview.ok).toBe(true)
     if (!preview.ok) return
     expect(preview.value).toMatchObject({
-      groups: 1,
       includesCredentials: false,
       profiles: 1,
       rules: 1,
@@ -119,8 +117,8 @@ describe('NativeImportService', () => {
     const preview = service.preview(exported(incoming), current)
     expect(preview.ok).toBe(true)
     if (!preview.ok) return
-    expect(preview.value.idConflicts).toBe(3)
-    expect(preview.value.nameConflicts).toBe(3)
+    expect(preview.value.idConflicts).toBe(2)
+    expect(preview.value.nameConflicts).toBe(2)
 
     const merged = service.apply(current, preview.value, 'MERGE', false)
     expect(merged.ok).toBe(true)
@@ -137,7 +135,7 @@ describe('NativeImportService', () => {
     expect(importedRule.action.targetProxyProfileId).toBe(importedProfile.id)
   })
 
-  it('rejects malformed, oversized, dangerous, and dangling input', () => {
+  it('rejects malformed, oversized, and dangerous input', () => {
     const service = new NativeImportService(ids)
     expect(service.preview('{', config())).toMatchObject({
       error: { code: 'JSON_INVALID' },
@@ -155,20 +153,28 @@ describe('NativeImportService', () => {
       error: { code: 'DANGEROUS_KEY' },
       ok: false,
     })
-    const incoming = config({
-      rules: [
-        rule('dangling', 0, {
-          groupId: asRuleGroupId('missing-group'),
-        }),
-      ],
-    })
-    const preview = service.preview(exported(incoming), config())
+  })
+
+  it('imports version one backups by discarding group metadata only', () => {
+    const service = new NativeImportService(ids)
+    const legacy = JSON.parse(exported(config({ rules: [rule('legacy-rule', 0)] }))) as Record<
+      string,
+      unknown
+    > & {
+      config: Record<string, unknown> & { rules: Array<Record<string, unknown>> }
+    }
+    legacy.config.schemaVersion = 1
+    legacy.config.groups = [{ id: 'legacy-group', isPreset: false, name: 'Legacy', position: 0 }]
+    legacy.config.rules[0]!.groupId = 'legacy-group'
+
+    const preview = service.preview(JSON.stringify(legacy), config())
     expect(preview.ok).toBe(true)
     if (!preview.ok) return
-    expect(service.apply(config(), preview.value, 'MERGE', false)).toEqual({
-      error: { code: 'DANGLING_GROUP_REFERENCE', ruleId: 'dangling' },
-      ok: false,
-    })
+    expect(preview.value.document.config.schemaVersion).toBe(2)
+    expect(preview.value.document.config).not.toHaveProperty('groups')
+    expect(preview.value.document.config.rules[0]).not.toHaveProperty('groupId')
+    expect(preview.value.document.config.rules[0]?.id).toBe('legacy-rule')
+    expect(preview.value.document.config.rules[0]?.position).toBe(0)
   })
 
   it('round-trips credential-free exports with empty endpoint credentials', () => {

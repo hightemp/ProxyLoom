@@ -1,6 +1,6 @@
 # Automated test report
 
-Date: 2026-07-27
+Date: 2026-08-01
 OS: Linux 7.0.0-28-generic x86_64  
 Node: 22.16.0  
 pnpm: 10.32.1
@@ -11,17 +11,17 @@ pnpm: 10.32.1
 | ---------------------------------------------- | ------------------------------------------------------------------ |
 | Isolated clean Git snapshot and frozen install | Pass; status clean before and after all gates                      |
 | Formatting, ESLint and strict Vue/TypeScript   | Pass                                                               |
-| Unit tests                                     | 205 pass in 37 files                                               |
+| Unit tests                                     | 206 pass in 37 files                                               |
 | Resolver/PAC parity and fuzz                   | 4 pass                                                             |
-| Coverage suite                                 | 211 pass in 39 files                                               |
-| Coverage                                       | 89.27% statements, 79.21% branches, 93.41% functions, 89.38% lines |
+| Coverage suite                                 | 212 pass in 39 files                                               |
+| Coverage                                       | 89.07% statements, 79.57% branches, 93.10% functions, 89.38% lines |
 | Idempotent GitHub Release publisher            | 6 local create/retry/failure/checksum regressions pass             |
 | Release performance budgets                    | 5 pass across unit and browser E2E                                 |
 | Five-minute Chromium memory soak               | 752 cycles; heap +0.96 MiB, PSS +55.15 MiB; all budgets pass       |
 | Local network and Firefox API integration      | 6 pass in 2 files                                                  |
 | Chromium extension E2E                         | 38 pass                                                            |
 | Headed Orca/AT-SPI accessibility               | Keyboard speech output and actual 200% zoom pass                   |
-| Docs, spelling, workflow and traceability      | 124 tasks and 150 requirements covered                             |
+| Docs, spelling, workflow and traceability      | 125 tasks and 150 requirements covered                             |
 | Store asset dimensions                         | 300×300, 440×280 and 1280×800 PNG candidates pass                  |
 | Dependency audit                               | No known vulnerabilities                                           |
 | Production builds                              | Chromium MV3 and Firefox MV3 pass                                  |
@@ -33,19 +33,19 @@ pnpm: 10.32.1
 | SHA-256 verification                           | Pass                                                               |
 
 The E2E suite covers the visible options, popup and error surfaces; the standalone Settings-tab
-contract; profile/rule/group operations; Once and Always popup actions; applied routing;
-fail-closed behavior; proxy authentication; distinct HTTP/HTTPS endpoints; HTTP and HTTPS proxy
-transports; WS/WSS; downloads; manual proxy check and cancellation; Firefox browser-manual
-fallback, second-extension precedence/recovery and locked enterprise policy; import/export;
-themes; accessibility; drag/keyboard ordering; native import replacement; local logs; incognito
-help; another real Chromium proxy extension; and cold/warm performance thresholds.
+contract; profile/rule operations; empty first-run rules without group management; Once and Always
+popup actions; applied routing; fail-closed behavior; proxy authentication; distinct HTTP/HTTPS
+endpoints; HTTP and HTTPS proxy transports; WS/WSS; downloads; manual proxy check and cancellation;
+Firefox browser-manual fallback, second-extension precedence/recovery and locked enterprise policy;
+import/export; themes; accessibility; drag/keyboard ordering; native import replacement; local logs;
+incognito help; another real Chromium proxy extension; and cold/warm performance thresholds.
 
 All integration targets and proxies run on loopback. The test suite does not use a public proxy or
 random external service.
 
 The final current tree was copied into an isolated Git repository with no dependencies or
-generated output. From an empty Git status it passed frozen installation, strict quality, 205 unit
-tests, 4 parity tests, 211 coverage tests, performance, 6 integration tests, all 38 E2E tests,
+generated output. From an empty Git status it passed frozen installation, strict quality, 206 unit
+tests, 4 parity tests, 212 coverage tests, performance, 6 integration tests, all 38 E2E tests,
 dependency audit, dual builds, permission-warning/canary gates, all three ZIP packages, exact
 Firefox source rebuild and deep archive scanning. Git status was still empty afterward; the
 disposable clone was then moved to trash.

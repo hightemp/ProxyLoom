@@ -163,8 +163,8 @@ const applyFoxy = async (): Promise<void> => {
       </button>
       <div v-if="nativePreview" class="preview-box">
         <strong>
-          {{ nativePreview.profiles }} {{ t('profilesCountLabel') }} · {{ nativePreview.groups }}
-          {{ t('groupsCountLabel') }} · {{ nativePreview.rules }} {{ t('rulesCountLabel') }}
+          {{ nativePreview.profiles }} {{ t('profilesCountLabel') }} · {{ nativePreview.rules }}
+          {{ t('rulesCountLabel') }}
         </strong>
         <p>
           {{ t('credentials') }}

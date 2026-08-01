@@ -1308,6 +1308,23 @@
   - **Тесты:** clean-checkout full quality/release commands and checksum install smoke.
   - **Готово, когда:** human release owner approves; store publication remains manual.
 
+- [x] **PL-125 — Удалить rule groups и упростить Rules workflow**
+  - **Цель:** убрать организационную сущность без routing semantics и оставить один понятный
+    глобальный порядок rules.
+  - **Требования:** FR-030, FR-034, FR-069, FR-076–FR-078.
+  - **Действия:** удалить groups/groupId из schema v2, runtime commands, Rules UI, seed и native
+    export; мигрировать schema v1 с удалением untouched preset demos; принимать старые native
+    backups.
+  - **Модули:** domain config/rules, storage migration, native import/export, Rules UI, locale/docs.
+  - **Зависимости:** PL-025, PL-033, PL-051, PL-058, PL-080–PL-083.
+  - **Критерии приёмки:** fresh install имеет пустой rules list; user-created/edited rules сохраняют
+    ID, action и относительный глобальный порядок; UI не содержит group management/filter/required
+    field.
+  - **Тесты:** schema migration, legacy native import, rule CRUD/filter unit, Chromium E2E,
+    Chromium/Firefox production builds.
+  - **Готово, когда:** repository search находит group fields только в backward migration,
+    historical task/evidence text и явно исключённом FoxyProxy metadata.
+
 ---
 
 # Release checklist

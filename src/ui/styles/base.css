@@ -363,8 +363,7 @@ small,
 }
 
 .button-row,
-.inline-form,
-.group-chips {
+.inline-form {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -534,23 +533,6 @@ small,
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 5px;
-}
-
-.group-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 12px 14px;
-}
-
-.group-row > div:first-child {
-  display: grid;
-  gap: 3px;
-}
-
-.destination-select {
-  min-width: 180px;
 }
 
 .row-actions button {

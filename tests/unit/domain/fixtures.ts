@@ -1,7 +1,6 @@
 import {
   asIsoTimestamp,
   asProxyProfileId,
-  asRuleGroupId,
   asRuleId,
   asTemporaryOverrideId,
 } from '../../../src/domain/types/brand'
@@ -14,7 +13,6 @@ import type {
 } from '../../../src/domain/types/entities'
 
 export const timestamp = asIsoTimestamp('2026-01-01T00:00:00.000Z')
-export const groupId = asRuleGroupId('group-1')
 
 export const endpoint = (
   host = '127.0.0.1',
@@ -51,7 +49,6 @@ export const rule = (idValue: string, position: number, options: Partial<Rule> =
   description: '',
   enabled: true,
   flags: 'i',
-  groupId,
   id: asRuleId(idValue),
   matcherType: 'ORIGIN',
   name: idValue,
@@ -92,17 +89,9 @@ export const config = (options: Partial<AppConfig> = {}): AppConfig => ({
     mode: 'RULES',
     proxyCheckTimeoutMs: 10_000,
   },
-  groups: [
-    {
-      id: groupId,
-      isPreset: false,
-      name: 'Test',
-      position: 0,
-    },
-  ],
   profiles: [],
   revision: 1,
   rules: [],
-  schemaVersion: 1,
+  schemaVersion: 2,
   ...options,
 })

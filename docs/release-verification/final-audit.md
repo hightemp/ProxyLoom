@@ -1,6 +1,6 @@
 # Final release audit
 
-Date: 2026-07-27
+Date: 2026-08-01
 Current disposition: **NOT RELEASE APPROVED**
 
 ## Automated candidate status
@@ -33,7 +33,11 @@ Current disposition: **NOT RELEASE APPROVED**
 - The Firefox Stable run found and fixed late MV3 event-listener registration. The Edge Stable run
   found and fixed Chromium private-log classification when `webRequest` omits `incognito`.
   Focused regression tests and repeated branded-browser runs cover both defects.
-- Machine-checked traceability covers all 124 tasks and all 150 PRD requirement identifiers.
+- Machine-checked traceability covers all 125 tasks and all 150 PRD requirement identifiers.
+- Schema v2 removes rule groups from storage, import/export and UI. The v1 migration and native
+  import compatibility discard obsolete group metadata and untouched built-in demos while
+  preserving user-created or edited rules, actions and relative global order; fresh installs start
+  with an empty rule list.
 - Dependency audit: no known vulnerabilities.
 - Privacy, permission, PAC/regex and import/storage engineering reviews: completed and recorded
   under `docs/security/`, including branded-browser console/network/storage canary inspection.
