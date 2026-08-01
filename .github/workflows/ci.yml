@@ -98,5 +98,6 @@ jobs:
           path: |
             .output/ProxyLoom-*.zip
             .output/SHA256SUMS
+          include-hidden-files: true
           retention-days: 14
           if-no-files-found: error
