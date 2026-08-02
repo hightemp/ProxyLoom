@@ -5,7 +5,10 @@ import type { ActualProxyInfo, SupportedRequestType } from '../../application/lo
 import { resolveRoute } from '../../domain/routing/resolver'
 import type { RoutingSnapshot } from '../../domain/routing/snapshot'
 import type { AppConfig, BrowserPlatform } from '../../domain/types/entities'
-import { resolveTargetTab, type TargetTabsApi } from './target-tab'
+import { resolveRequestIncognito, type IncognitoTab } from './request-incognito'
+import type { TargetTabsApi } from './target-tab'
+
+export { resolveRequestIncognito } from './request-incognito'
 
 interface RequestDetails {
   readonly requestId: string
@@ -32,11 +35,6 @@ interface PendingRequest {
   readonly startedAt: number
   readonly tabId: number | null
   readonly url: string
-}
-
-interface LoggingTab {
-  readonly id?: number | undefined
-  readonly incognito: boolean
 }
 
 export interface LoggingEventBridgeOptions {
@@ -84,28 +82,11 @@ const actualProxyInfo = (details: RequestDetails): ActualProxyInfo | null => {
   }
 }
 
-export const resolveRequestIncognito = async (
-  details: Pick<RequestDetails, 'incognito' | 'tabId'>,
-  tabs: TargetTabsApi<LoggingTab> = browser.tabs,
-): Promise<boolean> => {
-  if (details.incognito !== undefined) {
-    return details.incognito
-  }
-  if (details.tabId < 0) {
-    return false
-  }
-  try {
-    return (await resolveTargetTab(tabs, details.tabId))?.incognito ?? false
-  } catch {
-    return false
-  }
-}
-
 export const resolveRequestRoutingContext = async (
   snapshot: RoutingSnapshot,
   details: Pick<RequestDetails, 'incognito' | 'tabId' | 'url'>,
   platform: BrowserPlatform,
-  tabs: TargetTabsApi<LoggingTab> = browser.tabs,
+  tabs: TargetTabsApi<IncognitoTab> = browser.tabs,
 ): Promise<{
   readonly decision: ReturnType<typeof resolveRoute>
   readonly incognito: boolean

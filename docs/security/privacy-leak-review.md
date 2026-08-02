@@ -47,8 +47,10 @@ after an explicit Check and can be replaced in settings.
 - Chromium E2E exercises authenticated proxy traffic with a password canary, inspects the redacted
   proxy capture, verifies the log UI does not expose URL credentials/path/query/fragment and reads
   the downloaded default export to ensure credential keys, logs and overrides are absent.
-- Failure traces are uploaded only after `pnpm scan:test-artifacts` succeeds. Candidate store
-  screenshots are synthetic, dimension-checked and scanned with the other release assets.
+- Routing E2E traces are disabled because those tests apply complete credential-bearing profiles
+  through the page context. Failure artifacts and the Playwright HTML report are uploaded only
+  after `pnpm scan:test-artifacts` succeeds. Candidate store screenshots are synthetic,
+  dimension-checked and scanned with the other release assets.
 - A production-source inspection found no `fetch`, XHR, beacon or application WebSocket telemetry
   call. The only built-in external endpoint literal is the disclosed, replaceable manual
   `https://api.country.is/` setting; the actual check uses an explicit temporary tab and restores

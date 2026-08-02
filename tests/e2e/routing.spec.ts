@@ -1,4 +1,6 @@
-import type { Page } from '@playwright/test'
+import { randomUUID } from 'node:crypto'
+
+import type { Page, Worker } from '@playwright/test'
 
 import { asProxyProfileId } from '../../src/domain/types/brand'
 import type { AppConfig, ProxyProfile, Rule } from '../../src/domain/types/entities'
@@ -10,6 +12,13 @@ import { startHttpsOrigin, type HttpsOriginFixture } from '../integration/server
 import { expect, test } from './fixtures/extension'
 
 const CONFIG_KEY = 'config.v1'
+
+// Routing fixtures apply complete proxy profiles through the page context.
+// Keeping traces off prevents proxy credentials from entering test artifacts.
+test.use({ trace: 'off' })
+
+const createCredentialCanary = (kind: 'password' | 'username'): string =>
+  ['proxyloom', 'secret', 'canary', kind, randomUUID()].join('-')
 
 interface ExtensionBrowserApi {
   readonly proxy: {
@@ -144,6 +153,21 @@ const applyRawPac = async (extensionPage: Page, script: string): Promise<void> =
       }),
     )
     .toBe(script)
+}
+
+const findControlWorker = async (workers: readonly Worker[]): Promise<Worker> => {
+  for (const worker of workers) {
+    const name = await worker.evaluate(
+      () =>
+        (
+          globalThis as unknown as {
+            chrome: { runtime: { getManifest(): { name: string } } }
+          }
+        ).chrome.runtime.getManifest().name,
+    )
+    if (name === 'ProxyLoom E2E Control Fixture') return worker
+  }
+  throw new Error('The proxy-control fixture worker is unavailable.')
 }
 
 test.describe('actual Chromium proxy routing', () => {
@@ -323,44 +347,219 @@ test.describe('actual Chromium proxy routing', () => {
     await page.close()
   })
 
-  test('answers proxy authentication once with credentials for the selected endpoint', async ({
-    extensionContext,
-    extensionPage,
-  }) => {
-    const proxy = await startHttpProxy({
-      marker: 'authenticated',
-      password: 'correct-password',
-      username: 'proxy-user',
-    })
-    proxies.push(proxy)
-    const config = baseConfig()
-    const targetOrigin = origin.origin.replace('127.0.0.1', 'origin.proxyloom.test')
-    await applyConfig(extensionPage, {
-      ...config,
-      general: {
-        ...config.general,
-        activeProxyProfileId: asProxyProfileId('authenticated'),
-        mode: 'PROXY',
-      },
-      profiles: [
-        profile('authenticated', proxy.port, {
-          password: 'correct-password',
-          username: 'proxy-user',
-        }),
-      ],
-      revision: 5,
-    })
-    const page = await extensionContext.newPage()
+  test.describe('proxy authentication', () => {
+    test('answers proxy authentication once with credentials for the selected endpoint', async ({
+      extensionContext,
+      extensionPage,
+    }) => {
+      const password = createCredentialCanary('password')
+      const username = createCredentialCanary('username')
+      const proxy = await startHttpProxy({
+        marker: 'authenticated',
+        password,
+        username,
+      })
+      proxies.push(proxy)
+      const config = baseConfig()
+      const targetOrigin = origin.origin.replace('127.0.0.1', 'origin.proxyloom.test')
+      await applyConfig(extensionPage, {
+        ...config,
+        general: {
+          ...config.general,
+          activeProxyProfileId: asProxyProfileId('authenticated'),
+          mode: 'PROXY',
+        },
+        profiles: [
+          profile('authenticated', proxy.port, {
+            password,
+            username,
+          }),
+        ],
+        revision: 5,
+      })
+      const page = await extensionContext.newPage()
 
-    await page.goto(`${targetOrigin}/authenticated`)
+      await page.goto(`${targetOrigin}/authenticated`)
 
-    const attempts = proxy.requests.filter((request) =>
-      request.target.startsWith(`${targetOrigin}/authenticated`),
-    )
-    expect(attempts.map((request) => request.authenticated)).toEqual([false, true])
-    expect(origin.requests.some((request) => request.path === '/authenticated')).toBe(true)
-    expect(JSON.stringify(proxy.requests)).not.toContain('correct-password')
-    await page.close()
+      const attempts = proxy.requests.filter((request) =>
+        request.target.startsWith(`${targetOrigin}/authenticated`),
+      )
+      expect(attempts.map((request) => request.authenticated)).toEqual([false, true])
+      expect(origin.requests.some((request) => request.path === '/authenticated')).toBe(true)
+      expect(JSON.stringify(proxy.requests).includes(password)).toBe(false)
+      await page.close()
+    })
+
+    test('authenticates an HTTPS proxy on the first navigation after worker restart', async ({
+      extensionContext,
+      extensionId,
+      extensionPage,
+    }) => {
+      const targetOrigin = secureOrigin.origin.replace('127.0.0.1', 'origin.proxyloom.test')
+      const targetAuthority = new URL(targetOrigin).host
+
+      for (let cycle = 0; cycle < 5; cycle += 1) {
+        const profileId = `cold-start-authenticated-${String(cycle)}`
+        const password = createCredentialCanary('password')
+        const username = createCredentialCanary('username')
+        const proxy = await startHttpsProxy({ marker: profileId, password, username })
+        proxies.push(proxy)
+        const config = baseConfig()
+        const authenticatedProfile = profile(profileId, proxy.port, { password, username })
+        await applyConfig(extensionPage, {
+          ...config,
+          general: {
+            ...config.general,
+            activeProxyProfileId: asProxyProfileId(profileId),
+            mode: 'PROXY',
+          },
+          profiles: [
+            {
+              ...authenticatedProfile,
+              httpEndpoint: {
+                ...authenticatedProfile.httpEndpoint,
+                transport: 'HTTPS',
+              },
+              httpsEndpoint: {
+                ...authenticatedProfile.httpsEndpoint,
+                transport: 'HTTPS',
+              },
+            },
+          ],
+          revision: 6 + cycle,
+        })
+        proxy.reset()
+        secureOrigin.reset()
+
+        const cdp = await extensionContext.newCDPSession(extensionPage)
+        const findWorkerTarget = async () => {
+          const { targetInfos } = await cdp.send('Target.getTargets')
+          return targetInfos.find(
+            (target) =>
+              target.type === 'service_worker' && new URL(target.url).host === extensionId,
+          )
+        }
+        const workerTarget = await findWorkerTarget()
+        if (workerTarget === undefined) {
+          throw new Error('ProxyLoom service worker target is unavailable.')
+        }
+        await cdp.send('Target.closeTarget', { targetId: workerTarget.targetId })
+        await expect.poll(async () => (await findWorkerTarget()) === undefined).toBe(true)
+        await cdp.detach()
+
+        const page = await extensionContext.newPage()
+        const targetPath = `/cold-start-authenticated-${String(cycle)}`
+        try {
+          const response = await page.goto(`${targetOrigin}${targetPath}`, { timeout: 10_000 })
+
+          expect(response?.ok()).toBe(true)
+          await expect(page.getByRole('heading', { name: 'Secure origin' })).toBeVisible()
+          const attempts = proxy.requests.filter(
+            (request) => request.kind === 'CONNECT' && request.target === targetAuthority,
+          )
+          expect(attempts.length).toBeGreaterThanOrEqual(2)
+          expect(attempts.slice(0, -1).every((request) => !request.authenticated)).toBe(true)
+          expect(attempts.at(-1)?.authenticated).toBe(true)
+          expect(attempts.filter((request) => request.authenticated)).toHaveLength(1)
+          expect(
+            secureOrigin.requests.filter((request) => request.path === targetPath),
+          ).toHaveLength(1)
+          expect(JSON.stringify(proxy.requests).includes(password)).toBe(false)
+        } finally {
+          await page.close()
+        }
+      }
+    })
+
+    test('does not give credentials to the proxy controlled by another extension', async ({
+      extensionContext,
+      extensionPage,
+    }) => {
+      const password = createCredentialCanary('password')
+      const username = createCredentialCanary('username')
+      const proxy = await startHttpProxy({
+        marker: 'foreign-controller-auth',
+        password,
+        username,
+      })
+      proxies.push(proxy)
+      const config = baseConfig()
+      const targetOrigin = origin.origin.replace('127.0.0.1', 'origin.proxyloom.test')
+      await applyConfig(extensionPage, {
+        ...config,
+        general: {
+          ...config.general,
+          activeProxyProfileId: asProxyProfileId('foreign-controller-auth'),
+          mode: 'PROXY',
+        },
+        profiles: [
+          profile('foreign-controller-auth', proxy.port, {
+            password,
+            username,
+          }),
+        ],
+        revision: 11,
+      })
+      proxy.reset()
+      origin.reset()
+
+      const controlWorker = await findControlWorker(extensionContext.serviceWorkers())
+      await controlWorker.evaluate(
+        async ({ host, port }) => {
+          const settings = (
+            globalThis as unknown as {
+              chrome: {
+                proxy: {
+                  settings: {
+                    set(details: {
+                      scope: 'regular'
+                      value: {
+                        mode: 'fixed_servers'
+                        rules: {
+                          singleProxy: { host: string; port: number; scheme: 'http' }
+                        }
+                      }
+                    }): Promise<void>
+                  }
+                }
+              }
+            }
+          ).chrome.proxy.settings
+          await settings.set({
+            scope: 'regular',
+            value: {
+              mode: 'fixed_servers',
+              rules: { singleProxy: { host, port, scheme: 'http' } },
+            },
+          })
+        },
+        { host: proxy.host, port: proxy.port },
+      )
+
+      const page = await extensionContext.newPage()
+      try {
+        await expect(
+          page.goto(`${targetOrigin}/foreign-controller-auth`, { timeout: 5_000 }),
+        ).rejects.toThrow()
+        expect(proxy.requests.length).toBeGreaterThan(0)
+        expect(proxy.requests.every((request) => !request.authenticated)).toBe(true)
+        expect(origin.requests.some((request) => request.path === '/foreign-controller-auth')).toBe(
+          false,
+        )
+      } finally {
+        await page.close()
+        await controlWorker.evaluate(async () => {
+          const settings = (
+            globalThis as unknown as {
+              chrome: {
+                proxy: { settings: { clear(details: { scope: 'regular' }): Promise<void> } }
+              }
+            }
+          ).chrome.proxy.settings
+          await settings.clear({ scope: 'regular' })
+        })
+      }
+    })
   })
 
   test('routes HTTP/WS and HTTPS/WSS to separate endpoints', async ({
@@ -391,7 +590,7 @@ test.describe('actual Chromium proxy routing', () => {
           useSameProxy: false,
         },
       ],
-      revision: 6,
+      revision: 12,
     })
     const page = await extensionContext.newPage()
 
@@ -477,7 +676,7 @@ test.describe('actual Chromium proxy routing', () => {
           },
         },
       ],
-      revision: 7,
+      revision: 13,
     })
     const page = await extensionContext.newPage()
 
@@ -512,7 +711,7 @@ test.describe('actual Chromium proxy routing', () => {
         mode: 'PROXY',
       },
       profiles: [profile('download', proxy.port)],
-      revision: 8,
+      revision: 14,
     })
     const page = await extensionContext.newPage()
     await page.setContent(`<a href="${targetOrigin}/download">download fixture</a>`)

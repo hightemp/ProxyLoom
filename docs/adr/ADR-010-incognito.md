@@ -13,7 +13,9 @@ proxy settings, capability/status отображается честно и priva
 
 Unit tests покрывают разделение normal/private overrides и log stores. Для Chromium
 `webRequest` не гарантирует Firefox-style поле `incognito`, поэтому logging bridge вычисляет
-private status по `tabId` через `tabs.get` с fallback на видимый список вкладок.
+private status по `tabId` через `tabs.get` с fallback на видимый список вкладок. Proxy-auth listener
+использует тот же resolver до выбора route и проверки proxy-control context; неразрешимый
+положительный tab ID не получает credentials.
 
 Headed smokes финальных Firefox 153 Stable и Edge 150 Stable builds подтвердили browser-owned
 permission, реальный private request через выбранный proxy, отдельный in-memory log count,

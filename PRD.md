@@ -277,6 +277,17 @@ Credentials notice, дословно:
 
 Auth adapter слушает proxy challenge, проверяет `isProxy`, сопоставляет challenger host/port и effective route с profile endpoint, затем возвращает credentials не более одного раза на `requestId`.
 
+В Chromium PAC сохраняется независимо от lifecycle MV3 worker. Если proxy challenge пробуждает
+worker до восстановления in-memory routing state, `asyncBlocking` callback bounded ждёт только
+успешно применённый snapshot после startup session reconciliation. Persisted config сам по себе не
+считается доказательством active route. Перед каждой выдачей credentials adapter подтверждает, что
+browser proxy settings для соответствующего regular/incognito context всё ещё контролирует
+ProxyLoom. Если Chromium не передал `incognito`, context определяется по `tabId`; неразрешимый
+положительный tab context завершается без credentials. Совпадение host/port без ownership
+недостаточно. Auth challenge не запускает configuration apply. Site HTTP auth не запускает
+ожидание; timeout, apply error, control conflict, cleanup и teardown завершаются без credentials и
+без вмешательства в challenge proxy, которым управляет другой controller.
+
 ```mermaid
 sequenceDiagram
     participant Browser
@@ -285,15 +296,23 @@ sequenceDiagram
     participant RoutingState
     Browser->>AuthAdapter: onAuthRequired(details)
     AuthAdapter->>AuthAdapter: Require isProxy=true
-    AuthAdapter->>RoutingState: Match challenge to assigned endpoint
-    alt No profile or site HTTP auth
+    alt Site HTTP auth or missing challenger
         AuthAdapter-->>Browser: No proxy credentials
-    else Attempt already exists
-        AuthAdapter->>AttemptStore: Mark rejected and clear safely
-        AuthAdapter-->>Browser: Cancel request
-    else First proxy challenge
-        AuthAdapter->>AttemptStore: Record requestId with timeout
-        AuthAdapter-->>Browser: Return stored credentials
+    else Proxy challenge
+        AuthAdapter->>RoutingState: Resolve context and await applied snapshot
+        AuthAdapter->>Browser: Verify proxy-control ownership
+        Browser-->>AuthAdapter: Current context ownership
+        AuthAdapter->>RoutingState: Match challenge to assigned endpoint
+        alt No ready owned profile
+            AuthAdapter-->>Browser: No proxy credentials
+        else Assigned endpoint
+            AuthAdapter->>AttemptStore: Begin requestId with timeout
+            alt Attempt already exists
+                AuthAdapter-->>Browser: Cancel request
+            else First proxy challenge
+                AuthAdapter-->>Browser: Return stored credentials
+            end
+        end
     end
     Browser-->>AuthAdapter: onCompleted/onErrorOccurred
     AuthAdapter->>AttemptStore: Cleanup requestId
@@ -303,7 +322,9 @@ sequenceDiagram
 - `FR-047`: вторая challenge для того же request ID означает rejection, запрос отменяется, возникает `Proxy authentication failed`.
 - `FR-048`: attempt state удаляется по `onCompleted`, `onErrorOccurred` и timeout; startup очищает stale state.
 - `FR-049`: main-frame auth failure запускает best-effort error page; background/WebSocket/download failure попадает в log, download также в notification.
-- `COMPAT-007`: Chromium MV3 использует `webRequestAuthProvider` и `asyncBlocking` callback; Firefox использует совместимый адаптер и проверенные permissions.
+- `COMPAT-007`: Chromium MV3 использует `webRequestAuthProvider` и `asyncBlocking` callback,
+  включая bounded ожидание applied snapshot при cold wake и проверку текущего proxy-control
+  ownership; Firefox использует синхронный совместимый адаптер и проверенные permissions.
 - `SEC-003`: username/password отсутствуют в logs, diagnostics, errors, telemetry и console.
 
 ## 17. Popup

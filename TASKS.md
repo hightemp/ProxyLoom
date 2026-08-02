@@ -1359,6 +1359,32 @@
   - **Готово, когда:** оба examples создаются из Rules editor, сохраняются после explicit route и
     старые `russian.example`/`social.example` больше не остаются действующими заглушками.
 
+- [x] **PL-128 — Устранить cold-start race proxy auth в Chromium MV3**
+  - **Цель:** выдавать credentials при первой proxy challenge после перезапуска service worker,
+    не требуя повторной навигации.
+  - **Требования:** FR-014, FR-046–FR-049, COMPAT-007, NFR-004, NFR-006, NFR-017, SEC-003,
+    SEC-008, SEC-014.
+  - **Действия:** удерживать Chromium `asyncBlocking` callback до завершения bounded initial
+    session reconciliation/configuration apply, повторно читать только успешно опубликованный
+    routing snapshot, восстанавливать отсутствующий Chromium incognito context по `tabId`,
+    проверять ownership regular/incognito browser proxy settings перед каждой выдачей credentials и
+    завершать proxy challenge fail-closed при timeout/error/control conflict/неопределённом tab
+    context; auth listener не инициирует apply, Firefox blocking semantics не меняются.
+  - **Модули:** background lifecycle, runtime auth/context resolver, Chromium adapter,
+    ADR/traceability.
+  - **Зависимости:** PL-005, PL-040, PL-045–PL-047.
+  - **Критерии приёмки:** первая HTTPS navigation после принудительной остановки worker проходит
+    через authenticated HTTPS proxy без reload и завершается ровно одним authenticated CONNECT
+    после browser-initiated unauthenticated challenge(s); site auth не ожидает snapshot и не
+    получает proxy credentials; callback вызывается ровно один раз при success/timeout/error;
+    после передачи proxy control другому extension даже тот же host/port не получает credentials
+    ProxyLoom.
+  - **Тесты:** auth-listener unit с deferred readiness/timeout/rejection/site-auth и Chromium E2E с
+    local HTTPS proxy, HTTPS origin, CDP worker termination и second-extension control fixture;
+    typecheck/lint/production builds.
+  - **Готово, когда:** cold navigation проходит без reload, credentials отсутствуют в
+    logs/traces/fixture captures, schema/permissions/public routing semantics не изменены.
+
 ---
 
 # Release checklist

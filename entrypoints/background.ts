@@ -61,6 +61,10 @@ export default defineBackground(() => {
   let appliedSnapshotHash: string | null = null
   let lastApplyError: string | null = null
   let applyQueue = Promise.resolve()
+  let markInitialSnapshotReady = (): void => undefined
+  const initialSnapshotReady = new Promise<void>((resolve) => {
+    markInitialSnapshotReady = () => resolve()
+  })
   const badgeController = new BadgeController({
     adapter,
     getConfig: () => currentConfig,
@@ -148,6 +152,12 @@ export default defineBackground(() => {
 
   registerProxyAuthListeners({
     getSnapshot: () => currentSnapshot,
+    isSnapshotActive: async (incognito) =>
+      (await adapter.getControlStatus(incognito)) === 'CONTROLLED_BY_THIS_EXTENSION',
+    waitForSnapshot: async () => {
+      await initialSnapshotReady
+      return currentSnapshot
+    },
     onFailure: () => {
       // Error correlation is stored by the diagnostics service without credentials.
     },
@@ -213,6 +223,13 @@ export default defineBackground(() => {
     void sessionLifecycle.startup(true).then(scheduleApply)
   })
   void browser.alarms.create('proxyloom-session-reconcile', { periodInMinutes: 1 })
-  void sessionLifecycle.startup(false).then(scheduleApply)
-  void scheduleApply()
+  const initializeActiveSnapshot = async (): Promise<void> => {
+    try {
+      await sessionLifecycle.startup(false)
+      await scheduleApply()
+    } finally {
+      markInitialSnapshotReady()
+    }
+  }
+  void initializeActiveSnapshot()
 })

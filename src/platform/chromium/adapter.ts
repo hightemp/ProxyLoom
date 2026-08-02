@@ -44,9 +44,9 @@ export class ChromiumProxyAdapter implements ProxyPlatformAdapter {
     tabSpecificOverrides: false,
   } as const
 
-  async getControlStatus(): Promise<ControlStatus> {
+  async getControlStatus(incognito = false): Promise<ControlStatus> {
     try {
-      const settings = await browser.proxy.settings.get({ incognito: false })
+      const settings = await browser.proxy.settings.get({ incognito })
       return mapControlStatus(settings.levelOfControl)
     } catch {
       return 'NOT_CONTROLLABLE'

@@ -1,6 +1,6 @@
 # Automated test report
 
-Date: 2026-08-01
+Date: 2026-08-02
 OS: Linux 7.0.0-28-generic x86_64  
 Node: 22.16.0  
 pnpm: 10.32.1
@@ -11,17 +11,17 @@ pnpm: 10.32.1
 | ---------------------------------------------- | ------------------------------------------------------------------ |
 | Isolated clean Git snapshot and frozen install | Pass; status clean before and after all gates                      |
 | Formatting, ESLint and strict Vue/TypeScript   | Pass                                                               |
-| Unit tests                                     | 222 pass in 37 files                                               |
+| Unit tests                                     | 236 pass in 39 files                                               |
 | Resolver/PAC parity and fuzz                   | 5 pass                                                             |
-| Coverage suite                                 | 229 pass in 39 files                                               |
-| Coverage                                       | 89.43% statements, 80.40% branches, 93.37% functions, 89.93% lines |
+| Coverage suite                                 | 243 pass in 41 files                                               |
+| Coverage                                       | 89.49% statements, 80.40% branches, 93.67% functions, 90.00% lines |
 | Idempotent GitHub Release publisher            | 6 local create/retry/failure/checksum regressions pass             |
 | Release performance budgets                    | 5 pass across unit and browser E2E                                 |
 | Warmed five-minute Chromium memory soak        | 764 cycles; heap +0.17 MiB, PSS +25.28 MiB; all budgets pass       |
 | Local network and Firefox API integration      | 6 pass in 2 files                                                  |
-| Chromium extension E2E                         | 41 pass                                                            |
+| Chromium extension E2E                         | 43 pass                                                            |
 | Headed Orca/AT-SPI accessibility               | Keyboard speech output and actual 200% zoom pass                   |
-| Docs, spelling, workflow and traceability      | 127 tasks and 150 requirements covered                             |
+| Docs, spelling, workflow and traceability      | 128 tasks and 150 requirements covered                             |
 | Store asset dimensions                         | 300×300, 440×280 and 1280×800 PNG candidates pass                  |
 | Dependency audit                               | No known vulnerabilities                                           |
 | Production builds                              | Chromium MV3 and Firefox MV3 pass                                  |
@@ -37,7 +37,9 @@ contract; profile/rule operations; explicit per-rule profile assignment; `.ru`/`
 routes through two local proxies; populated editable Russian Sites and Social Networks examples;
 empty first-run rules without group management; Once and Always popup actions; applied routing;
 fail-closed behavior; proxy authentication; distinct HTTP/HTTPS
-endpoints; HTTP and HTTPS proxy transports; WS/WSS; downloads; manual proxy check and cancellation;
+endpoints; first-navigation authenticated HTTPS proxy recovery after a worker restart;
+same-endpoint credential isolation after a second extension takes control; HTTP and HTTPS proxy
+transports; WS/WSS; downloads; manual proxy check and cancellation;
 Firefox browser-manual fallback, second-extension precedence/recovery and locked enterprise policy;
 import/export; themes; accessibility; drag/keyboard ordering; native import replacement; local logs;
 incognito help; another real Chromium proxy extension; and cold/warm performance thresholds.
@@ -45,10 +47,11 @@ incognito help; another real Chromium proxy extension; and cold/warm performance
 All integration targets and proxies run on loopback. The test suite does not use a public proxy or
 random external service.
 
-The current preset and schema-v3 migration change passed the strict quality gate, 222 unit tests,
-5 parity tests, 229 coverage tests, all 41 Chromium E2E tests and validated Chromium/Firefox
-production builds. The preceding release baseline was also copied into an isolated Git repository
-with no dependencies or generated output; from an empty Git status it passed frozen installation,
+The current candidate passed the strict quality gate, 236 unit tests, 5 parity tests, 243 coverage
+tests and all 43 Chromium E2E scenarios on the first full-suite attempt. Chromium/Firefox
+production builds were validated. The preceding release baseline was also copied into an isolated
+Git repository with no dependencies or generated output; from an empty Git status it passed frozen
+installation,
 performance, integration, dependency, packaging, source-rebuild and artifact-scan gates before the
 disposable clone was moved to trash.
 

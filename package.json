@@ -34,7 +34,7 @@
     "publish:github-release": "node scripts/publish-github-release.mjs",
     "capture:store-assets": "node scripts/capture-store-assets.mjs",
     "scan:artifacts": "node scripts/scan-artifacts.mjs",
-    "scan:test-artifacts": "node scripts/scan-artifacts.mjs --inspect-archives test-results",
+    "scan:test-artifacts": "node scripts/scan-artifacts.mjs --inspect-archives test-results playwright-report",
     "package:artifacts": "node scripts/package-artifacts.mjs",
     "spellcheck": "cspell --no-progress",
     "test": "vitest run",

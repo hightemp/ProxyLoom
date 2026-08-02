@@ -1,6 +1,6 @@
 # Requirements and task traceability
 
-Date: 2026-08-01
+Date: 2026-08-02
 
 This document distinguishes implementation evidence from acceptance evidence. `A` means the
 implementation and its repository-local automated acceptance evidence are present. `B` means the
@@ -43,6 +43,7 @@ complete acceptance evidence exists.
 | PL-125        | A      | Schema-v2 migration, simplified Rules UI, native-import compatibility and unit/E2E regressions                                    | None beyond aggregate release gates                                |
 | PL-126        | A      | Explicit per-rule profile routes, IDN suffix template, resolver/PAC/Firefox and two-proxy Chromium E2E                            | None beyond aggregate release gates                                |
 | PL-127        | A      | Populated Russian/Social named templates, schema-v1/v2 placeholder migration, regex-safety unit and Chromium persistence E2E      | None beyond aggregate release gates                                |
+| PL-128        | A      | Cold-readiness/ownership auth unit matrix, HTTPS first-navigation E2E and same-endpoint second-controller credential isolation    | None beyond PL-121/PL-123 release matrices                         |
 
 ## Product requirement evidence
 

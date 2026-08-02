@@ -17,7 +17,7 @@ export interface PlatformApplyError {
 
 export interface ProxyPlatformAdapter {
   readonly capabilities: PlatformCapabilities
-  getControlStatus(): Promise<ControlStatus>
+  getControlStatus(incognito?: boolean): Promise<ControlStatus>
   applyDirect(revision: number): Promise<Result<number, PlatformApplyError>>
   applySnapshot(snapshot: RoutingSnapshot): Promise<Result<number, PlatformApplyError>>
 }
