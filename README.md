@@ -3,6 +3,7 @@
 [![CI](https://github.com/hightemp/ProxyLoom/actions/workflows/ci.yml/badge.svg)](https://github.com/hightemp/ProxyLoom/actions/workflows/ci.yml)
 [![Latest release](https://img.shields.io/github/v/release/hightemp/ProxyLoom?display_name=tag&sort=semver)](https://github.com/hightemp/ProxyLoom/releases/latest)
 [![Release downloads](https://img.shields.io/github/downloads/hightemp/ProxyLoom/total)](https://github.com/hightemp/ProxyLoom/releases)
+[![](https://asdertasd.site/counter/ProxyLoom)](https://asdertasd.site/counter/ProxyLoom)
 
 ProxyLoom is a Manifest V3 browser extension for explicit, deterministic HTTP and HTTPS proxy
 routing. One WXT/Vue/TypeScript codebase produces a Chromium package for Chrome, Chromium, Edge,
