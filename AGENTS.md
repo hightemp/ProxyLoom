@@ -1,5 +1,8 @@
 # AGENTS.md — правила работы над ProxyLoom
 
+Важно:
+1. Меняешь код, меняй соответственно версию, миграцию, тесты и документацию.
+
 ## 1. Назначение
 
 ProxyLoom — кроссбраузерное Manifest V3 расширение для управления HTTP/HTTPS proxy profiles и ordered routing rules. Одна кодовая база собирается в Chromium ZIP и Firefox ZIP. Chrome, Edge и Яндекс Браузер используют Chromium build; Firefox имеет отдельный routing adapter.
