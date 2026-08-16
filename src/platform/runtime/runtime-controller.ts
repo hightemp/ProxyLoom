@@ -271,7 +271,7 @@ export class RuntimeController {
           this.#proxyCheck.cancel()
           return { ok: true, value: null }
         case 'GET_ERROR_CONTEXT': {
-          const context = this.options.errorStore.get(request.token)
+          const context = await this.options.errorStore.get(request.token)
           return context.ok ? { ok: true, value: context.value } : commandError(context.error)
         }
         case 'RETRY_ERROR':
@@ -433,25 +433,23 @@ export class RuntimeController {
   }
 
   private async retryError(token: string, directOnce: boolean): Promise<RuntimeResponse<unknown>> {
-    const context = this.options.errorStore.get(token)
-    if (!context.ok) return commandError(context.error)
-    const retryUrl = this.options.errorStore.consumeRetryUrl(token)
-    if (!retryUrl.ok) return commandError(retryUrl.error)
+    const retry = await this.options.errorStore.consumeRetry(token)
+    if (!retry.ok) return commandError(retry.error)
     if (directOnce) {
       const config = await this.options.configRepository.initialize()
       if (!config.ok) return commandError(config.error)
       const created = await this.#overrides.create(config.value, {
         action: { targetProxyProfileId: null, type: 'DIRECT' },
-        incognito: context.value.incognito,
+        incognito: retry.value.context.incognito,
         platform: this.options.adapter.capabilities.platform,
         scope: 'EXACT_HOSTNAME',
-        tabId: context.value.tabId,
-        url: retryUrl.value,
+        tabId: retry.value.context.tabId,
+        url: retry.value.originalUrl,
       })
       if (!created.ok) return commandError(created.error)
       await this.options.applyConfiguration()
     }
-    await browser.tabs.update(context.value.tabId, { url: retryUrl.value })
+    await browser.tabs.update(retry.value.context.tabId, { url: retry.value.originalUrl })
     return { ok: true, value: null }
   }
 

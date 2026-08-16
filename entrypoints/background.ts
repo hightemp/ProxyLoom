@@ -24,7 +24,7 @@ import { TargetedProxyCheckRequest } from '../src/platform/runtime/targeted-prox
 import { CONFIG_KEY, ConfigRepository } from '../src/storage/config/config-repository'
 import { FallbackStorageArea } from '../src/storage/config/storage-area'
 import { IndexedDbLogRepository } from '../src/storage/logs/indexeddb-log-repository'
-import { SessionRepository } from '../src/storage/session/session-repository'
+import { ERROR_CONTEXTS_KEY, SessionRepository } from '../src/storage/session/session-repository'
 
 export default defineBackground(() => {
   const adapter: ProxyPlatformAdapter = import.meta.env.FIREFOX
@@ -41,7 +41,11 @@ export default defineBackground(() => {
   const logRepository = new IndexedDbLogRepository()
   const batchedLogRepository = new BatchedLogStore(logRepository)
   const loggingService = new LoggingService(batchedLogRepository, privateLogBuffer)
-  const errorStore = new ErrorCorrelationStore({ now: () => new Date() }, () => crypto.randomUUID())
+  const errorStore = new ErrorCorrelationStore(
+    { now: () => new Date() },
+    () => crypto.randomUUID(),
+    sessionRepository,
+  )
   const sessionLifecycle = new SessionLifecycleService(
     sessionRepository,
     {
@@ -189,13 +193,13 @@ export default defineBackground(() => {
     if (areaName === 'local' && CONFIG_KEY in changes) {
       void scheduleApply()
     }
-    if (areaName === 'session') {
+    if (areaName === 'session' && Object.keys(changes).some((key) => key !== ERROR_CONTEXTS_KEY)) {
       void scheduleApply()
     }
   })
 
   browser.tabs.onRemoved.addListener((tabId) => {
-    errorStore.clearTab(tabId)
+    void errorStore.clearTab(tabId).catch(() => undefined)
     void sessionLifecycle.tabClosed(tabId).then(scheduleApply)
   })
   browser.tabs.onCreated.addListener((tab) => {

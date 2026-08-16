@@ -12,7 +12,9 @@ upload, or remotely executed code. The extension does not sell or share data.
 - Credentials are plaintext application data inside that browser storage boundary. ProxyLoom does
   not claim encryption or a master-password vault.
 - Temporary overrides and recovery markers use extension session storage and expire on restart,
-  tab cleanup, or timeout.
+  tab cleanup, or timeout. An error-page recovery marker temporarily retains the exact failed URL
+  for one retry (at most five minutes), including its path/query/fragment; it is never copied to
+  local storage, logs, diagnostics, or exports.
 - Persistent routing logs use IndexedDB and are capped at 1000 entries. They contain scheme,
   hostname, route/result metadata, status, and timing; never path, query, fragment, headers, bodies,
   cookies, or credentials.

@@ -18,26 +18,34 @@ export interface ErrorContext {
   readonly occurredAt: string
 }
 
-interface StoredErrorContext {
+export interface StoredErrorContext {
   readonly context: ErrorContext
   readonly originalUrl: string
   readonly expiresAt: number
+}
+
+export interface ErrorContextStatePort {
+  mutateErrorContexts<T>(
+    mutation: (contexts: readonly StoredErrorContext[]) => {
+      readonly contexts: readonly StoredErrorContext[]
+      readonly value: T
+    },
+  ): Promise<T>
 }
 
 export type ErrorContextError =
   { readonly code: 'INVALID_URL' } | { readonly code: 'CONTEXT_NOT_FOUND' | 'CONTEXT_EXPIRED' }
 
 export class ErrorCorrelationStore {
-  readonly #contexts = new Map<string, StoredErrorContext>()
-
   constructor(
     private readonly clock: Clock,
     private readonly token: () => string,
+    private readonly state: ErrorContextStatePort,
     private readonly ttlMs = 5 * 60_000,
     private readonly maximumEntries = 100,
   ) {}
 
-  record(input: {
+  async record(input: {
     readonly tabId: number
     readonly incognito: boolean
     readonly requestId: string
@@ -48,87 +56,118 @@ export class ErrorCorrelationStore {
     readonly ruleId: RuleId | null
     readonly ruleName: string | null
     readonly platform: BrowserPlatform
-  }): Result<ErrorContext, ErrorContextError> {
+  }): Promise<Result<ErrorContext, ErrorContextError>> {
     const normalized = normalizeUrl(input.url)
     if (!normalized.ok) {
       return err({ code: 'INVALID_URL' })
     }
-    this.sweep()
-    while (this.#contexts.size >= this.maximumEntries) {
-      const oldest = this.#contexts.keys().next().value
-      if (oldest === undefined) {
-        break
+    return this.state.mutateErrorContexts<Result<ErrorContext, ErrorContextError>>(
+      (storedContexts) => {
+        const now = this.clock.now()
+        const token = this.token()
+        const context: ErrorContext = {
+          hostname: normalized.value.hostname,
+          incognito: input.incognito,
+          occurredAt: now.toISOString(),
+          platform: input.platform,
+          profileId: input.profileId,
+          profileName: input.profileName,
+          requestId: input.requestId,
+          ruleId: input.ruleId,
+          ruleName: input.ruleName,
+          tabId: input.tabId,
+          technicalCode: input.technicalCode,
+          token,
+        }
+        const active = storedContexts.filter(
+          (stored) => stored.expiresAt > now.getTime() && stored.context.token !== token,
+        )
+        const contexts = [
+          ...active,
+          {
+            context,
+            expiresAt: now.getTime() + this.ttlMs,
+            originalUrl: input.url,
+          },
+        ].slice(-this.maximumEntries)
+        return { contexts, value: ok(context) }
+      },
+    )
+  }
+
+  get(token: string): Promise<Result<ErrorContext, ErrorContextError>> {
+    return this.state.mutateErrorContexts<Result<ErrorContext, ErrorContextError>>((contexts) => {
+      const stored = contexts.find((candidate) => candidate.context.token === token)
+      const now = this.clock.now().getTime()
+      const active = contexts.filter((candidate) => candidate.expiresAt > now)
+      const retained = active.length === contexts.length ? contexts : active
+      if (stored === undefined) {
+        return { contexts: retained, value: err({ code: 'CONTEXT_NOT_FOUND' }) }
       }
-      this.#contexts.delete(oldest)
-    }
-    const now = this.clock.now()
-    const token = this.token()
-    const context: ErrorContext = {
-      hostname: normalized.value.hostname,
-      incognito: input.incognito,
-      occurredAt: now.toISOString(),
-      platform: input.platform,
-      profileId: input.profileId,
-      profileName: input.profileName,
-      requestId: input.requestId,
-      ruleId: input.ruleId,
-      ruleName: input.ruleName,
-      tabId: input.tabId,
-      technicalCode: input.technicalCode,
-      token,
-    }
-    this.#contexts.set(token, {
-      context,
-      expiresAt: now.getTime() + this.ttlMs,
-      originalUrl: input.url,
-    })
-    return ok(context)
-  }
-
-  get(token: string): Result<ErrorContext, ErrorContextError> {
-    const stored = this.#contexts.get(token)
-    if (stored === undefined) {
-      return err({ code: 'CONTEXT_NOT_FOUND' })
-    }
-    if (stored.expiresAt <= this.clock.now().getTime()) {
-      this.#contexts.delete(token)
-      return err({ code: 'CONTEXT_EXPIRED' })
-    }
-    return ok(stored.context)
-  }
-
-  consumeRetryUrl(token: string): Result<string, ErrorContextError> {
-    const context = this.get(token)
-    if (!context.ok) {
-      return context
-    }
-    const stored = this.#contexts.get(token)
-    if (stored === undefined) {
-      return err({ code: 'CONTEXT_NOT_FOUND' })
-    }
-    this.#contexts.delete(token)
-    return ok(stored.originalUrl)
-  }
-
-  clearTab(tabId: number): void {
-    for (const [token, stored] of this.#contexts) {
-      if (stored.context.tabId === tabId) {
-        this.#contexts.delete(token)
-      }
-    }
-  }
-
-  sweep(): void {
-    const now = this.clock.now().getTime()
-    for (const [token, stored] of this.#contexts) {
       if (stored.expiresAt <= now) {
-        this.#contexts.delete(token)
+        return { contexts: retained, value: err({ code: 'CONTEXT_EXPIRED' }) }
       }
-    }
+      return { contexts: retained, value: ok(stored.context) }
+    })
   }
 
-  get size(): number {
-    this.sweep()
-    return this.#contexts.size
+  consumeRetry(
+    token: string,
+  ): Promise<
+    Result<{ readonly context: ErrorContext; readonly originalUrl: string }, ErrorContextError>
+  > {
+    return this.state.mutateErrorContexts<
+      Result<{ readonly context: ErrorContext; readonly originalUrl: string }, ErrorContextError>
+    >((contexts) => {
+      const stored = contexts.find((candidate) => candidate.context.token === token)
+      if (stored === undefined) {
+        return { contexts, value: err({ code: 'CONTEXT_NOT_FOUND' }) }
+      }
+      const now = this.clock.now().getTime()
+      if (stored.expiresAt <= now) {
+        return {
+          contexts: contexts.filter((candidate) => candidate.expiresAt > now),
+          value: err({ code: 'CONTEXT_EXPIRED' }),
+        }
+      }
+      return {
+        contexts: contexts.filter(
+          (candidate) => candidate.context.token !== token && candidate.expiresAt > now,
+        ),
+        value: ok({ context: stored.context, originalUrl: stored.originalUrl }),
+      }
+    })
+  }
+
+  clearTab(tabId: number): Promise<void> {
+    return this.state.mutateErrorContexts((contexts) => {
+      const retained = contexts.filter((stored) => stored.context.tabId !== tabId)
+      return {
+        contexts: retained.length === contexts.length ? contexts : retained,
+        value: undefined,
+      }
+    })
+  }
+
+  sweep(): Promise<void> {
+    return this.state.mutateErrorContexts((contexts) => {
+      const now = this.clock.now().getTime()
+      const active = contexts.filter((stored) => stored.expiresAt > now)
+      return {
+        contexts: active.length === contexts.length ? contexts : active,
+        value: undefined,
+      }
+    })
+  }
+
+  size(): Promise<number> {
+    return this.state.mutateErrorContexts((contexts) => {
+      const now = this.clock.now().getTime()
+      const active = contexts.filter((stored) => stored.expiresAt > now)
+      return {
+        contexts: active.length === contexts.length ? contexts : active,
+        value: active.length,
+      }
+    })
   }
 }

@@ -1385,6 +1385,26 @@
   - **Готово, когда:** cold navigation проходит без reload, credentials отсутствуют в
     logs/traces/fixture captures, schema/permissions/public routing semantics не изменены.
 
+- [x] **PL-129 — Сохранить error-page Retry при переключении mode и restart worker**
+  - **Цель:** не терять исходный retry URL открытой error page после `PROXY → DIRECT → PROXY` или
+    допустимой остановки MV3 service worker.
+  - **Требования:** FR-024, FR-055–FR-056, FR-059, FR-076, SEC-003, PRIV-010.
+  - **Действия:** перенести bounded TTL correlation из worker `Map` в отдельный versioned
+    `storage.session` envelope, сериализовать concurrent updates, сохранить one-time consume/tab
+    cleanup и исключить error-context changes из routing reapply. Namespace начинается с schema v1;
+    legacy migration отсутствует, malformed/future payload fail-safe очищается; persisted config и
+    native import/export schema не меняются.
+  - **Модули:** application error store, session repository, runtime error navigation/controller,
+    background lifecycle, privacy/user/ADR docs.
+  - **Зависимости:** PL-026, PL-069–PL-071.
+  - **Критерии приёмки:** error context и exact retry target доступны новому worker в пределах TTL;
+    path/query не отображаются и не попадают в local storage/logs/diagnostics; Retry остаётся
+    одноразовым, expiry/tab close/browser restart очищают state.
+  - **Тесты:** repository/store unit с reconstruction/malformed/bounds/expiry/tab cleanup и
+    Chromium E2E `proxy failure → worker stop → DIRECT → PROXY → Retry` на local drop proxy.
+  - **Готово, когда:** Retry повторно запрашивает исходный URL без `CONTEXT_NOT_FOUND` после mode
+    cycle/worker restart, unit/E2E/typecheck/lint/dual builds зелёные, version/docs обновлены.
+
 ---
 
 # Release checklist

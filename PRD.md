@@ -412,6 +412,11 @@ Best-effort page только для main-frame:
 
 `This temporary override may also affect other tabs using the same site.`
 
+Одноразовый exact retry URL хранится отдельно от отображаемого redacted context в versioned
+`storage.session` не более пяти минут. Он переживает остановку MV3 service worker и переключение
+`DIRECT`/`PROXY`, но удаляется после Retry, закрытия исходной вкладки, истечения TTL или restart
+browser session; в local storage, logs и diagnostics URL не попадает.
+
 - `FR-055`: redirect guard предотвращает loops и никогда не обрабатывает extension/internal requests.
 - `FR-056`: background/subresource/WebSocket error не открывает page; download error использует notification + log.
 - `COMPAT-008`: error page не считается гарантированной заменой native page: post-failure events не предоставляют атомарного redirect, tab может быть закрыт/перенаправлен, а часть сетевых ошибок не содержит достаточно стабильной корреляции. UI и тесты называют это best effort.

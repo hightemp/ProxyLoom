@@ -8,6 +8,10 @@ Temporary overrides и transient recovery markers хранятся в `storage.s
 service-worker globals не являются source of truth. При старте, alarm и закрытии tab выполняется
 идемпотентная reconciliation по live tab IDs и expiry.
 
+Error-page correlation также использует отдельный versioned session envelope: redacted metadata и
+одноразовый exact retry URL живут не более пяти минут, переживают worker suspension/mode changes и
+удаляются после Retry либо tab cleanup. Изменения этого namespace не инициируют routing reapply.
+
 Firefox override имеет `TAB` scope и применяется только при reliable non-negative tab ID.
 Chromium PAC не знает tab ID, поэтому override имеет `ORIGIN` scope до закрытия source tab; UI
 показывает точное предупреждение до подтверждения и в inspection.

@@ -59,27 +59,29 @@ export const registerErrorNavigation = (options: ErrorNavigationOptions): (() =>
       decision.matchedRuleId === null
         ? null
         : (config.rules.find((candidate) => candidate.id === decision.matchedRuleId) ?? null)
-    const context = options.store.record({
-      incognito: details.incognito ?? false,
-      platform: options.platform,
-      profileId: decision.profileId,
-      profileName: profile?.name ?? null,
-      requestId: details.requestId,
-      ruleId: decision.matchedRuleId,
-      ruleName: rule?.name ?? null,
-      tabId: details.tabId,
-      technicalCode: details.error,
-      url: details.url,
-    })
-    if (!context.ok) {
-      return
-    }
-    options.onProxyFailure?.(details.tabId)
     navigatingTabs.add(details.tabId)
-    void browser.tabs
-      .update(details.tabId, {
+    void (async () => {
+      const context = await options.store.record({
+        incognito: details.incognito ?? false,
+        platform: options.platform,
+        profileId: decision.profileId,
+        profileName: profile?.name ?? null,
+        requestId: details.requestId,
+        ruleId: decision.matchedRuleId,
+        ruleName: rule?.name ?? null,
+        tabId: details.tabId,
+        technicalCode: details.error,
+        url: details.url,
+      })
+      if (!context.ok) {
+        return
+      }
+      options.onProxyFailure?.(details.tabId)
+      await browser.tabs.update(details.tabId, {
         url: browser.runtime.getURL(`/error.html?token=${encodeURIComponent(context.value.token)}`),
       })
+    })()
+      .catch(() => undefined)
       .finally(() => {
         setTimeout(() => navigatingTabs.delete(details.tabId), 1_000)
       })

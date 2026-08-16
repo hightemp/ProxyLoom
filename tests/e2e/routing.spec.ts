@@ -315,8 +315,9 @@ test.describe('actual Chromium proxy routing', () => {
     await page.close()
   })
 
-  test('fails closed when the selected proxy drops the connection', async ({
+  test('fails closed and retains the retry URL across mode switches and a worker restart', async ({
     extensionContext,
+    extensionId,
     extensionPage,
   }) => {
     const proxy = await startHttpProxy({ failureMode: 'DROP', marker: 'unreachable' })
@@ -344,6 +345,46 @@ test.describe('actual Chromium proxy routing', () => {
     await expect.poll(() => page.url(), { timeout: 5_000 }).toContain('/error.html?token=')
     await expect(page.getByText('origin.proxyloom.test', { exact: true })).toBeVisible()
     await expect(page.locator('body')).not.toContainText('must-not-be-direct')
+
+    const firstErrorPageUrl = page.url()
+    const attemptsBeforeRetry = requestCountFor(proxy, `${targetOrigin}/must-not-be-direct`)
+    const cdp = await extensionContext.newCDPSession(extensionPage)
+    const findWorkerTarget = async () => {
+      const { targetInfos } = await cdp.send('Target.getTargets')
+      return targetInfos.find(
+        (target) => target.type === 'service_worker' && new URL(target.url).host === extensionId,
+      )
+    }
+    const workerTarget = await findWorkerTarget()
+    if (workerTarget !== undefined) {
+      await cdp.send('Target.closeTarget', { targetId: workerTarget.targetId })
+      await expect.poll(async () => (await findWorkerTarget()) === undefined).toBe(true)
+    }
+    await cdp.detach()
+
+    const popup = await extensionContext.newPage()
+    await popup.goto(`chrome-extension://${extensionId}/popup.html`)
+    await popup.getByRole('button', { name: 'DIRECT' }).click()
+    await expect(popup.getByRole('button', { name: 'DIRECT' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await popup.getByRole('button', { name: 'PROXY' }).click()
+    await expect(popup.getByRole('button', { name: 'PROXY' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+
+    await page.getByRole('button', { name: 'Retry' }).click()
+    await expect
+      .poll(() => requestCountFor(proxy, `${targetOrigin}/must-not-be-direct`), {
+        timeout: 10_000,
+      })
+      .toBeGreaterThan(attemptsBeforeRetry)
+    await expect.poll(() => page.url(), { timeout: 10_000 }).not.toBe(firstErrorPageUrl)
+    await expect(page).toHaveURL(/\/error\.html\?token=/u)
+
+    await popup.close()
     await page.close()
   })
 

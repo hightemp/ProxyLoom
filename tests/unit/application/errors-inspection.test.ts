@@ -4,16 +4,23 @@ import { ErrorCorrelationStore } from '../../../src/application/errors/error-cor
 import { inspectTab } from '../../../src/application/inspection/current-tab-inspection'
 import { buildRoutingSnapshot } from '../../../src/domain/routing/snapshot'
 import type { Clock } from '../../../src/domain/types/entities'
+import { MemoryStorageArea } from '../../../src/storage/config/storage-area'
+import { SessionRepository } from '../../../src/storage/session/session-repository'
 import { config } from '../domain/fixtures'
 
 describe('redacted error correlation store', () => {
-  it('exposes hostname-only context while keeping the retry URL one-time and private', () => {
+  it('exposes hostname-only context while keeping the retry URL one-time and private', async () => {
     let now = new Date('2026-01-01T00:00:00.000Z')
     const clock: Clock = { now: () => now }
-    const store = new ErrorCorrelationStore(clock, () => 'token-1', 1_000)
+    const store = new ErrorCorrelationStore(
+      clock,
+      () => 'token-1',
+      new SessionRepository(new MemoryStorageArea()),
+      1_000,
+    )
     const originalUrl = 'https://user:password@example.com/private/path?token=canary#fragment'
 
-    const recorded = store.record({
+    const recorded = await store.record({
       incognito: true,
       platform: 'CHROMIUM',
       profileId: null,
@@ -36,13 +43,16 @@ describe('redacted error correlation store', () => {
       },
     })
     expect(JSON.stringify(recorded)).not.toContain('private/path')
-    expect(store.consumeRetryUrl('token-1')).toEqual({ ok: true, value: originalUrl })
-    expect(store.get('token-1')).toEqual({
+    expect(await store.consumeRetry('token-1')).toEqual({
+      ok: true,
+      value: { context: recorded.ok ? recorded.value : null, originalUrl },
+    })
+    expect(await store.get('token-1')).toEqual({
       error: { code: 'CONTEXT_NOT_FOUND' },
       ok: false,
     })
 
-    store.record({
+    await store.record({
       incognito: false,
       platform: 'CHROMIUM',
       profileId: null,
@@ -55,37 +65,79 @@ describe('redacted error correlation store', () => {
       url: 'https://example.com/',
     })
     now = new Date('2026-01-01T00:00:02.000Z')
-    expect(store.get('token-1')).toEqual({
+    expect(await store.get('token-1')).toEqual({
       error: { code: 'CONTEXT_EXPIRED' },
       ok: false,
     })
   })
 
-  it('bounds contexts and clears every item for a closed tab', () => {
+  it('survives a service-worker store reconstruction within the session TTL', async () => {
+    const storage = new MemoryStorageArea()
+    const clock: Clock = { now: () => new Date('2026-01-01T00:00:00.000Z') }
+    const firstWorkerStore = new ErrorCorrelationStore(
+      clock,
+      () => 'restart-token',
+      new SessionRepository(storage),
+    )
+    await firstWorkerStore.record({
+      incognito: false,
+      platform: 'CHROMIUM',
+      profileId: null,
+      profileName: 'Proxy 1',
+      requestId: 'request-before-worker-stop',
+      ruleId: null,
+      ruleName: null,
+      tabId: 7,
+      technicalCode: 'net::ERR_PROXY_CONNECTION_FAILED',
+      url: 'https://example.com/recover-after-mode-switch?value=1',
+    })
+
+    const restartedWorkerStore = new ErrorCorrelationStore(
+      clock,
+      () => 'unused-token',
+      new SessionRepository(storage),
+    )
+
+    expect(await restartedWorkerStore.get('restart-token')).toMatchObject({
+      ok: true,
+      value: { hostname: 'example.com', token: 'restart-token' },
+    })
+    expect(await restartedWorkerStore.consumeRetry('restart-token')).toMatchObject({
+      ok: true,
+      value: {
+        originalUrl: 'https://example.com/recover-after-mode-switch?value=1',
+      },
+    })
+  })
+
+  it('bounds contexts and clears every item for a closed tab', async () => {
     let token = 0
     const store = new ErrorCorrelationStore(
       { now: () => new Date('2026-01-01T00:00:00.000Z') },
       () => `token-${String((token += 1))}`,
+      new SessionRepository(new MemoryStorageArea()),
       10_000,
       2,
     )
-    for (const tabId of [1, 2, 3]) {
-      store.record({
-        incognito: false,
-        platform: 'FIREFOX',
-        profileId: null,
-        profileName: null,
-        requestId: String(tabId),
-        ruleId: null,
-        ruleName: null,
-        tabId,
-        technicalCode: 'FAILED',
-        url: 'https://example.com/',
-      })
-    }
-    expect(store.size).toBe(2)
-    store.clearTab(3)
-    expect(store.size).toBe(1)
+    await Promise.all(
+      [1, 2, 3].map((tabId) =>
+        store.record({
+          incognito: false,
+          platform: 'FIREFOX',
+          profileId: null,
+          profileName: null,
+          requestId: String(tabId),
+          ruleId: null,
+          ruleName: null,
+          tabId,
+          technicalCode: 'FAILED',
+          url: 'https://example.com/',
+        }),
+      ),
+    )
+    expect(await store.size()).toBe(2)
+    await store.clearTab(3)
+    expect(await store.size()).toBe(1)
   })
 })
 
