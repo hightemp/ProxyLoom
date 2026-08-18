@@ -43,7 +43,6 @@ the HTTPS endpoint.
 ![ProxyLoom global routing settings](screenshots/2026-08-01_16-16_1.png)
 ![ProxyLoom proxy profiles](screenshots/2026-08-01_16-16_2.png)
 ![ProxyLoom ordered routing rules](screenshots/2026-08-01_16-16_3.png)
-![](screenshots/2026-08-01_16-16.png)
 
 ## Development
 
