@@ -19,6 +19,14 @@ Subresource/WebSocket/background failures не перенаправляются.
 исключение обязательны. Ошибка называется best effort, потому что post-failure tab update не
 атомарен с browser navigation.
 
+Chromium может сообщать `main_frame` failure для спекулятивной загрузки ссылки, которая не является
+навигацией видимой вкладки. Поэтому error navigation принимает только active `documentLifecycle`,
+`outermost_frame`, root `frameId`/`parentFrameId`; `prerender`, `cached`, `pending_deletion` и
+не-outermost frames игнорируются. Metadata оставлена optional для совместимости с Firefox events,
+которые не обязаны предоставлять Chromium-specific lifecycle fields. Это не меняет fail-closed
+routing: фоновый запрос всё равно завершается ошибкой назначенного proxy, но не захватывает tab и не
+создаёт неверный Retry context.
+
 Private context хранит `incognito`, поэтому `Open Directly Once` не пересекает обычную сессию.
 
 Явные proxy/tunnel/auth ошибки поддерживаются напрямую. `EMPTY_RESPONSE`, timeout и transport

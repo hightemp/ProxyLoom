@@ -7,7 +7,11 @@ import type { RoutingSnapshot } from '../../domain/routing/snapshot'
 import type { AppConfig, BrowserPlatform } from '../../domain/types/entities'
 
 interface ErrorDetails {
+  readonly documentLifecycle?: 'active' | 'cached' | 'pending_deletion' | 'prerender'
   readonly error: string
+  readonly frameId?: number
+  readonly frameType?: 'fenced_frame' | 'outermost_frame' | 'sub_frame'
+  readonly parentFrameId?: number
   readonly requestId: string
   readonly tabId: number
   readonly type: string
@@ -24,11 +28,23 @@ export interface ErrorNavigationOptions {
   readonly isInternalUrl?: (url: string) => boolean
 }
 
+export const isActiveOutermostNavigation = (
+  details: Pick<
+    ErrorDetails,
+    'documentLifecycle' | 'frameId' | 'frameType' | 'parentFrameId' | 'type'
+  >,
+): boolean =>
+  details.type === 'main_frame' &&
+  (details.documentLifecycle === undefined || details.documentLifecycle === 'active') &&
+  (details.frameType === undefined || details.frameType === 'outermost_frame') &&
+  (details.frameId === undefined || details.frameId === 0) &&
+  (details.parentFrameId === undefined || details.parentFrameId === -1)
+
 export const registerErrorNavigation = (options: ErrorNavigationOptions): (() => void) => {
   const navigatingTabs = new Set<number>()
   const onError = (details: ErrorDetails): void => {
     if (
-      details.type !== 'main_frame' ||
+      !isActiveOutermostNavigation(details) ||
       details.tabId < 0 ||
       navigatingTabs.has(details.tabId) ||
       options.isInternalUrl?.(details.url) === true ||

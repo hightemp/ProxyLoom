@@ -1426,6 +1426,23 @@
   - **Готово, когда:** Docker Hub/Certificate Transparency открываются с первой Retry/navigation после
     discarded-tab restore, unit/E2E/typecheck/lint/dual builds зелёные, version 0.1.2/docs обновлены.
 
+- [ ] **PL-131 — Не подменять поисковую вкладку ошибкой speculative navigation**
+  - **Цель:** proxy failure фонового prerender первой поисковой ссылки не должен открывать error page
+    вместо активной выдачи и сохранять эту ссылку как Retry target.
+  - **Требования:** FR-024, FR-049, FR-055–FR-056, COMPAT-008, SEC-003, PRIV-010.
+  - **Действия:** фильтровать Chromium `documentLifecycle`, `frameType`, root `frameId` и
+    `parentFrameId` до error correlation; принимать active outermost navigation и совместимые
+    Firefox events без lifecycle metadata; не менять fail-closed routing/logging фонового request.
+  - **Модули:** runtime error navigation, unit/E2E regression, ADR/PRD/user/release docs.
+  - **Зависимости:** PL-008, PL-129.
+  - **Критерии приёмки:** `prerender`/cached/pending-deletion/non-root failure не создаёт context и не
+    вызывает `tabs.update`; настоящий active main-frame failure по-прежнему открывает error page и
+    Retry использует только адрес этой явной навигации.
+  - **Тесты:** lifecycle/frame unit matrix, существующий Chromium fail-closed Retry E2E и named
+    manual Yandex 26 Google-search prerender regression.
+  - **Готово, когда:** выдача Google остаётся открытой при неудачном preload первой ссылки, unit/E2E/
+    typecheck/lint/dual builds зелёные, version 0.1.3/docs обновлены и Yandex regression подписана.
+
 ---
 
 # Release checklist

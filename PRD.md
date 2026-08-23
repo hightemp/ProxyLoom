@@ -321,7 +321,9 @@ sequenceDiagram
 - `FR-046`: обычный site HTTP auth никогда не получает proxy credentials.
 - `FR-047`: вторая challenge для того же request ID означает rejection, запрос отменяется, возникает `Proxy authentication failed`.
 - `FR-048`: attempt state удаляется по `onCompleted`, `onErrorOccurred` и timeout; startup очищает stale state.
-- `FR-049`: main-frame auth failure запускает best-effort error page; background/WebSocket/download failure попадает в log, download также в notification.
+- `FR-049`: только failure активной outermost main-frame навигации запускает best-effort error page;
+  prerender/cached/pending-deletion document, background/WebSocket/download failure не подменяют
+  видимую вкладку, а download также попадает в notification.
 - `COMPAT-007`: Chromium MV3 использует `webRequestAuthProvider` и `asyncBlocking` callback,
   включая bounded ожидание applied snapshot при cold wake и проверку текущего proxy-control
   ownership. Восстановление request context и snapshot выполняется параллельно; количество прочих
@@ -421,7 +423,11 @@ browser session; в local storage, logs и diagnostics URL не попадает
 
 - `FR-055`: redirect guard предотвращает loops и никогда не обрабатывает extension/internal requests.
 - `FR-056`: background/subresource/WebSocket error не открывает page; download error использует notification + log.
-- `COMPAT-008`: error page не считается гарантированной заменой native page: post-failure events не предоставляют атомарного redirect, tab может быть закрыт/перенаправлен, а часть сетевых ошибок не содержит достаточно стабильной корреляции. UI и тесты называют это best effort.
+- `COMPAT-008`: error page не считается гарантированной заменой native page: post-failure events не
+  предоставляют атомарного redirect, tab может быть закрыт/перенаправлен, а часть сетевых ошибок не
+  содержит достаточно стабильной корреляции. Chromium lifecycle/frame metadata используется для
+  исключения prerender и неактивных документов; при отсутствии metadata совместимый Firefox event
+  остаётся допустимым. UI и тесты называют это best effort.
 
 ## 20. Temporary overrides
 
@@ -801,7 +807,8 @@ E2E:
 3. Доступность path/query и точное представление `http/https/ws/wss` URL внутри Chromium PAC подтверждаются spike; v1 полагается только на переносимый normalized Origin contract.
 4. Firefox после отказа единственного возвращённого `ProxyInfo` может перейти к browser-defined settings; массивы означают явный proxy failover и в production не используются. Поэтому routing snapshot применяется только после `proxy.settings.proxyType = none`.
 5. Firefox `undefined` оставляет выбор browser-defined settings, `{type: direct}` может не перекрыть user-defined manual proxy, а terminal `null` выполняет DIRECT без proxy. Production использует `null` для DIRECT и честный conflict UI при невозможности отключить fallback для proxy actions.
-6. Proxy failure event не даёт гарантированной атомарной замены native main-frame error; custom error page best effort.
+6. Proxy failure event не даёт гарантированной атомарной замены native main-frame error; custom
+   error page best effort и не открывается для Chromium prerender/cached/pending-deletion document.
 7. Browser API обычно не предоставляет proxy TCP connect duration; показывается `Not available`.
 8. Actual proxy info доступна не для каждого request/browser; UI отличает planned от actual/unknown.
 9. Established WebSocket messages не наблюдаются; виден handshake и его failure.

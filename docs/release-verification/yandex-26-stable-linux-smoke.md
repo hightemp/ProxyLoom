@@ -38,8 +38,23 @@ not publish the extension service worker in Yandex (headed and headless); both s
 setup before the auth scenario. Therefore the post-fix discarded-tab case remains a named manual
 gate and must not be inferred from the Chromium E2E result.
 
-- [ ] Load the 0.1.2 Chromium candidate through the visible Developer mode flow.
+- [ ] Load the 0.1.3 Chromium candidate through the visible Developer mode flow.
 - [ ] Configure an authenticated HTTPS proxy and confirm proxy control.
 - [ ] Let the MV3 worker and a target tab become inactive/discarded, then restore the tab.
 - [ ] Confirm the first navigation or first explicit Retry succeeds without an intermediate
       `net::ERR_TIMED_OUT` and without a direct/system fallback.
+
+## PL-131 Google-search prerender regression
+
+Observed on 2026-08-23 with Yandex Browser while a Google results page was active: a failed
+speculative request to the first `github.com` result was reported as `main_frame`, and ProxyLoom
+replaced the results tab with its error page. Retry then opened GitHub because that speculative URL
+had been incorrectly stored as the recovery target. Repository tests cover Chromium lifecycle/frame
+filtering, but the vendor behavior remains a named manual gate.
+
+- [ ] With the 0.1.3 candidate and the reproducing HTTPS proxy active, open a Google query whose
+      first result points to GitHub and do not click the result.
+- [ ] Confirm a failed preload does not replace the Google results tab and does not create a Retry
+      context for GitHub.
+- [ ] Explicitly open that GitHub result and confirm a real proxy failure still opens the
+      best-effort error page for the active navigation.

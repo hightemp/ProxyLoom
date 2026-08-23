@@ -67,7 +67,8 @@ before confirmation.
 The badge shows `D`, the profile short name, `R`, or `!`. Popup and badge use the same resolver
 inspection. The best-effort error page is limited to supported main-frame proxy failures and shows
 hostname only. **Open Directly Once** is explicit recovery; background/WebSocket/download errors
-never redirect an arbitrary tab. The Retry target remains available for five minutes while you
+never redirect an arbitrary tab. Chromium speculative or cached page loads (including search-result
+preloading) also stay in the background and cannot replace the visible search tab. The Retry target remains available for five minutes while you
 switch between DIRECT and PROXY, even if the MV3 background worker stops in between. Retry is
 one-time; closing the source tab or restarting the browser discards it.
 
