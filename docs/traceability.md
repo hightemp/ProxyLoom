@@ -45,6 +45,7 @@ complete acceptance evidence exists.
 | PL-127        | A      | Populated Russian/Social named templates, schema-v1/v2 placeholder migration, regex-safety unit and Chromium persistence E2E      | None beyond aggregate release gates                                |
 | PL-128        | A      | Cold-readiness/ownership auth unit matrix, HTTPS first-navigation E2E and same-endpoint second-controller credential isolation    | None beyond PL-121/PL-123 release matrices                         |
 | PL-129        | A      | Versioned session error-context unit reconstruction plus Chromium worker-stop/mode-cycle/Retry E2E                                | None beyond aggregate release gates                                |
+| PL-130        | B      | Parallel cold-auth readiness, candidate-only routing reconciliation and Chromium HTTPS worker-restart regression                  | Yandex 26 discarded-tab manual regression                          |
 
 ## Product requirement evidence
 

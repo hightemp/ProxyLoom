@@ -129,12 +129,19 @@ describe('session repository', () => {
       },
     ])
 
-    const first = await repository.reconcile(
+    const first = await repository.reconcileRouting(
+      new Set([7, 8]),
       new Set([7]),
       new Date('2026-01-01T00:00:00.000Z'),
       true,
     )
-    const second = await repository.reconcile(
+    await repository.reconcileErrorContexts(
+      new Set([7]),
+      new Date('2026-01-01T00:00:00.000Z'),
+      true,
+    )
+    const second = await repository.reconcileRouting(
+      new Set([7]),
       new Set([7]),
       new Date('2026-01-01T00:00:00.000Z'),
       true,
@@ -144,6 +151,23 @@ describe('session repository', () => {
     expect(first.disables.map((entry) => entry.ruleId)).toEqual(['future'])
     expect(second).toEqual(first)
     expect(await repository.getErrorContexts()).toEqual([])
+  })
+
+  it('does not delete an override added after the owner-tab inventory snapshot', async () => {
+    const repository = new SessionRepository(new MemoryStorageArea())
+    await repository.setOverrides([
+      override({ sourceTabId: 7 }),
+      override({ id: asTemporaryOverrideId('concurrent'), sourceTabId: 9 }),
+    ])
+
+    const result = await repository.reconcileRouting(
+      new Set([7]),
+      new Set(),
+      new Date('2026-01-01T00:00:00.000Z'),
+      false,
+    )
+
+    expect(result.overrides.map((entry) => entry.sourceTabId)).toEqual([9])
   })
 
   it('retains only live, unexpired error contexts during the same browser session', async () => {
@@ -172,7 +196,11 @@ describe('session repository', () => {
       stored('expired', 7, '2025-01-01T00:00:00.000Z'),
     ])
 
-    await repository.reconcile(new Set([7]), new Date('2026-01-01T00:00:00.000Z'), false)
+    await repository.reconcileErrorContexts(
+      new Set([7]),
+      new Date('2026-01-01T00:00:00.000Z'),
+      false,
+    )
 
     expect((await repository.getErrorContexts()).map(({ context }) => context.token)).toEqual([
       'live',

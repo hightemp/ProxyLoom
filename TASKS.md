@@ -1405,6 +1405,27 @@
   - **Готово, когда:** Retry повторно запрашивает исходный URL без `CONTEXT_NOT_FOUND` после mode
     cycle/worker restart, unit/E2E/typecheck/lint/dual builds зелёные, version/docs обновлены.
 
+- [ ] **PL-130 — Устранить timeout proxy auth при восстановлении выгруженных вкладок**
+  - **Цель:** первая навигация восстановленной Chromium/Яндекс вкладки через authenticated HTTPS
+    proxy не должна терять credentials из-за медленного cold-start MV3 worker.
+  - **Требования:** FR-014, FR-046–FR-049, COMPAT-007, COMPAT-015, NFR-004, NFR-006, NFR-017,
+    SEC-003, SEC-008, SEC-014.
+  - **Действия:** параллельно восстанавливать request context и applied snapshot; до auth readiness
+    проверять только owner tabs routing overrides; очистку error contexts выполнять после публикации
+    snapshot; увеличить bounded readiness guard до 10 секунд без изменения fail-closed/control
+    ownership semantics; зафиксировать ограничение автоматического запуска unpacked MV3 в Яндекс.
+  - **Модули:** Chromium auth listener, background startup orchestration, session lifecycle/repository,
+    ADR/PRD/user/release docs.
+  - **Зависимости:** PL-128–PL-129.
+  - **Критерии приёмки:** routing-critical startup не зависит от полного числа открытых вкладок или
+    cleanup error contexts; cold challenge не отвечает пусто на прежней двухсекундной границе;
+    credentials по-прежнему выдаются только после applied snapshot и подтверждения proxy control.
+  - **Тесты:** auth-listener unit с параллельным delayed tab/snapshot и default timeout boundary;
+    session lifecycle/repository unit с candidate-only tab inventory; существующий Chromium HTTPS
+    cold-worker E2E; named manual Yandex 26 discarded-tab regression.
+  - **Готово, когда:** Docker Hub/Certificate Transparency открываются с первой Retry/navigation после
+    discarded-tab restore, unit/E2E/typecheck/lint/dual builds зелёные, version 0.1.2/docs обновлены.
+
 ---
 
 # Release checklist

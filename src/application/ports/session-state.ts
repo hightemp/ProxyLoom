@@ -12,7 +12,8 @@ export interface SessionStatePort {
   getRuleDisables(): Promise<readonly RuleDisableRecord[]>
   setRuleDisables(disables: readonly RuleDisableRecord[]): Promise<void>
   removeOverridesForTab(tabId: number): Promise<readonly TemporaryOverride[]>
-  reconcile(
+  reconcileRouting(
+    checkedTabIds: ReadonlySet<number>,
     liveTabIds: ReadonlySet<number>,
     now: Date,
     browserRestart: boolean,
@@ -20,4 +21,9 @@ export interface SessionStatePort {
     overrides: readonly TemporaryOverride[]
     disables: readonly RuleDisableRecord[]
   }>
+  reconcileErrorContexts(
+    liveTabIds: ReadonlySet<number>,
+    now: Date,
+    browserRestart: boolean,
+  ): Promise<void>
 }

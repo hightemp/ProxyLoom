@@ -21,6 +21,7 @@ import { registerLoggingEventBridge } from '../src/platform/runtime/logging-even
 import { PrivateSessionController } from '../src/platform/runtime/private-session-controller'
 import { RuntimeController } from '../src/platform/runtime/runtime-controller'
 import { TargetedProxyCheckRequest } from '../src/platform/runtime/targeted-proxy-check'
+import { BrowserTabInventory } from '../src/platform/runtime/tab-inventory'
 import { CONFIG_KEY, ConfigRepository } from '../src/storage/config/config-repository'
 import { FallbackStorageArea } from '../src/storage/config/storage-area'
 import { IndexedDbLogRepository } from '../src/storage/logs/indexeddb-log-repository'
@@ -48,14 +49,7 @@ export default defineBackground(() => {
   )
   const sessionLifecycle = new SessionLifecycleService(
     sessionRepository,
-    {
-      liveTabIds: async () =>
-        new Set(
-          (await browser.tabs.query({}))
-            .map((tab) => tab.id)
-            .filter((tabId): tabId is number => tabId !== undefined),
-        ),
-    },
+    new BrowserTabInventory(),
     { now: () => new Date() },
   )
 
@@ -224,16 +218,21 @@ export default defineBackground(() => {
     }
   })
   browser.runtime.onStartup.addListener(() => {
-    void sessionLifecycle.startup(true).then(scheduleApply)
+    void (async () => {
+      await sessionLifecycle.reconcileRouting(true)
+      await scheduleApply()
+      await sessionLifecycle.reconcileErrorContexts(true)
+    })().catch(() => undefined)
   })
   void browser.alarms.create('proxyloom-session-reconcile', { periodInMinutes: 1 })
   const initializeActiveSnapshot = async (): Promise<void> => {
     try {
-      await sessionLifecycle.startup(false)
+      await sessionLifecycle.reconcileRouting(false)
       await scheduleApply()
     } finally {
       markInitialSnapshotReady()
     }
+    await sessionLifecycle.reconcileErrorContexts(false)
   }
-  void initializeActiveSnapshot()
+  void initializeActiveSnapshot().catch(() => undefined)
 })

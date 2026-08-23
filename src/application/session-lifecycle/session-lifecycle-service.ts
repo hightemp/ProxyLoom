@@ -2,7 +2,7 @@ import type { Clock } from '../../domain/types/entities'
 import type { SessionStatePort } from '../ports/session-state'
 
 export interface TabInventoryPort {
-  liveTabIds(): Promise<ReadonlySet<number>>
+  liveTabIds(candidateTabIds?: ReadonlySet<number>): Promise<ReadonlySet<number>>
 }
 
 export class SessionLifecycleService {
@@ -12,9 +12,26 @@ export class SessionLifecycleService {
     private readonly clock: Clock,
   ) {}
 
-  async startup(browserRestart: boolean): Promise<void> {
+  async reconcileRouting(browserRestart: boolean): Promise<void> {
+    const overrides = await this.session.getOverrides()
+    const ownerTabIds = new Set(overrides.map((override) => override.sourceTabId))
+    const liveOwnerTabs = await this.tabs.liveTabIds(ownerTabIds)
+    await this.session.reconcileRouting(
+      ownerTabIds,
+      liveOwnerTabs,
+      this.clock.now(),
+      browserRestart,
+    )
+  }
+
+  async reconcileErrorContexts(browserRestart: boolean): Promise<void> {
     const liveTabs = await this.tabs.liveTabIds()
-    await this.session.reconcile(liveTabs, this.clock.now(), browserRestart)
+    await this.session.reconcileErrorContexts(liveTabs, this.clock.now(), browserRestart)
+  }
+
+  async startup(browserRestart: boolean): Promise<void> {
+    await this.reconcileRouting(browserRestart)
+    await this.reconcileErrorContexts(browserRestart)
   }
 
   async tabClosed(tabId: number): Promise<void> {
@@ -43,7 +60,6 @@ export class SessionLifecycleService {
   }
 
   async alarm(): Promise<void> {
-    const liveTabs = await this.tabs.liveTabIds()
-    await this.session.reconcile(liveTabs, this.clock.now(), false)
+    await this.startup(false)
   }
 }

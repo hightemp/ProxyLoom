@@ -18,6 +18,13 @@ reconciliation и existing configuration-apply path, после чего пов�
 proxy control или apply могли завершиться неуспешно, и тогда сохранённый route не доказывает, что
 challenge принадлежит ProxyLoom.
 
+PL-130 разделяет startup reconciliation на routing-critical и ancillary фазы. До публикации
+snapshot проверяются только source tab IDs существующих overrides и очищаются временные disables;
+полный inventory вкладок для очистки error contexts выполняется после auth readiness. Разрешение
+incognito/request tab и ожидание applied snapshot запускаются параллельно. Bounded guard увеличен с
+2 до 10 секунд как резерв для медленного vendor browser/storage, но не заменяет раннюю публикацию
+проверенного snapshot. Timeout по-прежнему отвечает без credentials и не ослабляет fail-closed.
+
 Перед ответом на каждую Chromium proxy challenge listener асинхронно подтверждает
 `CONTROLLED_BY_THIS_EXTENSION` для соответствующего regular/incognito context и проверяет, что
 snapshot не сменился за время проверки. Отсутствующий в Chromium `webRequest` incognito flag
@@ -46,3 +53,9 @@ cold wake Chromium может создать несколько unauthenticated 
 second-extension E2E забирает control, сохраняя тот же host/port, и подтверждает отсутствие выдачи
 credentials. Routing E2E traces отключены, потому что test fixture передаёт полный профиль через
 page context.
+
+PL-130 добавляет unit evidence, что delayed tab resolution и snapshot restoration не складываются
+последовательно, прежняя двухсекундная граница не завершает cold challenge, а startup routing
+inventory зависит от числа override owners, не от общего числа вкладок. Ручной regression остаётся
+в матрице Яндекс Браузера: его command-line unpacked-extension automation не публикует MV3 worker,
+поэтому зелёный Playwright Chromium тест не считается vendor-browser sign-off.

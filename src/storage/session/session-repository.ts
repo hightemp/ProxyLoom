@@ -179,13 +179,17 @@ export class SessionRepository implements SessionStatePort, ErrorContextStatePor
     await this.storage.remove([OVERRIDES_KEY, DISABLES_KEY, TRANSIENT_KEY, ERROR_CONTEXTS_KEY])
   }
 
-  async reconcile(
+  async reconcileRouting(
+    checkedTabIds: ReadonlySet<number>,
     liveTabIds: ReadonlySet<number>,
     now: Date,
     browserRestart: boolean,
   ): Promise<{ overrides: readonly TemporaryOverride[]; disables: readonly RuleDisableRecord[] }> {
     const [overrides, disables] = await Promise.all([this.getOverrides(), this.getRuleDisables()])
-    const reconciledOverrides = overrides.filter((override) => liveTabIds.has(override.sourceTabId))
+    const reconciledOverrides = overrides.filter(
+      (override) =>
+        !checkedTabIds.has(override.sourceTabId) || liveTabIds.has(override.sourceTabId),
+    )
     const reconciledDisables = disables.filter((record) => {
       if (record.state.kind === 'UNTIL_RESTART') {
         return !browserRestart
@@ -195,23 +199,30 @@ export class SessionRepository implements SessionStatePort, ErrorContextStatePor
     await Promise.all([
       this.setOverrides(reconciledOverrides),
       this.setRuleDisables(reconciledDisables),
-      this.mutateErrorContexts((contexts) => {
-        const retained = contexts.filter(
-          (stored) =>
-            liveTabIds.has(stored.context.tabId) &&
-            stored.expiresAt > now.getTime() &&
-            !browserRestart,
-        )
-        return {
-          contexts: retained.length === contexts.length ? contexts : retained,
-          value: undefined,
-        }
-      }),
     ])
     return {
       disables: reconciledDisables,
       overrides: reconciledOverrides,
     }
+  }
+
+  async reconcileErrorContexts(
+    liveTabIds: ReadonlySet<number>,
+    now: Date,
+    browserRestart: boolean,
+  ): Promise<void> {
+    await this.mutateErrorContexts((contexts) => {
+      const retained = contexts.filter(
+        (stored) =>
+          liveTabIds.has(stored.context.tabId) &&
+          stored.expiresAt > now.getTime() &&
+          !browserRestart,
+      )
+      return {
+        contexts: retained.length === contexts.length ? contexts : retained,
+        value: undefined,
+      }
+    })
   }
 
   async removeOverridesForTab(tabId: number): Promise<readonly TemporaryOverride[]> {

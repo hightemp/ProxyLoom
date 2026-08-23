@@ -37,6 +37,7 @@ interface ExtensionBrowserApi {
   }
   readonly storage: {
     readonly local: {
+      get(keys: readonly string[]): Promise<Readonly<Record<string, unknown>>>
       set(values: Readonly<Record<string, unknown>>): Promise<void>
     }
   }
@@ -99,15 +100,27 @@ const baseConfig = (): AppConfig => ({
 })
 
 const applyConfig = async (extensionPage: Page, config: AppConfig): Promise<void> => {
-  await extensionPage.evaluate(
+  const appliedConfig = await extensionPage.evaluate(
     async ({ key, value }) => {
       const extensionApi = (globalThis as unknown as { chrome: ExtensionBrowserApi }).chrome
-      await extensionApi.storage.local.set({ [key]: value })
+      const stored = await extensionApi.storage.local.get([key])
+      const storedRevision =
+        typeof stored[key] === 'object' &&
+        stored[key] !== null &&
+        typeof (stored[key] as { revision?: unknown }).revision === 'number'
+          ? (stored[key] as { revision: number }).revision
+          : -1
+      const monotonicValue = {
+        ...value,
+        revision: Math.max(value.revision, storedRevision + 1),
+      }
+      await extensionApi.storage.local.set({ [key]: monotonicValue })
+      return monotonicValue
     },
     { key: CONFIG_KEY, value: config },
   )
-  const expectedMode = config.general.mode === 'DIRECT' ? 'direct' : 'pac_script'
-  const expectedProxyPort = config.profiles[0]?.httpEndpoint.port
+  const expectedMode = appliedConfig.general.mode === 'DIRECT' ? 'direct' : 'pac_script'
+  const expectedProxyPort = appliedConfig.profiles[0]?.httpEndpoint.port
   await expect
     .poll(
       async () =>

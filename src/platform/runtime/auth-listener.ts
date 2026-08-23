@@ -61,15 +61,18 @@ export interface AuthListenerOptions {
   readonly timeoutMs?: number
 }
 
-const DEFAULT_SNAPSHOT_WAIT_TIMEOUT_MS = 2_000
+export const DEFAULT_SNAPSHOT_WAIT_TIMEOUT_MS = 10_000
 
 const resolveActiveSnapshot = async (
   options: AuthListenerOptions,
   details: Pick<AuthChallengeDetails, 'incognito' | 'tabId'>,
 ): Promise<ReadyAuthContext | null> => {
-  const incognito = await resolveRequestIncognitoContext(details)
+  const initialSnapshot = options.getSnapshot()
+  const [incognito, candidate] = await Promise.all([
+    resolveRequestIncognitoContext(details),
+    initialSnapshot === null ? options.waitForSnapshot() : Promise.resolve(initialSnapshot),
+  ])
   if (incognito === null) return null
-  const candidate = options.getSnapshot() ?? (await options.waitForSnapshot())
   if (candidate === null || !(await options.isSnapshotActive(incognito))) return null
   return options.getSnapshot() === candidate ? { incognito, snapshot: candidate } : null
 }

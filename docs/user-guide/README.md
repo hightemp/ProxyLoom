@@ -71,6 +71,11 @@ never redirect an arbitrary tab. The Retry target remains available for five min
 switch between DIRECT and PROXY, even if the MV3 background worker stops in between. Retry is
 one-time; closing the source tab or restarting the browser discards it.
 
+On Chromium-family browsers, authenticated proxy recovery waits up to ten seconds for a cold MV3
+worker to restore and verify its applied routing snapshot. Cleanup of unrelated tab error contexts
+does not block this authentication path. If a vendor browser still reports a transient timeout for
+a restored/discarded tab, **Retry** repeats the original URL through the same fail-closed route.
+
 Routing Logs are local, bounded to 1000 persistent entries, filterable, pausable, and clearable.
 Private entries remain in memory. About / Diagnostics can copy a safe snapshot without URLs,
 credentials, logs, or private state.

@@ -233,6 +233,37 @@ describe('session lifecycle service', () => {
     expect(await session.getOverrides()).toEqual([normalOverride])
     expect(await lifecycle.privateSessionEnded()).toBe(false)
   })
+
+  it('publishes routing reconciliation before full error-context tab inventory', async () => {
+    const session = new SessionRepository(new MemoryStorageArea())
+    await session.setOverrides([await createOverride(session, false, 23)])
+    let resolveAllTabs!: (tabs: ReadonlySet<number>) => void
+    const allTabs = new Promise<ReadonlySet<number>>((resolve) => {
+      resolveAllTabs = resolve
+    })
+    const inventoryCalls: Array<ReadonlySet<number> | undefined> = []
+    const lifecycle = new SessionLifecycleService(
+      session,
+      {
+        liveTabIds: (candidateTabIds) => {
+          inventoryCalls.push(candidateTabIds)
+          return candidateTabIds === undefined ? allTabs : Promise.resolve(new Set([23]))
+        },
+      },
+      clock,
+    )
+
+    await lifecycle.reconcileRouting(false)
+    expect(inventoryCalls).toHaveLength(1)
+    expect([...(inventoryCalls[0] ?? [])]).toEqual([23])
+    expect(await session.getOverrides()).toHaveLength(1)
+
+    const cleanup = lifecycle.reconcileErrorContexts(false)
+    await Promise.resolve()
+    expect(inventoryCalls).toHaveLength(2)
+    resolveAllTabs(new Set([23]))
+    await cleanup
+  })
 })
 
 const createOverride = async (session: SessionRepository, incognito: boolean, tabId: number) => {

@@ -1,7 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { buildRoutingSnapshot, type RoutingSnapshot } from '../../../src/domain/routing/snapshot'
-import { registerProxyAuthListeners } from '../../../src/platform/runtime/auth-listener'
+import {
+  DEFAULT_SNAPSHOT_WAIT_TIMEOUT_MS,
+  registerProxyAuthListeners,
+} from '../../../src/platform/runtime/auth-listener'
 import { config, endpoint, profile } from '../domain/fixtures'
 
 const browserMocks = vi.hoisted(() => ({
@@ -247,6 +250,68 @@ describe('proxy auth runtime listener', () => {
     expect(callback).toHaveBeenCalledWith({
       authCredentials: { password: 'canary-password', username: 'alice' },
     })
+    unregister()
+  })
+
+  it('restores the request tab and applied snapshot in parallel on a cold challenge', async () => {
+    const snapshot = authenticatedSnapshot()
+    let currentSnapshot: RoutingSnapshot | null = null
+    let resolveSnapshot!: (snapshot: RoutingSnapshot | null) => void
+    let resolveTab!: (tab: { id: number; incognito: boolean }) => void
+    const readySnapshot = new Promise<RoutingSnapshot | null>((resolve) => {
+      resolveSnapshot = resolve
+    })
+    browserMocks.tabsGet.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveTab = resolve
+        }),
+    )
+    const waitForSnapshot = vi.fn(() => readySnapshot)
+    const unregister = registerProxyAuthListeners({
+      getSnapshot: () => currentSnapshot,
+      isSnapshotActive: () => Promise.resolve(true),
+      onFailure: vi.fn(),
+      platform: 'CHROMIUM',
+      waitForSnapshot,
+    })
+    const callback = vi.fn<TestAuthCallback>()
+
+    registeredAuthListener()(proxyChallengeWithoutIncognito(9), callback)
+
+    await vi.waitFor(() => expect(waitForSnapshot).toHaveBeenCalledOnce())
+    expect(browserMocks.tabsGet).toHaveBeenCalledWith(9)
+    currentSnapshot = snapshot
+    resolveSnapshot(snapshot)
+    await Promise.resolve()
+    expect(callback).not.toHaveBeenCalled()
+
+    resolveTab({ id: 9, incognito: false })
+    await vi.waitFor(() => expect(callback).toHaveBeenCalledOnce())
+    expect(callback).toHaveBeenCalledWith({
+      authCredentials: { password: 'canary-password', username: 'alice' },
+    })
+    unregister()
+  })
+
+  it('keeps a cold challenge pending beyond the former two-second readiness guard', async () => {
+    vi.useFakeTimers()
+    const unregister = registerProxyAuthListeners({
+      getSnapshot: () => null,
+      isSnapshotActive: () => Promise.resolve(true),
+      onFailure: vi.fn(),
+      platform: 'CHROMIUM',
+      waitForSnapshot: () => new Promise(() => undefined),
+    })
+    const callback = vi.fn<TestAuthCallback>()
+
+    registeredAuthListener()(proxyChallenge(), callback)
+    await vi.advanceTimersByTimeAsync(2_000)
+    expect(callback).not.toHaveBeenCalled()
+
+    await vi.advanceTimersByTimeAsync(DEFAULT_SNAPSHOT_WAIT_TIMEOUT_MS - 2_000)
+    expect(callback).toHaveBeenCalledOnce()
+    expect(callback).toHaveBeenCalledWith({})
     unregister()
   })
 

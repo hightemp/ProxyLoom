@@ -324,7 +324,9 @@ sequenceDiagram
 - `FR-049`: main-frame auth failure запускает best-effort error page; background/WebSocket/download failure попадает в log, download также в notification.
 - `COMPAT-007`: Chromium MV3 использует `webRequestAuthProvider` и `asyncBlocking` callback,
   включая bounded ожидание applied snapshot при cold wake и проверку текущего proxy-control
-  ownership; Firefox использует синхронный совместимый адаптер и проверенные permissions.
+  ownership. Восстановление request context и snapshot выполняется параллельно; количество прочих
+  открытых вкладок и очистка error contexts не блокируют auth readiness. Firefox использует
+  синхронный совместимый адаптер и проверенные permissions.
 - `SEC-003`: username/password отсутствуют в logs, diagnostics, errors, telemetry и console.
 
 ## 17. Popup

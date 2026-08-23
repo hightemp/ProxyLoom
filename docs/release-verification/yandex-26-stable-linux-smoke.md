@@ -27,3 +27,19 @@ This smoke resolves the earlier limitation of command-line extension flags, but 
 the complete PL-123 checklist. Authentication, install-warning variants, Incognito, long-session,
 second-extension and vendor-store behavior still require the release-owner matrix using the final
 checksummed Chromium ZIP.
+
+## PL-130 discarded-tab regression
+
+Observed on 2026-08-22 with Yandex Browser 26.4.1.1110 and an authenticated HTTPS proxy: a
+discarded tab could reach the ProxyLoom error page with `net::ERR_TIMED_OUT` while the same target
+returned HTTP 200 through the proxy and a fresh browser tab loaded successfully. Two automated
+attempts to launch this unpacked MV3 build through Playwright's command-line extension flags did
+not publish the extension service worker in Yandex (headed and headless); both stopped in fixture
+setup before the auth scenario. Therefore the post-fix discarded-tab case remains a named manual
+gate and must not be inferred from the Chromium E2E result.
+
+- [ ] Load the 0.1.2 Chromium candidate through the visible Developer mode flow.
+- [ ] Configure an authenticated HTTPS proxy and confirm proxy control.
+- [ ] Let the MV3 worker and a target tab become inactive/discarded, then restore the tab.
+- [ ] Confirm the first navigation or first explicit Retry succeeds without an intermediate
+      `net::ERR_TIMED_OUT` and without a direct/system fallback.
