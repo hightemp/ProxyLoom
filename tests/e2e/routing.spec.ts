@@ -356,7 +356,11 @@ test.describe('actual Chromium proxy routing', () => {
     expect(requestCountFor(proxy, `${targetOrigin}/must-not-be-direct`)).toBeGreaterThan(0)
     expect(origin.requests.some((request) => request.path === '/must-not-be-direct')).toBe(false)
     await expect.poll(() => page.url(), { timeout: 5_000 }).toContain('/error.html?token=')
-    await expect(page.getByText('origin.proxyloom.test', { exact: true })).toBeVisible()
+    const safeTargetUrl = `${targetOrigin}/`
+    await expect(page.getByRole('link', { name: safeTargetUrl })).toHaveAttribute(
+      'href',
+      safeTargetUrl,
+    )
     await expect(page.locator('body')).not.toContainText('must-not-be-direct')
 
     const firstErrorPageUrl = page.url()
@@ -398,6 +402,37 @@ test.describe('actual Chromium proxy routing', () => {
     await expect(page).toHaveURL(/\/error\.html\?token=/u)
 
     await popup.close()
+    await page.close()
+  })
+
+  test('keeps the browser native failure surface when the ProxyLoom error page is disabled', async ({
+    extensionContext,
+    extensionPage,
+  }) => {
+    const proxy = await startHttpProxy({ failureMode: 'DROP', marker: 'native-error-page' })
+    proxies.push(proxy)
+    const config = baseConfig()
+    const targetOrigin = origin.origin.replace('127.0.0.1', 'origin.proxyloom.test')
+    await applyConfig(extensionPage, {
+      ...config,
+      general: {
+        ...config.general,
+        activeProxyProfileId: asProxyProfileId('native-error-page'),
+        errorPageEnabled: false,
+        mode: 'PROXY',
+      },
+      profiles: [profile('native-error-page', proxy.port)],
+      revision: 5,
+    })
+    const page = await extensionContext.newPage()
+    const targetUrl = `${targetOrigin}/keep-browser-error`
+
+    await expect(page.goto(targetUrl, { timeout: 5_000 })).rejects.toThrow()
+
+    expect(requestCountFor(proxy, targetUrl)).toBeGreaterThan(0)
+    expect(origin.requests.some((request) => request.path === '/keep-browser-error')).toBe(false)
+    await page.waitForTimeout(1_250)
+    expect(page.url()).not.toContain('/error.html?token=')
     await page.close()
   })
 

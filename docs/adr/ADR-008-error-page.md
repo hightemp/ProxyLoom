@@ -4,9 +4,16 @@
 
 ## Решение
 
-Только поддерживаемая proxy failure для `main_frame` создаёт bounded TTL context и пытается
-перевести исходную вкладку на extension error page. Context содержит hostname, code, profile/rule
-IDs/names и timestamp; полный URL хранится отдельно только до одноразового Retry.
+Только поддерживаемая proxy failure для `main_frame` при включённой настройке `Show ProxyLoom error
+page` создаёт bounded TTL context и пытается перевести исходную вкладку на extension error page.
+При выключенной настройке coordinator не создаёт context и не вызывает `tabs.update`, оставляя
+browser-native error page. Context содержит hostname, code, profile/rule IDs/names и timestamp;
+полный URL хранится отдельно только до одноразового Retry.
+
+Error-page response вычисляет из отдельного exact retry URL только safe origin
+`scheme://hostname[:port]/`. Он отображается как ссылка; обычный click вызывает тот же one-time
+Retry, что и кнопка. Exact path/query/fragment/credentials не попадают ни в текст, ни в `href`.
+Safe origin не дублируется в session envelope, поэтому его schema остаётся v1.
 
 Retry state использует bounded versioned envelope в `storage.session`, а не service-worker global.
 Поэтому допустимая остановка MV3 worker и переключение global mode не обрывают recovery в течение

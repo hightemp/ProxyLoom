@@ -73,6 +73,25 @@ test('shows honest browser-owned Chromium incognito status and help', async ({ e
   )
 })
 
+test('persists the option to keep the browser native proxy error page', async ({
+  extensionPage,
+}) => {
+  await resetExtension(extensionPage)
+  const errorPageToggle = extensionPage.getByLabel('Show ProxyLoom error page')
+
+  await expect(errorPageToggle).toBeChecked()
+  await errorPageToggle.uncheck()
+  await extensionPage.getByRole('button', { name: 'Save general settings' }).click()
+  await expect(extensionPage.getByRole('status')).toContainText('Saved and applied.')
+
+  await extensionPage.reload()
+  await expect(extensionPage.getByLabel('Show ProxyLoom error page')).not.toBeChecked()
+
+  await extensionPage.getByLabel('Show ProxyLoom error page').check()
+  await extensionPage.getByRole('button', { name: 'Save general settings' }).click()
+  await expect(extensionPage.getByRole('status')).toContainText('Saved and applied.')
+})
+
 test('previews and imports supported FoxyProxy profiles only', async ({ extensionPage }) => {
   await extensionPage.getByRole('button', { name: /Import & Export/ }).click()
   const file = resolve('tests/fixtures/foxyproxy/v8-redacted.json')

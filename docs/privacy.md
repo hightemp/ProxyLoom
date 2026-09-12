@@ -14,7 +14,9 @@ upload, or remotely executed code. The extension does not sell or share data.
 - Temporary overrides and recovery markers use extension session storage and expire on restart,
   tab cleanup, or timeout. An error-page recovery marker temporarily retains the exact failed URL
   for one retry (at most five minutes), including its path/query/fragment; it is never copied to
-  local storage, logs, diagnostics, or exports.
+  local storage, logs, diagnostics, exports, or the rendered page. The error page derives and links
+  only the safe origin (`scheme://hostname[:port]/`). Disabling the page prevents creation of this
+  recovery marker for future failures.
 - Persistent routing logs use IndexedDB and are capped at 1000 entries. They contain scheme,
   hostname, route/result metadata, status, and timing; never path, query, fragment, headers, bodies,
   cookies, or credentials.

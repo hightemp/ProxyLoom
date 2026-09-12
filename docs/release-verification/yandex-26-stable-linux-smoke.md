@@ -38,7 +38,7 @@ not publish the extension service worker in Yandex (headed and headless); both s
 setup before the auth scenario. Therefore the post-fix discarded-tab case remains a named manual
 gate and must not be inferred from the Chromium E2E result.
 
-- [ ] Load the 0.1.3 Chromium candidate through the visible Developer mode flow.
+- [ ] Load the 0.1.4 Chromium candidate through the visible Developer mode flow.
 - [ ] Configure an authenticated HTTPS proxy and confirm proxy control.
 - [ ] Let the MV3 worker and a target tab become inactive/discarded, then restore the tab.
 - [ ] Confirm the first navigation or first explicit Retry succeeds without an intermediate
@@ -52,7 +52,7 @@ replaced the results tab with its error page. Retry then opened GitHub because t
 had been incorrectly stored as the recovery target. Repository tests cover Chromium lifecycle/frame
 filtering, but the vendor behavior remains a named manual gate.
 
-- [ ] With the 0.1.3 candidate and the reproducing HTTPS proxy active, open a Google query whose
+- [ ] With the 0.1.4 candidate and the reproducing HTTPS proxy active, open a Google query whose
       first result points to GitHub and do not click the result.
 - [ ] Confirm a failed preload does not replace the Google results tab and does not create a Retry
       context for GitHub.

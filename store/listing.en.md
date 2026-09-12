@@ -27,5 +27,6 @@ Let users define and diagnose deterministic browser proxy routing.
 - The `scripting` permission is exercised only after a Check click against an inactive temporary
   tab created by the extension; it reads a bounded JSON provider response and closes the tab.
 - Chromium Once is origin-scoped and visibly disclosed. Firefox can use reliable tab scope.
-- The error page is best effort and main-frame only.
+- The optional error page is best effort and main-frame only; it links a redacted origin and can be
+  disabled to retain the browser's native error page.
 - Store publication is manual; the repository release workflow publishes GitHub artifacts only.

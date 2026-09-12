@@ -119,6 +119,36 @@ describe('error navigation lifecycle filter', () => {
     unregister()
   })
 
+  it('keeps the browser error page and does not persist Retry state when disabled', async () => {
+    const selectedProfile = profile('fornex')
+    const current = config({
+      general: {
+        ...config().general,
+        activeProxyProfileId: selectedProfile.id,
+        errorPageEnabled: false,
+        mode: 'PROXY',
+      },
+      profiles: [selectedProfile],
+    })
+    const snapshot = buildRoutingSnapshot(current, [], new Date('2026-08-23T06:42:47.000Z'))
+    expect(snapshot.ok).toBe(true)
+    if (!snapshot.ok) return
+    const record = vi.fn()
+    const unregister = registerErrorNavigation({
+      getConfig: () => current,
+      getSnapshot: () => snapshot.value,
+      platform: 'CHROMIUM',
+      store: { record } as unknown as ErrorCorrelationStore,
+    })
+
+    registeredErrorListener()(activeFailure())
+    await Promise.resolve()
+
+    expect(record).not.toHaveBeenCalled()
+    expect(browserMocks.tabUpdate).not.toHaveBeenCalled()
+    unregister()
+  })
+
   it('retains best-effort recovery for an active outermost proxy failure', async () => {
     const selectedProfile = profile('fornex')
     const current = config({

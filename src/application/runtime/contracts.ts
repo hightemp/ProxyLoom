@@ -14,7 +14,7 @@ import type {
   RuleAction,
   TemporaryOverride,
 } from '../../domain/types/entities'
-import type { ErrorContext } from '../errors/error-correlation-store'
+import type { ErrorPageContext } from '../errors/error-correlation-store'
 import type { IncognitoHelp } from '../incognito/incognito-capability-service'
 
 export interface RuntimeDiagnostics {
@@ -169,4 +169,4 @@ export type RuntimeResponse<T = unknown> =
   | { readonly ok: true; readonly value: T }
   | { readonly ok: false; readonly error: RuntimeCommandError }
 
-export type ErrorContextResponse = RuntimeResponse<ErrorContext>
+export type ErrorContextResponse = RuntimeResponse<ErrorPageContext>

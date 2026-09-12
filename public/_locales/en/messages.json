@@ -231,10 +231,10 @@
     "message": "All supported requests"
   },
   "bestEffortErrorPage": {
-    "message": "Best-effort proxy error page"
+    "message": "Show ProxyLoom error page"
   },
   "bestEffortErrorPageDescription": {
-    "message": "Only supported main-frame failures can be redirected."
+    "message": "Turn off to keep the browser's native error page for future proxy navigation failures."
   },
   "manualCheckEndpoint": {
     "message": "Manual check endpoint"
@@ -312,7 +312,7 @@
     "message": "The assigned proxy could not complete the navigation to"
   },
   "proxyFailureAfterHost": {
-    "message": "The original path and query are intentionally not displayed or persisted."
+    "message": "The path, query, fragment, and credentials are hidden; Retry uses the original address once."
   },
   "technicalCode": { "message": "Technical code" },
   "proxyProfile": { "message": "Proxy profile" },

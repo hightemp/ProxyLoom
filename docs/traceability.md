@@ -1,6 +1,6 @@
 # Requirements and task traceability
 
-Date: 2026-08-23
+Date: 2026-09-12
 
 This document distinguishes implementation evidence from acceptance evidence. `A` means the
 implementation and its repository-local automated acceptance evidence are present. `B` means the
@@ -47,6 +47,7 @@ complete acceptance evidence exists.
 | PL-129        | A      | Versioned session error-context unit reconstruction plus Chromium worker-stop/mode-cycle/Retry E2E                                | None beyond aggregate release gates                                |
 | PL-130        | B      | Parallel cold-auth readiness, candidate-only routing reconciliation and Chromium HTTPS worker-restart regression                  | Yandex 26 discarded-tab manual regression                          |
 | PL-131        | B      | Lifecycle/frame filter unit matrix plus existing Chromium active-navigation fail-closed Retry regression                          | Yandex 26 Google-search prerender manual regression                |
+| PL-132        | A      | Safe-origin context and disabled-coordinator unit coverage plus Chromium options/error-page E2E                                   | None beyond aggregate release gates                                |
 
 ## Product requirement evidence
 

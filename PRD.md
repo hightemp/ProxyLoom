@@ -367,7 +367,10 @@ Badge:
 
 ### General
 
-Mode, active proxy, logging enabled, log level, check timeout, default IP/GeoIP endpoint, GeoIP toggle, error page behavior, confirmations, incognito instructions/status, proxy control status.
+Mode, active proxy, logging enabled, log level, check timeout, default IP/GeoIP endpoint, GeoIP toggle,
+an explicit `Show ProxyLoom error page` toggle, confirmations, incognito instructions/status, proxy
+control status. When the error-page toggle is off, supported proxy failures remain on the browser's
+native error page and no error recovery context is created.
 
 ### Proxies
 
@@ -404,7 +407,7 @@ Best-effort page только для main-frame:
 
 - title/reason/technical code;
 - profile name;
-- target hostname, без path/query;
+- clickable target origin (`scheme://hostname[:port]/`), без credentials/path/query/fragment;
 - matched rule;
 - timestamp;
 - `Retry`;
@@ -421,7 +424,13 @@ Best-effort page только для main-frame:
 `DIRECT`/`PROXY`, но удаляется после Retry, закрытия исходной вкладки, истечения TTL или restart
 browser session; в local storage, logs и diagnostics URL не попадает.
 
-- `FR-055`: redirect guard предотвращает loops и никогда не обрабатывает extension/internal requests.
+Кликабельный текст вычисляется при чтении context из exact URL через единый normalization contract
+и содержит только origin. Обычный click запускает тот же одноразовый `Retry`, поэтому navigation
+восстанавливает точный исходный адрес, но path/query/fragment/credentials не появляются в DOM или
+`href`. Session schema не дублирует display URL.
+
+- `FR-055`: redirect guard предотвращает loops, никогда не обрабатывает extension/internal requests
+  и при выключенной error page не создаёт context и не вызывает tab redirect.
 - `FR-056`: background/subresource/WebSocket error не открывает page; download error использует notification + log.
 - `COMPAT-008`: error page не считается гарантированной заменой native page: post-failure events не
   предоставляют атомарного redirect, tab может быть закрыт/перенаправлен, а часть сетевых ошибок не

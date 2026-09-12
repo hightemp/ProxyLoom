@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, shallowRef } from 'vue'
 
-import type { ErrorContext } from '../../src/application/errors/error-correlation-store'
+import type { ErrorPageContext } from '../../src/application/errors/error-correlation-store'
 import { t } from '../../src/i18n/messages'
 import { runtimeClient } from '../../src/ui/runtime/client'
 
-const context = shallowRef<ErrorContext | null>(null)
+const context = shallowRef<ErrorPageContext | null>(null)
 const loading = shallowRef(true)
 const error = shallowRef('')
 const busy = shallowRef(false)
@@ -33,6 +33,7 @@ const load = async (): Promise<void> => {
 }
 
 const recover = async (directOnce: boolean): Promise<void> => {
+  if (busy.value) return
   busy.value = true
   const result = await runtimeClient.command<null>({
     token: token(),
@@ -69,8 +70,15 @@ onMounted(() => {
       <template v-else-if="context">
         <p>
           {{ t('proxyFailureBeforeHost') }}
-          <strong>{{ context.hostname }}</strong
-          >. {{ t('proxyFailureAfterHost') }}
+          <a
+            class="target-link"
+            :href="context.displayUrl"
+            :aria-disabled="busy"
+            @click.prevent="recover(false)"
+          >
+            {{ context.displayUrl }} </a
+          >.
+          {{ t('proxyFailureAfterHost') }}
         </p>
         <dl>
           <div>
@@ -179,5 +187,17 @@ dd {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.target-link {
+  color: var(--color-primary);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  text-underline-offset: 2px;
+}
+
+.target-link[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.52;
 }
 </style>

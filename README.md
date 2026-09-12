@@ -32,7 +32,8 @@ the HTTPS endpoint.
   drag-and-drop and keyboard ordering;
 - local regex and full routing testers with no network requests;
 - Once/Always site actions and private-session isolation;
-- redacted local routing logs and a best-effort main-frame error page;
+- redacted local routing logs and an optional best-effort main-frame error page with a safe origin
+  link;
 - inactive-profile checks through the selected proxy, only after an explicit click;
 - native JSON merge/replace/export and profiles-only FoxyProxy 6–9 import;
 - system/light/dark themes and localized English UI;

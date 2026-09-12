@@ -9,7 +9,7 @@ import { SessionRepository } from '../../../src/storage/session/session-reposito
 import { config } from '../domain/fixtures'
 
 describe('redacted error correlation store', () => {
-  it('exposes hostname-only context while keeping the retry URL one-time and private', async () => {
+  it('exposes a safe origin link while keeping the exact retry URL one-time and private', async () => {
     let now = new Date('2026-01-01T00:00:00.000Z')
     const clock: Clock = { now: () => now }
     const store = new ErrorCorrelationStore(
@@ -43,6 +43,16 @@ describe('redacted error correlation store', () => {
       },
     })
     expect(JSON.stringify(recorded)).not.toContain('private/path')
+    expect(await store.get('token-1')).toMatchObject({
+      ok: true,
+      value: {
+        displayUrl: 'https://example.com/',
+        hostname: 'example.com',
+      },
+    })
+    expect(JSON.stringify(await store.get('token-1'))).not.toMatch(
+      /password|private\/path|token=canary/u,
+    )
     expect(await store.consumeRetry('token-1')).toEqual({
       ok: true,
       value: { context: recorded.ok ? recorded.value : null, originalUrl },
@@ -69,6 +79,46 @@ describe('redacted error correlation store', () => {
       error: { code: 'CONTEXT_EXPIRED' },
       ok: false,
     })
+  })
+
+  it('rejects a corrupted retry target instead of exposing a mismatched link', async () => {
+    const store = new ErrorCorrelationStore(
+      { now: () => new Date('2026-01-01T00:00:00.000Z') },
+      () => 'unused-token',
+      new SessionRepository(
+        new MemoryStorageArea({
+          'session.error-contexts': {
+            contexts: [
+              {
+                context: {
+                  hostname: 'expected.example',
+                  incognito: false,
+                  occurredAt: '2026-01-01T00:00:00.000Z',
+                  platform: 'CHROMIUM',
+                  profileId: null,
+                  profileName: null,
+                  requestId: 'request-1',
+                  ruleId: null,
+                  ruleName: null,
+                  tabId: 7,
+                  technicalCode: 'FAILED',
+                  token: 'corrupted-token',
+                },
+                expiresAt: Date.parse('2026-01-01T00:05:00.000Z'),
+                originalUrl: 'https://other.example/private',
+              },
+            ],
+            schemaVersion: 1,
+          },
+        }),
+      ),
+    )
+
+    expect(await store.get('corrupted-token')).toEqual({
+      error: { code: 'INVALID_URL' },
+      ok: false,
+    })
+    expect(await store.size()).toBe(0)
   })
 
   it('survives a service-worker store reconstruction within the session TTL', async () => {

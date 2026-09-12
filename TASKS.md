@@ -1441,7 +1441,28 @@
   - **Тесты:** lifecycle/frame unit matrix, существующий Chromium fail-closed Retry E2E и named
     manual Yandex 26 Google-search prerender regression.
   - **Готово, когда:** выдача Google остаётся открытой при неудачном preload первой ссылки, unit/E2E/
-    typecheck/lint/dual builds зелёные, version 0.1.3/docs обновлены и Yandex regression подписана.
+    typecheck/lint/dual builds зелёные, version 0.1.4/docs обновлены и Yandex regression подписана.
+
+- [x] **PL-132 — Отключать custom error page и показывать safe URL link**
+  - **Цель:** дать пользователю явный выбор browser-native error page и кликабельный адрес на
+    ProxyLoom error page без раскрытия чувствительных частей URL.
+  - **Требования:** FR-024, FR-053–FR-056, COMPAT-008, SEC-003, SEC-010, PRIV-010.
+  - **Действия:** явно назвать existing General toggle; при `errorPageEnabled=false` не создавать
+    recovery context и не вызывать `tabs.update`; вычислять safe origin из private exact retry URL
+    только при чтении context; отображать его ссылкой, обычный click которой вызывает one-time
+    Retry; не помещать credentials/path/query/fragment в UI или `href`.
+  - **Модули:** General/error Vue UI, error correlation/runtime contract, Chromium coordinator,
+    locale, privacy/user/store/ADR docs.
+  - **Зависимости:** PL-070–PL-071, PL-129.
+  - **Критерии приёмки:** настройка сохраняется через application service и после reload; disabled
+    state оставляет native error page без recovery context; ссылка показывает только normalized
+    origin и повторяет exact original URL через существующий Retry flow.
+  - **Тесты:** coordinator/store unit redaction/corruption/disabled cases; Chromium options and
+    fail-closed error-page E2E; typecheck/lint/format/docs/traceability/dual builds.
+  - **Миграции/permissions/privacy:** persisted config field уже существует в schema v3; safe origin
+    вычисляется без изменения config/native export/session schemas; permissions и external network
+    не меняются; exact URL остаётся bounded one-time `storage.session` state.
+  - **Готово, когда:** automated acceptance зелёный, version 0.1.4/docs обновлены, checkbox отмечен.
 
 ---
 

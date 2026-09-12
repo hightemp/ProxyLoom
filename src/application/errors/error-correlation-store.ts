@@ -18,6 +18,10 @@ export interface ErrorContext {
   readonly occurredAt: string
 }
 
+export interface ErrorPageContext extends ErrorContext {
+  readonly displayUrl: string
+}
+
 export interface StoredErrorContext {
   readonly context: ErrorContext
   readonly originalUrl: string
@@ -95,20 +99,32 @@ export class ErrorCorrelationStore {
     )
   }
 
-  get(token: string): Promise<Result<ErrorContext, ErrorContextError>> {
-    return this.state.mutateErrorContexts<Result<ErrorContext, ErrorContextError>>((contexts) => {
-      const stored = contexts.find((candidate) => candidate.context.token === token)
-      const now = this.clock.now().getTime()
-      const active = contexts.filter((candidate) => candidate.expiresAt > now)
-      const retained = active.length === contexts.length ? contexts : active
-      if (stored === undefined) {
-        return { contexts: retained, value: err({ code: 'CONTEXT_NOT_FOUND' }) }
-      }
-      if (stored.expiresAt <= now) {
-        return { contexts: retained, value: err({ code: 'CONTEXT_EXPIRED' }) }
-      }
-      return { contexts: retained, value: ok(stored.context) }
-    })
+  get(token: string): Promise<Result<ErrorPageContext, ErrorContextError>> {
+    return this.state.mutateErrorContexts<Result<ErrorPageContext, ErrorContextError>>(
+      (contexts) => {
+        const stored = contexts.find((candidate) => candidate.context.token === token)
+        const now = this.clock.now().getTime()
+        const active = contexts.filter((candidate) => candidate.expiresAt > now)
+        const retained = active.length === contexts.length ? contexts : active
+        if (stored === undefined) {
+          return { contexts: retained, value: err({ code: 'CONTEXT_NOT_FOUND' }) }
+        }
+        if (stored.expiresAt <= now) {
+          return { contexts: retained, value: err({ code: 'CONTEXT_EXPIRED' }) }
+        }
+        const normalized = normalizeUrl(stored.originalUrl)
+        if (!normalized.ok || normalized.value.hostname !== stored.context.hostname) {
+          return {
+            contexts: retained.filter((candidate) => candidate.context.token !== token),
+            value: err({ code: 'INVALID_URL' }),
+          }
+        }
+        return {
+          contexts: retained,
+          value: ok({ ...stored.context, displayUrl: normalized.value.originTarget }),
+        }
+      },
+    )
   }
 
   consumeRetry(

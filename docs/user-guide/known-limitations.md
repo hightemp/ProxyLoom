@@ -9,7 +9,7 @@
   proxy. Policy, another extension, or missing private-browsing access can block apply; controls
   report the conflict instead of simulating success.
 - Error-page navigation is best effort because browser post-failure events do not provide an
-  atomic redirect.
+  atomic redirect. It can be disabled in General settings to retain the browser's native error page.
 - Browsers do not expose a reliable proxy connect phase, so manual-check connect duration can be
   **Not available**.
 - Established WebSocket message payloads are not observed or logged; only the handshake is routed.

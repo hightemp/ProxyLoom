@@ -65,12 +65,16 @@ before confirmation.
 ## 5. Diagnostics and recovery
 
 The badge shows `D`, the profile short name, `R`, or `!`. Popup and badge use the same resolver
-inspection. The best-effort error page is limited to supported main-frame proxy failures and shows
-hostname only. **Open Directly Once** is explicit recovery; background/WebSocket/download errors
-never redirect an arbitrary tab. Chromium speculative or cached page loads (including search-result
-preloading) also stay in the background and cannot replace the visible search tab. The Retry target remains available for five minutes while you
-switch between DIRECT and PROXY, even if the MV3 background worker stops in between. Retry is
-one-time; closing the source tab or restarting the browser discards it.
+inspection. The best-effort error page is limited to supported main-frame proxy failures. General
+settings includes **Show ProxyLoom error page**; turn it off to keep the browser's native error page
+and prevent creation of error recovery context. When enabled, the page shows a clickable safe origin
+without credentials, path, query, or fragment. Clicking it or **Retry** repeats the exact original
+address once. **Open Directly Once** is explicit recovery; background/WebSocket/download errors never
+redirect an arbitrary tab. Chromium speculative or cached page loads (including search-result
+preloading) also stay in the background and cannot replace the visible search tab. The Retry target
+remains available for five minutes while you switch between DIRECT and PROXY, even if the MV3
+background worker stops in between. Retry is one-time; closing the source tab or restarting the
+browser discards it.
 
 On Chromium-family browsers, authenticated proxy recovery waits up to ten seconds for a cold MV3
 worker to restore and verify its applied routing snapshot. Cleanup of unrelated tab error contexts
