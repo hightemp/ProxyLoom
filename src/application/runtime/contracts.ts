@@ -108,6 +108,12 @@ export type RuntimeRequest =
     }
   | { readonly type: 'DUPLICATE_RULE'; readonly ruleId: string }
   | { readonly type: 'DELETE_RULE'; readonly ruleId: string }
+  | { readonly type: 'DELETE_RULES'; readonly ruleIds: readonly string[] }
+  | {
+      readonly type: 'SET_RULES_ENABLED'
+      readonly ruleIds: readonly string[]
+      readonly enabled: boolean
+    }
   | {
       readonly type: 'SET_RULE_ENABLED'
       readonly ruleId: string

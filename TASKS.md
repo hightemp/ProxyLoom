@@ -1715,7 +1715,7 @@ rules`, compact check pill; `Use globally`/`Check` + «⋯» (Edit, Duplicate, C
   - **Тесты:** component tests, E2E CRUD/check/copy, performance smoke.
   - **Готово, когда:** unit/E2E/typecheck/lint/dual builds зелёные, version 0.1.15/docs обновлены.
 
-- [ ] **PL-150 — Редизайн раздела Rules**
+- [x] **PL-150 — Редизайн раздела Rules**
   - **Цель:** читаемый плотный список правил и удобный редактор.
   - **Требования:** FR-003, FR-030–FR-040, NFR-003, NFR-005, NFR-007.
   - **Действия:** подписанный switch `Enabled`, обрезка pattern с раскрытием, action как
@@ -1743,6 +1743,21 @@ rules`, compact check pill; `Use globally`/`Check` + «⋯» (Edit, Duplicate, C
     читался с `about:blank`); 10 полных E2E-прогонов без сбоя `proxy-check` (до исправления 3 из 11).
   - **Миграции/permissions/privacy:** нет; `tab.url` доступен через существующий `<all_urls>`.
   - **Готово, когда:** unit/E2E/typecheck/lint/dual builds зелёные, version 0.1.6.
+
+- [ ] **PL-152 — UI временного отключения правил (FR-036)**
+  - **Цель:** дать пользователю temporary disable `5 minutes`, `15 minutes`, `1 hour`,
+    `Until browser restart`, как обещает FR-036.
+  - **Требования:** FR-032, FR-036, FR-059.
+  - **Действия:** найдено при PL-150: session storage (`session.rule-disables`), reconciliation и
+    resolver уже учитывают temporary disable, но runtime-команды и UI нет. Добавить команды
+    set/clear temporary disable, пункт в меню «⋯» строки правила, badge `Disabled for N min` /
+    `Until restart` и cleanup по истечении.
+  - **Модули:** rule application service, runtime contracts/controller, RulesSection, locale.
+  - **Зависимости:** PL-150.
+  - **Критерии приёмки:** permanent `enabled` не меняется; истёкшее отключение снимается
+    alarms/reconciliation; правило пропускается resolver и PAC только пока отключение активно.
+  - **Тесты:** application/session unit, resolver/PAC parity, Chromium E2E.
+  - **Готово, когда:** unit/parity/E2E/typecheck/lint/dual builds зелёные, version/docs обновлены.
 
 ---
 

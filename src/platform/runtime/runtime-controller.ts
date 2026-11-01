@@ -223,6 +223,14 @@ export class RuntimeController {
           return this.mutate((config) => this.#rules.duplicate(config, asRuleId(request.ruleId)))
         case 'DELETE_RULE':
           return this.mutate((config) => this.#rules.delete(config, asRuleId(request.ruleId)))
+        case 'DELETE_RULES':
+          return this.mutate((config) =>
+            this.#rules.deleteMany(config, request.ruleIds.map(asRuleId)),
+          )
+        case 'SET_RULES_ENABLED':
+          return this.mutate((config) =>
+            this.#rules.setManyEnabled(config, request.ruleIds.map(asRuleId), request.enabled),
+          )
         case 'SET_RULE_ENABLED':
           return this.mutate((config) =>
             this.#rules.setEnabled(config, asRuleId(request.ruleId), request.enabled),

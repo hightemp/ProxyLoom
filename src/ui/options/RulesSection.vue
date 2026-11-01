@@ -13,7 +13,7 @@ import {
   NAMED_RULE_TEMPLATE_PRESETS,
   type RuleTemplateId,
 } from '../../domain/rules/templates'
-import type { MatcherType, Rule } from '../../domain/types/entities'
+import type { MatcherType, ProxyProfile, Rule } from '../../domain/types/entities'
 import { t } from '../../i18n/messages'
 import {
   decisionActionLabel,
@@ -24,6 +24,9 @@ import {
 } from '../labels'
 import { confirmController } from '../confirm/confirm-controller'
 import { createRegexWorker } from '../runtime/regex-worker-factory'
+import Drawer from '../components/Drawer.vue'
+import OverflowMenu from '../components/OverflowMenu.vue'
+import ProfileChip from '../components/ProfileChip.vue'
 
 const props = defineProps<{
   state: AppRuntimeState
@@ -147,12 +150,60 @@ const filteredRules = computed(() => {
     )
 })
 
-const ruleRouteLabel = (rule: Rule): string => {
-  if (rule.action.type === 'DIRECT') return t('directConnection')
-  const profile = props.state.config.profiles.find(
-    (candidate) => candidate.id === rule.action.targetProxyProfileId,
+const ruleProfile = (rule: Rule): ProxyProfile | null =>
+  rule.action.type === 'PROXY'
+    ? (props.state.config.profiles.find(
+        (candidate) => candidate.id === rule.action.targetProxyProfileId,
+      ) ?? null)
+    : null
+
+const moreFiltersOpen = shallowRef(false)
+const expandedPatterns = shallowRef<ReadonlySet<string>>(new Set())
+const selectedRuleIds = shallowRef<ReadonlySet<string>>(new Set())
+
+watch(
+  () => props.state.config.rules,
+  (rules) => {
+    const existing = new Set<string>(rules.map((rule) => rule.id))
+    selectedRuleIds.value = new Set([...selectedRuleIds.value].filter((id) => existing.has(id)))
+  },
+)
+
+const toggleSet = (set: ReadonlySet<string>, id: string, on: boolean): ReadonlySet<string> => {
+  const next = new Set(set)
+  if (on) next.add(id)
+  else next.delete(id)
+  return next
+}
+
+const selectedInOrder = (): string[] =>
+  [...props.state.config.rules]
+    .sort((left, right) => left.position - right.position)
+    .filter((rule) => selectedRuleIds.value.has(rule.id))
+    .map((rule) => rule.id)
+
+const selectAllShown = (): void => {
+  selectedRuleIds.value = new Set([
+    ...selectedRuleIds.value,
+    ...filteredRules.value.map((rule) => rule.id),
+  ])
+}
+
+const setSelectedEnabled = (enabled: boolean): void => {
+  emit('command', { enabled, ruleIds: selectedInOrder(), type: 'SET_RULES_ENABLED' })
+}
+
+const deleteSelected = async (): Promise<void> => {
+  const ruleIds = selectedInOrder()
+  const confirmed = await confirmController.destructive(
+    {
+      confirmLabel: t('delete'),
+      message: t('deleteRulesMessage'),
+      title: t('deleteRulesTitle', String(ruleIds.length)),
+    },
+    props.state.config.general.confirmDangerousActions,
   )
-  return profile === undefined ? t('missingProxyRoute') : t('viaProxy', profile.name)
+  if (confirmed) emit('command', { ruleIds, type: 'DELETE_RULES' })
 }
 
 const replaceDraft = (next: RuleDraft): void => {
@@ -180,7 +231,10 @@ const create = (event: MouseEvent): void => {
 }
 
 const edit = (rule: Rule, event: MouseEvent): void => {
-  editorActivator = event.currentTarget as HTMLElement
+  const source = event.currentTarget as HTMLElement
+  // A menu item disappears when the menu closes; focus returns to the menu button instead.
+  editorActivator =
+    source.closest('.overflow-menu')?.querySelector<HTMLElement>('[aria-haspopup="menu"]') ?? source
   editingId.value = rule.id
   replaceDraft(copyRule(rule))
   formOpen.value = true
@@ -343,14 +397,23 @@ watch(() => props.busy, restoreFocus)
     </div>
 
     <article class="surface card stack">
-      <div class="filter-grid">
+      <div class="rule-filter-row">
         <label>
           {{ t('search') }}
           <input v-model="search" type="search" :placeholder="t('nameOrPattern')" />
         </label>
+        <button
+          type="button"
+          :aria-expanded="moreFiltersOpen ? 'true' : 'false'"
+          @click="moreFiltersOpen = !moreFiltersOpen"
+        >
+          {{ moreFiltersOpen ? t('fewerFilters') : t('moreFilters') }}
+        </button>
+      </div>
+      <div v-if="moreFiltersOpen" class="filter-grid">
         <label>
           {{ t('action') }}
-          <select v-model="actionFilter" :aria-label="t('action')">
+          <select v-model="actionFilter" name="rule-action-filter" :aria-label="t('action')">
             <option value="">{{ t('allActions') }}</option>
             <option value="DIRECT">{{ t('directLabel') }}</option>
             <option value="PROXY">{{ t('proxyLabel') }}</option>
@@ -358,7 +421,11 @@ watch(() => props.busy, restoreFocus)
         </label>
         <label>
           {{ t('proxyProfile') }}
-          <select v-model="profileFilter" :aria-label="t('proxyProfile')">
+          <select
+            v-model="profileFilter"
+            name="rule-profile-filter"
+            :aria-label="t('proxyProfile')"
+          >
             <option value="">{{ t('allProxyProfiles') }}</option>
             <option v-for="profile in state.config.profiles" :key="profile.id" :value="profile.id">
               {{ profile.name }}
@@ -367,7 +434,7 @@ watch(() => props.busy, restoreFocus)
         </label>
         <label>
           {{ t('enabled') }}
-          <select v-model="enabledFilter" :aria-label="t('enabled')">
+          <select v-model="enabledFilter" name="rule-enabled-filter" :aria-label="t('enabled')">
             <option value="">{{ t('anyState') }}</option>
             <option value="true">{{ t('enabled') }}</option>
             <option value="false">{{ t('disabled') }}</option>
@@ -375,7 +442,11 @@ watch(() => props.busy, restoreFocus)
         </label>
         <label>
           {{ t('compatibility') }}
-          <select v-model="compatibilityFilter" :aria-label="t('compatibility')">
+          <select
+            v-model="compatibilityFilter"
+            name="rule-compatibility-filter"
+            :aria-label="t('compatibility')"
+          >
             <option value="">{{ t('all') }}</option>
             <option value="PORTABLE">{{ t('chromeFirefox') }}</option>
             <option value="FIREFOX_ONLY">{{ t('firefoxOnly') }}</option>
@@ -383,10 +454,30 @@ watch(() => props.busy, restoreFocus)
         </label>
       </div>
       <div class="button-row">
-        <button type="button" @click="clearFilters">
+        <span aria-live="polite">
+          {{ t('showingCount', [String(filteredRules.length), String(state.config.rules.length)]) }}
+        </span>
+        <button v-if="filtersActive" type="button" @click="clearFilters">
           {{ t('clearFilters') }}
         </button>
         <span v-if="filtersActive" class="notice"> {{ t('clearFiltersToReorder') }} </span>
+        <button type="button" :disabled="filteredRules.length === 0" @click="selectAllShown">
+          {{ t('selectAllShown') }}
+        </button>
+        <template v-if="selectedRuleIds.size > 0">
+          <button type="button" @click="selectedRuleIds = new Set()">
+            {{ t('clearSelection') }}
+          </button>
+          <button type="button" :disabled="busy" @click="setSelectedEnabled(true)">
+            {{ t('enableSelected', String(selectedRuleIds.size)) }}
+          </button>
+          <button type="button" :disabled="busy" @click="setSelectedEnabled(false)">
+            {{ t('disableSelected', String(selectedRuleIds.size)) }}
+          </button>
+          <button class="danger-text" type="button" :disabled="busy" @click="void deleteSelected()">
+            {{ t('deleteSelected', String(selectedRuleIds.size)) }}
+          </button>
+        </template>
       </div>
     </article>
 
@@ -399,16 +490,34 @@ watch(() => props.busy, restoreFocus)
         v-for="rule in filteredRules"
         :key="rule.id"
         class="surface rule-row"
+        :class="{ 'rule-disabled': !rule.enabled }"
         :draggable="!filtersActive && !busy"
         @dragstart="dragId = rule.id"
         @dragover.prevent
         @drop="drop(rule)"
       >
+        <input
+          type="checkbox"
+          name="rule-select"
+          :checked="selectedRuleIds.has(rule.id)"
+          :aria-label="t('selectRuleNamed', rule.name)"
+          @change="
+            selectedRuleIds = toggleSet(
+              selectedRuleIds,
+              rule.id,
+              ($event.target as HTMLInputElement).checked,
+            )
+          "
+        />
         <span class="drag-handle" aria-hidden="true"> {{ t('dragHandleSymbol') }} </span>
         <span class="position">{{ rule.position + 1 }}</span>
         <div class="rule-main">
           <div class="rule-title">
             <strong>{{ rule.name }}</strong>
+            <ProfileChip
+              :profile="ruleProfile(rule)"
+              :missing="rule.action.type === 'PROXY' && ruleProfile(rule) === null"
+            />
             <span v-if="rule.matcherType === 'FULL_URL'" class="status-pill warning">
               {{ t('firefoxOnly') }}
             </span>
@@ -416,17 +525,34 @@ watch(() => props.busy, restoreFocus)
               {{ ruleValidityLabel(rule.validity) }}
             </span>
           </div>
-          <code>{{ rule.pattern }}</code>
-          <small>
-            {{ ruleRouteLabel(rule) }}
-          </small>
+          <div class="pattern-line">
+            <code class="rule-pattern" :class="{ expanded: expandedPatterns.has(rule.id) }">{{
+              rule.pattern
+            }}</code>
+            <button
+              v-if="rule.pattern.length > 60"
+              class="link-button pattern-toggle"
+              type="button"
+              :aria-expanded="expandedPatterns.has(rule.id) ? 'true' : 'false'"
+              @click="
+                expandedPatterns = toggleSet(
+                  expandedPatterns,
+                  rule.id,
+                  !expandedPatterns.has(rule.id),
+                )
+              "
+            >
+              {{ expandedPatterns.has(rule.id) ? t('hideFullPattern') : t('showFullPattern') }}
+            </button>
+          </div>
         </div>
-        <label class="switch-label">
-          <span class="sr-only">{{ t('enable') }} {{ rule.name }}</span>
+        <label class="switch">
           <input
             type="checkbox"
+            role="switch"
             :checked="rule.enabled"
             :disabled="busy"
+            :aria-label="t('enableRule', rule.name)"
             @change="
               emit('command', {
                 enabled: ($event.target as HTMLInputElement).checked,
@@ -435,12 +561,15 @@ watch(() => props.busy, restoreFocus)
               })
             "
           />
+          <span class="switch-text" aria-hidden="true">{{
+            rule.enabled ? t('enabled') : t('disabled')
+          }}</span>
         </label>
         <div class="row-actions">
           <button
             type="button"
             :disabled="busy || filtersActive || rule.position === 0"
-            :aria-label="`${t('move')} ${rule.name} ${t('up')}`"
+            :aria-label="t('moveRuleUp', rule.name)"
             @click="move(rule, -1)"
           >
             {{ t('upSymbol') }}
@@ -448,176 +577,179 @@ watch(() => props.busy, restoreFocus)
           <button
             type="button"
             :disabled="busy || filtersActive || rule.position === state.config.rules.length - 1"
-            :aria-label="`${t('move')} ${rule.name} ${t('down')}`"
+            :aria-label="t('moveRuleDown', rule.name)"
             @click="move(rule, 1)"
           >
             {{ t('downSymbol') }}
           </button>
-          <button type="button" @click="edit(rule, $event)">
-            {{ t('edit') }}
-          </button>
-          <button
-            type="button"
-            @click="
-              emit('command', {
-                ruleId: rule.id,
-                type: 'DUPLICATE_RULE',
-              })
-            "
-          >
-            {{ t('duplicate') }}
-          </button>
-          <button class="danger-text" type="button" @click="void removeRule(rule)">
-            {{ t('delete') }}
-          </button>
+          <OverflowMenu :label="t('ruleActionsFor', rule.name)">
+            <button role="menuitem" type="button" @click="edit(rule, $event)">
+              {{ t('edit') }}
+            </button>
+            <button
+              role="menuitem"
+              type="button"
+              @click="emit('command', { ruleId: rule.id, type: 'DUPLICATE_RULE' })"
+            >
+              {{ t('duplicate') }}
+            </button>
+            <button
+              role="menuitem"
+              class="danger-text"
+              type="button"
+              @click="void removeRule(rule)"
+            >
+              {{ t('delete') }}
+            </button>
+          </OverflowMenu>
         </div>
       </li>
     </ol>
 
-    <form v-if="formOpen" class="surface card stack editor" @submit.prevent="void save()">
-      <div class="section-heading">
-        <h3>{{ editingId === null ? t('addRule') : t('editRule') }}</h3>
-        <button type="button" @click="closeEditor">
-          {{ t('close') }}
-        </button>
-      </div>
-      <div class="form-grid">
+    <Drawer
+      :open="formOpen"
+      :title="editingId === null ? t('addRule') : t('editRule')"
+      @close="closeEditor"
+    >
+      <form class="stack editor" @submit.prevent="void save()">
+        <div class="form-grid">
+          <label>
+            {{ t('name') }}
+            <input ref="editorNameInput" v-model="draft.name" maxlength="256" required />
+          </label>
+          <label>
+            {{ t('matcherTarget') }}
+            <select v-model="draft.matcherType">
+              <option value="ORIGIN">{{ t('originPortable') }}</option>
+              <option value="FULL_URL">{{ t('fullUrlFirefoxOnly') }}</option>
+            </select>
+          </label>
+          <label>
+            {{ t('flags') }}
+            <input v-model="draft.flags" maxlength="2" pattern="[im]*" />
+          </label>
+        </div>
         <label>
-          {{ t('name') }}
-          <input ref="editorNameInput" v-model="draft.name" maxlength="256" required />
+          {{ t('description') }}
+          <textarea v-model="draft.description" rows="2" maxlength="4096" />
         </label>
         <label>
-          {{ t('matcherTarget') }}
-          <select v-model="draft.matcherType">
-            <option value="ORIGIN">{{ t('originPortable') }}</option>
-            <option value="FULL_URL">{{ t('fullUrlFirefoxOnly') }}</option>
-          </select>
+          {{ t('regularExpression') }}
+          <textarea v-model="draft.pattern" rows="3" maxlength="2048" spellcheck="false" required />
         </label>
-        <label>
-          {{ t('flags') }}
-          <input v-model="draft.flags" maxlength="2" pattern="[im]*" />
-        </label>
-      </div>
-      <label>
-        {{ t('description') }}
-        <textarea v-model="draft.description" rows="2" maxlength="4096" />
-      </label>
-      <label>
-        {{ t('regularExpression') }}
-        <textarea v-model="draft.pattern" rows="3" maxlength="2048" spellcheck="false" required />
-      </label>
-      <p class="notice">
-        {{ t('regexGuidance') }}
-      </p>
-      <div class="form-grid">
-        <label>
-          {{ t('template') }}
-          <select v-model="templateId" :aria-label="t('template')">
-            <option value="EXACT_HOSTNAME">{{ t('exactHostname') }}</option>
-            <option value="DOMAIN_AND_SUBDOMAINS">{{ t('domainSubdomains') }}</option>
-            <option value="DOMAIN_SUFFIXES">{{ t('domainSuffixes') }}</option>
-            <option value="RUSSIAN_DOMAINS">{{ t('russianSitesExample') }}</option>
-            <option value="SOCIAL_NETWORKS">{{ t('socialNetworksExample') }}</option>
-            <option value="EXACT_ORIGIN">{{ t('exactOrigin') }}</option>
-            <option value="HTTP_ONLY">{{ t('httpOnly') }}</option>
-            <option value="HTTPS_ONLY">{{ t('httpsOnly') }}</option>
-            <option value="CUSTOM_PORT">{{ t('customPort') }}</option>
-            <option value="LOCALHOST">{{ t('localhost') }}</option>
-            <option value="PRIVATE_IPV4">{{ t('privateIpv4') }}</option>
-            <option value="FIREFOX_URL_PATH">{{ t('firefoxUrlPath') }}</option>
-            <option value="FIREFOX_QUERY_PARAMETER">{{ t('firefoxQueryParameter') }}</option>
-          </select>
-        </label>
-        <label
-          v-if="
-            templateId !== 'DOMAIN_SUFFIXES' &&
-            templateId !== 'RUSSIAN_DOMAINS' &&
-            templateId !== 'SOCIAL_NETWORKS'
-          "
-        >
-          {{ t('templateHostname') }}
-          <input v-model="templateHost" />
-        </label>
-        <label v-else-if="templateId === 'DOMAIN_SUFFIXES'">
-          {{ t('domainSuffixes') }}
-          <textarea
-            v-model="templateDomainSuffixes"
-            rows="2"
-            :placeholder="t('domainSuffixesPlaceholder')"
-          />
-        </label>
-        <button type="button" @click="applyTemplate">
-          {{ t('generateEditablePattern') }}
-        </button>
-      </div>
-      <label>
-        {{ t('routeVia') }}
-        <select v-model="draft.routeTarget" required>
-          <option value="" disabled>{{ t('selectRoute') }}</option>
-          <option value="DIRECT">{{ t('directConnection') }}</option>
-          <option v-if="routeSelectionMissing" :value="draft.routeTarget" disabled>
-            {{ t('missingProxyRoute') }}
-          </option>
-          <option
-            v-for="profile in state.config.profiles"
-            :key="profile.id"
-            :value="profileRouteTarget(profile.id)"
+        <p class="notice">
+          {{ t('regexGuidance') }}
+        </p>
+        <div class="form-grid">
+          <label>
+            {{ t('template') }}
+            <select v-model="templateId" :aria-label="t('template')">
+              <option value="EXACT_HOSTNAME">{{ t('exactHostname') }}</option>
+              <option value="DOMAIN_AND_SUBDOMAINS">{{ t('domainSubdomains') }}</option>
+              <option value="DOMAIN_SUFFIXES">{{ t('domainSuffixes') }}</option>
+              <option value="RUSSIAN_DOMAINS">{{ t('russianSitesExample') }}</option>
+              <option value="SOCIAL_NETWORKS">{{ t('socialNetworksExample') }}</option>
+              <option value="EXACT_ORIGIN">{{ t('exactOrigin') }}</option>
+              <option value="HTTP_ONLY">{{ t('httpOnly') }}</option>
+              <option value="HTTPS_ONLY">{{ t('httpsOnly') }}</option>
+              <option value="CUSTOM_PORT">{{ t('customPort') }}</option>
+              <option value="LOCALHOST">{{ t('localhost') }}</option>
+              <option value="PRIVATE_IPV4">{{ t('privateIpv4') }}</option>
+              <option value="FIREFOX_URL_PATH">{{ t('firefoxUrlPath') }}</option>
+              <option value="FIREFOX_QUERY_PARAMETER">{{ t('firefoxQueryParameter') }}</option>
+            </select>
+          </label>
+          <label
+            v-if="
+              templateId !== 'DOMAIN_SUFFIXES' &&
+              templateId !== 'RUSSIAN_DOMAINS' &&
+              templateId !== 'SOCIAL_NETWORKS'
+            "
           >
-            {{ t('proxyRouteOption', profile.name) }}
-          </option>
-        </select>
-      </label>
-      <p v-if="routeSelectionMissing" class="notice danger-text" role="alert">
-        {{ t('chooseAvailableRoute') }}
-      </p>
-      <label class="check-row">
-        <input v-model="draft.enabled" type="checkbox" />
-        <span>{{ t('enabled') }}</span>
-      </label>
-
-      <details class="tester-panel">
-        <summary>{{ t('singleMultipleTester') }}</summary>
-        <p>{{ t('testerPrivacyDescription') }}</p>
-        <label>
-          {{ t('urlsOnePerLine') }}
-          <textarea v-model="testLines" rows="5" />
-        </label>
-        <div class="button-row">
-          <button type="button" @click="runRegexTest">
-            {{ t('testPattern') }}
+            {{ t('templateHostname') }}
+            <input v-model="templateHost" />
+          </label>
+          <label v-else-if="templateId === 'DOMAIN_SUFFIXES'">
+            {{ t('domainSuffixes') }}
+            <textarea
+              v-model="templateDomainSuffixes"
+              rows="2"
+              :placeholder="t('domainSuffixesPlaceholder')"
+            />
+          </label>
+          <button type="button" @click="applyTemplate">
+            {{ t('generateEditablePattern') }}
           </button>
-          <button type="button" @click="tester.cancel()">
+        </div>
+        <label>
+          {{ t('routeVia') }}
+          <select v-model="draft.routeTarget" required>
+            <option value="" disabled>{{ t('selectRoute') }}</option>
+            <option value="DIRECT">{{ t('directConnection') }}</option>
+            <option v-if="routeSelectionMissing" :value="draft.routeTarget" disabled>
+              {{ t('missingProxyRoute') }}
+            </option>
+            <option
+              v-for="profile in state.config.profiles"
+              :key="profile.id"
+              :value="profileRouteTarget(profile.id)"
+            >
+              {{ t('proxyRouteOption', profile.name) }}
+            </option>
+          </select>
+        </label>
+        <p v-if="routeSelectionMissing" class="notice danger-text" role="alert">
+          {{ t('chooseAvailableRoute') }}
+        </p>
+        <label class="check-row">
+          <input v-model="draft.enabled" type="checkbox" />
+          <span>{{ t('enabled') }}</span>
+        </label>
+
+        <details class="tester-panel">
+          <summary>{{ t('singleMultipleTester') }}</summary>
+          <p>{{ t('testerPrivacyDescription') }}</p>
+          <label>
+            {{ t('urlsOnePerLine') }}
+            <textarea v-model="testLines" rows="5" />
+          </label>
+          <div class="button-row">
+            <button type="button" @click="runRegexTest">
+              {{ t('testPattern') }}
+            </button>
+            <button type="button" @click="tester.cancel()">
+              {{ t('cancel') }}
+            </button>
+            <span class="muted" aria-live="polite">
+              {{ testerStatus }}
+            </span>
+          </div>
+          <ul class="test-results">
+            <li v-for="row in testRows" :key="row.input">
+              <strong>
+                {{
+                  row.errorCode === null
+                    ? row.matched
+                      ? t('match')
+                      : t('noMatch')
+                    : errorText({ code: row.errorCode })
+                }}
+              </strong>
+              <code>{{ row.normalizedTarget ?? row.input }}</code>
+            </li>
+          </ul>
+        </details>
+
+        <div class="button-row">
+          <button class="primary" type="submit" :disabled="busy || !routeSelectionValid">
+            {{ t('saveRule') }}
+          </button>
+          <button type="button" @click="closeEditor">
             {{ t('cancel') }}
           </button>
-          <span class="muted" aria-live="polite">
-            {{ testerStatus }}
-          </span>
         </div>
-        <ul class="test-results">
-          <li v-for="row in testRows" :key="row.input">
-            <strong>
-              {{
-                row.errorCode === null
-                  ? row.matched
-                    ? t('match')
-                    : t('noMatch')
-                  : errorText({ code: row.errorCode })
-              }}
-            </strong>
-            <code>{{ row.normalizedTarget ?? row.input }}</code>
-          </li>
-        </ul>
-      </details>
-
-      <div class="button-row">
-        <button class="primary" type="submit" :disabled="busy || !routeSelectionValid">
-          {{ t('saveRule') }}
-        </button>
-        <button type="button" @click="closeEditor">
-          {{ t('cancel') }}
-        </button>
-      </div>
-    </form>
+      </form>
+    </Drawer>
 
     <article class="surface card stack">
       <div>

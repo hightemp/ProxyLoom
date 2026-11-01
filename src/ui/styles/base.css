@@ -473,10 +473,17 @@ small,
 
 .rule-row {
   display: grid;
-  grid-template-columns: auto auto minmax(200px, 1fr) auto auto;
+  grid-template-columns: auto auto auto minmax(200px, 1fr) auto auto;
   gap: 10px;
   padding: 13px;
   align-items: center;
+}
+
+.rule-filter-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: end;
 }
 
 .rule-row[draggable='true'] {
@@ -524,9 +531,91 @@ small,
   font-size: 12px;
 }
 
-.switch-label input {
+.rule-row > input[type='checkbox'] {
   width: 18px;
   min-height: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.rule-row.rule-disabled .rule-main {
+  opacity: 0.62;
+}
+
+.pattern-line {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  min-width: 0;
+}
+
+.rule-pattern {
+  overflow: hidden;
+  min-width: 0;
+  color: var(--color-muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rule-pattern.expanded {
+  overflow: visible;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.pattern-toggle {
+  flex: none;
+  font-size: 12px;
+}
+
+.switch {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.switch input {
+  appearance: none;
+  position: relative;
+  width: 34px;
+  min-height: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  border-radius: 999px;
+  background: var(--color-border);
+  cursor: pointer;
+}
+
+.switch input::after {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  content: '';
+  transition: transform 0.15s ease;
+}
+
+.switch input:checked {
+  border-color: var(--color-primary-fill);
+  background: var(--color-primary-fill);
+}
+
+.switch input:checked::after {
+  transform: translateX(14px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch input::after {
+    transition: none;
+  }
 }
 
 .test-results {
@@ -635,11 +724,11 @@ td small {
   }
 
   .rule-row {
-    grid-template-columns: auto auto 1fr auto;
+    grid-template-columns: auto auto auto 1fr;
   }
 
   .row-actions {
-    grid-column: 2 / -1;
+    grid-column: 3 / -1;
     justify-content: flex-start;
   }
 }

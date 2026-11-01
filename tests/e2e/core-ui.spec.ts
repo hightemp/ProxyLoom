@@ -95,7 +95,7 @@ test('supports drag, keyboard sorting, and blocks filtered reordering', async ({
   const rows = extensionPage.getByRole('listitem')
   await expect
     .poll(async () => {
-      const orderedNames = await rows.locator('.rule-title').allTextContents()
+      const orderedNames = await rows.locator('.rule-title strong').allTextContents()
       return orderedNames.indexOf('Second rule') < orderedNames.indexOf('First rule')
     })
     .toBe(true)
@@ -103,7 +103,7 @@ test('supports drag, keyboard sorting, and blocks filtered reordering', async ({
   await firstRow.getByRole('button', { name: 'Move First rule up' }).click()
   await expect
     .poll(async () => {
-      const orderedNames = await rows.locator('.rule-title').allTextContents()
+      const orderedNames = await rows.locator('.rule-title strong').allTextContents()
       return orderedNames.indexOf('First rule') < orderedNames.indexOf('Second rule')
     })
     .toBe(true)
@@ -116,6 +116,12 @@ test('supports drag, keyboard sorting, and blocks filtered reordering', async ({
       .getByRole('button', { name: 'Move First rule down' }),
   ).toBeDisabled()
   await expect(extensionPage.getByText('Clear filters to reorder rules.')).toBeVisible()
+
+  await extensionPage.getByRole('button', { name: 'Clear filters' }).click()
+  await extensionPage.getByRole('button', { name: 'Select all shown' }).click()
+  await extensionPage.getByRole('button', { name: 'Disable selected (2)' }).click()
+  await expect(extensionPage.getByLabel('Enable First rule', { exact: true })).not.toBeChecked()
+  await expect(extensionPage.getByLabel('Enable Second rule', { exact: true })).not.toBeChecked()
 })
 
 test('runs local pattern and global routing testers and supports duplicate, disable, filter, and delete', async ({
@@ -139,10 +145,12 @@ test('runs local pattern and global routing testers and supports duplicate, disa
   await extensionPage.getByRole('button', { name: 'Save rule' }).click()
 
   const original = extensionPage.getByRole('listitem').filter({ hasText: 'Tester route' }).first()
-  await original.getByRole('button', { name: 'Duplicate' }).click()
+  await original.getByRole('button', { name: 'More actions for Tester route' }).click()
+  await original.getByRole('menuitem', { name: 'Duplicate' }).click()
   await expect(extensionPage.getByText('Tester route copy', { exact: true })).toBeVisible()
 
   await extensionPage.getByLabel('Enable Tester route', { exact: true }).uncheck()
+  await extensionPage.getByRole('button', { name: 'More filters' }).click()
   await extensionPage.getByLabel('Enabled', { exact: true }).selectOption('false')
   await expect(extensionPage.getByText('Tester route', { exact: true })).toBeVisible()
   await expect(extensionPage.getByText('Tester route copy', { exact: true })).toHaveCount(0)
@@ -156,7 +164,8 @@ test('runs local pattern and global routing testers and supports duplicate, disa
   await expect(extensionPage.locator('.route-result')).toContainText('Direct · Rule')
 
   const copy = extensionPage.getByRole('listitem').filter({ hasText: 'Tester route copy' }).first()
-  await copy.getByRole('button', { name: 'Delete' }).click()
+  await copy.getByRole('button', { name: 'More actions for Tester route copy' }).click()
+  await copy.getByRole('menuitem', { name: 'Delete' }).click()
   await acceptConfirm(extensionPage)
   await expect(extensionPage.getByText('Tester route copy', { exact: true })).toHaveCount(0)
 })
@@ -206,11 +215,9 @@ test('duplicates a profile and safely invalidates referring routes when deleting
   await expect(
     extensionPage.getByRole('listitem').filter({ hasText: 'Referring route' }),
   ).toContainText('Invalid proxy reference')
-  await extensionPage
-    .getByRole('listitem')
-    .filter({ hasText: 'Referring route' })
-    .getByRole('button', { name: 'Edit' })
-    .click()
+  const referring = extensionPage.getByRole('listitem').filter({ hasText: 'Referring route' })
+  await referring.getByRole('button', { name: 'More actions for Referring route' }).click()
+  await referring.getByRole('menuitem', { name: 'Edit' }).click()
   await expect(extensionPage.getByRole('alert')).toContainText('no longer exists')
   await expect(extensionPage.getByRole('button', { name: 'Save rule' })).toBeDisabled()
 })
@@ -249,11 +256,12 @@ test('assigns domain suffix rules to different proxy profiles and persists the r
 
   await expect(
     extensionPage.getByRole('listitem').filter({ hasText: 'Russian domains' }),
-  ).toContainText('Via Proxy 1')
+  ).toContainText('Proxy 1')
   await expect(
     extensionPage.getByRole('listitem').filter({ hasText: 'German domains' }),
-  ).toContainText('Via Proxy 2')
+  ).toContainText('Proxy 2')
 
+  await extensionPage.getByRole('button', { name: 'More filters' }).click()
   await extensionPage.getByLabel('Proxy profile').selectOption({ label: 'Proxy 1' })
   await expect(extensionPage.getByText('Russian domains', { exact: true })).toBeVisible()
   await expect(extensionPage.getByText('German domains', { exact: true })).toHaveCount(0)
@@ -276,10 +284,10 @@ test('assigns domain suffix rules to different proxy profiles and persists the r
   await extensionPage.getByRole('button', { name: /Rules/ }).click()
   await expect(
     extensionPage.getByRole('listitem').filter({ hasText: 'Russian domains' }),
-  ).toContainText('Via Proxy 1')
+  ).toContainText('Proxy 1')
   await expect(
     extensionPage.getByRole('listitem').filter({ hasText: 'German domains' }),
-  ).toContainText('Via Proxy 2')
+  ).toContainText('Proxy 2')
 })
 
 test('starts with an empty ordered rule list and no group management', async ({

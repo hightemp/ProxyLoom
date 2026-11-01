@@ -41,6 +41,12 @@ configuration error and never silently becomes direct.
 
 ## 3. Create rules
 
+Each rule row shows its position, name, route (Direct or the profile chip), compatibility and
+validity badges, a shortened pattern you can expand, and an **Enabled** switch. ↑/↓ reorder from
+the keyboard; **⋯** holds Edit, Duplicate and Delete. Search is always visible; **More filters**
+opens action, profile, enabled and compatibility filters. Select rules to enable, disable or
+delete them together. The editor opens in a side panel.
+
 Rules have one global numeric priority. The first enabled, compatible, non-expired match wins.
 Rules are evaluated strictly in their displayed global order. Categories and hidden specificity
 tie-breakers are not used.

@@ -1802,5 +1802,84 @@
         "content": "$1"
       }
     }
+  },
+  "enableRule": {
+    "message": "Enable $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "moveRuleUp": {
+    "message": "Move $NAME$ up",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "moveRuleDown": {
+    "message": "Move $NAME$ down",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "moreFilters": {
+    "message": "More filters"
+  },
+  "fewerFilters": {
+    "message": "Fewer filters"
+  },
+  "showFullPattern": {
+    "message": "Show full pattern"
+  },
+  "hideFullPattern": {
+    "message": "Hide full pattern"
+  },
+  "enableSelected": {
+    "message": "Enable selected ($COUNT$)",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "disableSelected": {
+    "message": "Disable selected ($COUNT$)",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteRulesTitle": {
+    "message": "Delete $COUNT$ rules?",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteRulesMessage": {
+    "message": "The selected rules are removed and the remaining rules keep their order. This cannot be undone."
+  },
+  "selectRuleNamed": {
+    "message": "Select $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "ruleActionsFor": {
+    "message": "More actions for $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
   }
 }

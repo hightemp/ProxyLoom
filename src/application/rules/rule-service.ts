@@ -131,6 +131,35 @@ export class RuleApplicationService {
     })
   }
 
+  /** Deletes all selected rules at once, or nothing when any is missing. */
+  deleteMany(
+    config: AppConfig,
+    ruleIds: readonly RuleId[],
+  ): Result<{ config: AppConfig }, RuleCommandError> {
+    let current = config
+    for (const ruleId of new Set(ruleIds)) {
+      const deleted = this.delete(current, ruleId)
+      if (!deleted.ok) return deleted
+      current = deleted.value.config
+    }
+    return ok({ config: current })
+  }
+
+  /** Enables or disables all selected rules at once, or nothing when any is missing. */
+  setManyEnabled(
+    config: AppConfig,
+    ruleIds: readonly RuleId[],
+    enabled: boolean,
+  ): Result<{ config: AppConfig }, RuleCommandError> {
+    let current = config
+    for (const ruleId of new Set(ruleIds)) {
+      const updated = this.setEnabled(current, ruleId, enabled)
+      if (!updated.ok) return updated
+      current = updated.value.config
+    }
+    return ok({ config: current })
+  }
+
   setEnabled(
     config: AppConfig,
     ruleId: RuleId,

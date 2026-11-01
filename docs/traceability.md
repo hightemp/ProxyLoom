@@ -64,8 +64,9 @@ complete acceptance evidence exists.
 | PL-147        | A      | Toast/ProfileChip/OverflowMenu/Drawer/apply-state component tests and full Chromium E2E incl. accessibility contrast and zoom     | None beyond aggregate release gates                                |
 | PL-148        | A      | Popup layout/copy component tests and full Chromium popup E2E incl. 200% zoom and intrinsic width                                 | None beyond aggregate release gates                                |
 | PL-149        | A      | Profile card/menu/drawer component tests and full Chromium E2E incl. editor focus return, check, copy and 500 profiles            | None beyond aggregate release gates                                |
-| PL-150        | P      | Planned in `docs/IMPROVEMENT_PLAN.md`; no implementation evidence yet                                                             | Full task acceptance                                               |
+| PL-150        | A      | Rule bulk unit tests, rule row/filter/drawer component tests and Chromium E2E incl. drag/keyboard order and bulk disable          | None beyond aggregate release gates                                |
 | PL-151        | A      | about:blank completion regression unit test and repeated full Chromium E2E runs without proxy-check failures                      | None beyond aggregate release gates                                |
+| PL-152        | P      | Planned follow-up found during PL-150; no implementation evidence yet                                                             | Full task acceptance                                               |
 
 ## Product requirement evidence
 

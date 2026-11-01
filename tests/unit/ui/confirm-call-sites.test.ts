@@ -137,7 +137,12 @@ describe('confirmation call sites', () => {
       },
     })
 
-    await buttonByText(wrapper, message('delete')).trigger('click')
+    await wrapper.get('li.rule-row button[aria-haspopup="menu"]').trigger('click')
+    await nextTick()
+    await wrapper
+      .findAll('li.rule-row [role="menuitem"]')
+      .find((item) => item.text() === message('delete'))!
+      .trigger('click')
     expect(confirmController.pending.value?.message).toContain('Work')
     expect(wrapper.emitted('command')).toBeUndefined()
     confirmController.answer(true)
