@@ -1472,7 +1472,7 @@
 воспроизводящий его), затем минимальная реализация, затем refactor при зелёных тестах. Handoff
 называет тест, который был красным до изменения.
 
-- [ ] **PL-133 — Заменить `window.confirm` встроенными диалогами**
+- [x] **PL-133 — Заменить `window.confirm` встроенными диалогами**
   - **Цель:** единый доступный confirm/preview flow в popup и options.
   - **Требования:** FR-026, FR-054, NFR-008, NFR-009.
   - **Действия:** `ConfirmDialog.vue` на `<dialog>` и composable `useConfirm()`; inline preview

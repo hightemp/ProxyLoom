@@ -5,6 +5,7 @@ import { computed, onBeforeUnmount, onMounted, shallowRef } from 'vue'
 import type { AppRuntimeState, RuntimeRequest } from '../../src/application/runtime/contracts'
 import type { LogQuery } from '../../src/application/logging/log-types'
 import { t } from '../../src/i18n/messages'
+import ConfirmDialog from '../../src/ui/components/ConfirmDialog.vue'
 import AppearanceSection from '../../src/ui/options/AppearanceSection.vue'
 import DiagnosticsSection from '../../src/ui/options/DiagnosticsSection.vue'
 import GeneralSection from '../../src/ui/options/GeneralSection.vue'
@@ -233,6 +234,7 @@ onBeforeUnmount(() => {
         <DiagnosticsSection v-else :state="state" />
       </template>
     </main>
+    <ConfirmDialog />
   </div>
 </template>
 

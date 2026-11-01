@@ -15,6 +15,7 @@ import {
 } from '../../domain/rules/templates'
 import type { MatcherType, Rule } from '../../domain/types/entities'
 import { t } from '../../i18n/messages'
+import { confirmController } from '../confirm/confirm-controller'
 import { createRegexWorker } from '../runtime/regex-worker-factory'
 
 const props = defineProps<{
@@ -179,12 +180,29 @@ const edit = (rule: Rule, event: MouseEvent): void => {
   void nextTick(() => editorNameInput.value?.focus())
 }
 
-const save = (): void => {
+const removeRule = async (rule: Rule): Promise<void> => {
+  const confirmed = await confirmController.destructive(
+    {
+      code: rule.pattern,
+      confirmLabel: t('delete'),
+      message: t('deleteRuleMessage', rule.name),
+      title: t('deleteRuleTitle'),
+    },
+    props.state.config.general.confirmDangerousActions,
+  )
+  if (confirmed) emit('command', { ruleId: rule.id, type: 'DELETE_RULE' })
+}
+
+const save = async (): Promise<void> => {
   if (!routeSelectionValid.value) return
   if (
     draft.matcherType === 'FULL_URL' &&
     props.state.diagnostics.platform === 'CHROMIUM' &&
-    !window.confirm(t('fullUrlSaveWarning'))
+    !(await confirmController.request({
+      confirmLabel: t('saveRule'),
+      message: t('fullUrlSaveWarning'),
+      title: t('fullUrlSaveTitle'),
+    }))
   ) {
     return
   }
@@ -446,23 +464,14 @@ watch(() => props.busy, restoreFocus)
           >
             {{ t('duplicate') }}
           </button>
-          <button
-            class="danger-text"
-            type="button"
-            @click="
-              emit('command', {
-                ruleId: rule.id,
-                type: 'DELETE_RULE',
-              })
-            "
-          >
+          <button class="danger-text" type="button" @click="void removeRule(rule)">
             {{ t('delete') }}
           </button>
         </div>
       </li>
     </ol>
 
-    <form v-if="formOpen" class="surface card stack editor" @submit.prevent="save">
+    <form v-if="formOpen" class="surface card stack editor" @submit.prevent="void save()">
       <div class="section-heading">
         <h3>{{ editingId === null ? t('addRule') : t('editRule') }}</h3>
         <button type="button" @click="closeEditor">

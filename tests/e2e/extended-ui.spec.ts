@@ -2,7 +2,7 @@ import { resolve } from 'node:path'
 import { readFile } from 'node:fs/promises'
 import type { Page } from '@playwright/test'
 
-import { expect, test } from './fixtures/extension'
+import { acceptConfirm, expect, test } from './fixtures/extension'
 
 const resetExtension = async (page: Page): Promise<void> => {
   await page.evaluate(async () => {
@@ -152,8 +152,8 @@ test('previews and atomically replaces configuration through the native import U
   await expect(extensionPage.getByText(/1 profiles/)).toBeVisible()
   await expect(extensionPage.getByText(/Credentials:.*not present/)).toBeVisible()
   await extensionPage.getByRole('button', { name: 'Replace', exact: true }).click()
-  extensionPage.once('dialog', (dialog) => dialog.accept())
   await extensionPage.getByRole('button', { name: 'Apply Replace' }).click()
+  await acceptConfirm(extensionPage)
   await expect(extensionPage.getByRole('status')).toContainText('Native import committed')
 
   await extensionPage.getByRole('button', { name: /Proxies/ }).click()
@@ -220,8 +220,8 @@ test('shows redacted local logs and applies filters and clear through visible UI
   await extensionPage.getByLabel('Hostname contains').fill('logs.proxyloom.test')
   await extensionPage.getByRole('button', { name: 'Apply filters' }).click()
   await expect(extensionPage.getByText('http://logs.proxyloom.test').first()).toBeVisible()
-  extensionPage.once('dialog', (dialog) => dialog.accept())
   await extensionPage.getByRole('button', { name: 'Clear logs' }).click()
+  await acceptConfirm(extensionPage)
   await expect(extensionPage.getByText('No log entries', { exact: true })).toBeVisible()
   await target.close()
 })

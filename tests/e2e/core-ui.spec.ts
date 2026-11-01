@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
 
-import { expect, test } from './fixtures/extension'
+import { acceptConfirm, expect, test } from './fixtures/extension'
 
 const resetExtension = async (page: Page): Promise<void> => {
   await page.evaluate(async () => {
@@ -157,6 +157,7 @@ test('runs local pattern and global routing testers and supports duplicate, disa
 
   const copy = extensionPage.getByRole('listitem').filter({ hasText: 'Tester route copy' }).first()
   await copy.getByRole('button', { name: 'Delete' }).click()
+  await acceptConfirm(extensionPage)
   await expect(extensionPage.getByText('Tester route copy', { exact: true })).toHaveCount(0)
 })
 
@@ -187,8 +188,8 @@ test('duplicates a profile and safely invalidates referring routes when deleting
   await original.getByRole('button', { name: 'Duplicate' }).click()
   await expect(extensionPage.getByRole('heading', { name: 'Impact proxy copy' })).toBeVisible()
 
-  extensionPage.once('dialog', (dialog) => dialog.accept())
   await original.getByRole('button', { name: 'Delete' }).click()
+  await acceptConfirm(extensionPage)
   await expect(
     extensionPage.getByRole('heading', { name: 'Impact proxy', exact: true }),
   ).toHaveCount(0)
@@ -364,8 +365,8 @@ test('creates Once and Always routes from the real action popup and opens the ma
 
   let popup = await openPopup()
   await popup.getByRole('button', { name: 'RULES' }).click()
-  popup.once('dialog', (dialog) => dialog.accept())
   await popup.getByRole('button', { name: 'Once' }).click()
+  await acceptConfirm(popup)
   await expect(popup.locator('.current-site small')).toContainText('DIRECT · OVERRIDE')
 
   const sessionState = await extensionPage.evaluate(async () => {
@@ -400,8 +401,8 @@ test('creates Once and Always routes from the real action popup and opens the ma
     ).chrome.storage.session.clear(),
   )
   popup = await openPopup()
-  popup.once('dialog', (dialog) => dialog.accept())
   await popup.getByRole('button', { name: 'Always (create rule)' }).click()
+  await acceptConfirm(popup)
   await expect(popup.locator('.current-site small')).toContainText('DIRECT · RULE')
   await expect(popup.getByRole('button', { name: 'Edit matched rule' })).toBeVisible()
 

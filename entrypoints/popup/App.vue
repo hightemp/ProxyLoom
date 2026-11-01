@@ -6,6 +6,8 @@ import { asProxyProfileId } from '../../src/domain/types/brand'
 import type { OverrideScope, RuleAction } from '../../src/domain/types/entities'
 import { t } from '../../src/i18n/messages'
 import type { OverridePreview } from '../../src/application/overrides/override-service'
+import ConfirmDialog from '../../src/ui/components/ConfirmDialog.vue'
+import { confirmController } from '../../src/ui/confirm/confirm-controller'
 import { runtimeClient } from '../../src/ui/runtime/client'
 
 const state = shallowRef<AppRuntimeState | null>(null)
@@ -90,14 +92,17 @@ const siteAction = async (persistent: boolean): Promise<void> => {
     return
   }
   const preview = previewResult.value
-  const warning = preview.chromiumScopeWarning ? `\n\n${t('temporaryOverrideWarning')}` : ''
-  if (
-    !window.confirm(
-      `${persistent ? t('createPermanentRule') : t('createTemporaryOverride')}?\n\n${t('pattern')}: ${preview.generatedPattern}\n${t('action')}: ${actionType.value}${warning}`,
-    )
-  ) {
-    return
-  }
+  const confirmed = await confirmController.request({
+    code: preview.generatedPattern,
+    confirmLabel: t('create'),
+    details: [
+      `${t('action')}: ${actionType.value}`,
+      ...(preview.chromiumScopeWarning && !persistent ? [t('temporaryOverrideWarning')] : []),
+    ],
+    message: t('siteActionMessage'),
+    title: persistent ? t('createPermanentRule') : t('createTemporaryOverride'),
+  })
+  if (!confirmed) return
   await execute({
     action: action(),
     scope: scope.value,
@@ -252,6 +257,7 @@ onMounted(() => {
         {{ t('openSettings') }}
       </button>
     </template>
+    <ConfirmDialog />
   </main>
 </template>
 

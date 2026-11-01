@@ -7,9 +7,10 @@ import type {
   NativeImportPreviewView,
 } from '../../application/runtime/contracts'
 import { t } from '../../i18n/messages'
+import { confirmController } from '../confirm/confirm-controller'
 import { runtimeClient } from '../runtime/client'
 
-defineProps<{
+const props = defineProps<{
   state: AppRuntimeState
   busy: boolean
 }>()
@@ -41,7 +42,14 @@ const readFile = async (event: Event, target: 'NATIVE' | 'FOXY'): Promise<void> 
 }
 
 const downloadExport = async (): Promise<void> => {
-  if (includeCredentials.value && !window.confirm(t('credentialExportWarning'))) {
+  if (
+    includeCredentials.value &&
+    !(await confirmController.request({
+      confirmLabel: t('exportFile'),
+      message: t('credentialExportWarning'),
+      title: t('credentialExportTitle'),
+    }))
+  ) {
     return
   }
   working.value = true
@@ -74,7 +82,16 @@ const previewNative = async (): Promise<void> => {
 }
 
 const applyNative = async (): Promise<void> => {
-  const replaceConfirmed = nativeMode.value === 'MERGE' || window.confirm(t('replaceImportWarning'))
+  const replaceConfirmed =
+    nativeMode.value === 'MERGE' ||
+    (await confirmController.destructive(
+      {
+        confirmLabel: t('replace'),
+        message: t('replaceImportWarning'),
+        title: t('replaceImportTitle'),
+      },
+      props.state.config.general.confirmDangerousActions,
+    ))
   if (!replaceConfirmed) return
   working.value = true
   const result = await runtimeClient.applyNativeImport(

@@ -62,6 +62,15 @@ Firefox Once is tab-scoped when the request has a reliable tab ID. Chromium PAC 
 Once may affect other tabs on that origin until the source tab closes. The UI displays this warning
 before confirmation.
 
+Both actions open an in-page preview with the generated pattern before anything is created.
+
+## Confirmations
+
+Deleting a profile or rule, clearing logs, and replacing the configuration ask for confirmation in
+an in-page dialog that shows the impact. Turn off **Confirm destructive actions** in General
+settings to skip these questions. Privacy disclosures, such as the external request of a manual
+proxy check or a credential export, are always shown.
+
 ## 5. Diagnostics and recovery
 
 The badge shows `D`, the profile short name, `R`, or `!`. Popup and badge use the same resolver

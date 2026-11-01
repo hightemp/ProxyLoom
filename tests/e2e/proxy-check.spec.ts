@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test'
 
 import { startHttpProxy } from '../integration/proxies/http-proxy'
 import { startHttpOrigin } from '../integration/servers/http-origin'
-import { expect, test } from './fixtures/extension'
+import { acceptConfirm, expect, test } from './fixtures/extension'
 
 const resetExtension = async (page: Page): Promise<void> => {
   await page.evaluate(async () => {
@@ -41,8 +41,8 @@ test('checks an inactive profile through that proxy, excludes the check from log
     await extensionPage.getByRole('button', { name: 'Save profile' }).click()
 
     const profileCard = extensionPage.locator('.profile-card').filter({ hasText: 'Check proxy' })
-    extensionPage.once('dialog', (dialog) => dialog.accept())
     await profileCard.getByRole('button', { name: 'Check' }).click()
+    await acceptConfirm(extensionPage)
 
     await expect
       .poll(() => ({
@@ -131,8 +131,8 @@ test('cancels a hanging inactive-profile check and restores direct routing', asy
     await extensionPage.getByRole('button', { name: 'Save profile' }).click()
 
     const profileCard = extensionPage.locator('.profile-card').filter({ hasText: 'Hanging proxy' })
-    extensionPage.once('dialog', (dialog) => dialog.accept())
     await profileCard.getByRole('button', { name: 'Check' }).click()
+    await acceptConfirm(extensionPage)
     await expect(profileCard.getByRole('button', { name: 'Cancel check' })).toBeVisible()
     await expect.poll(() => proxy.requests.length).toBeGreaterThan(0)
     await profileCard.getByRole('button', { name: 'Cancel check' }).click()
@@ -172,8 +172,8 @@ test('recovers the committed route after the worker is interrupted during a chec
     const profileCard = extensionPage
       .locator('.profile-card')
       .filter({ hasText: 'Interrupted check' })
-    extensionPage.once('dialog', (dialog) => dialog.accept())
     await profileCard.getByRole('button', { name: 'Check' }).click()
+    await acceptConfirm(extensionPage)
     await expect.poll(() => proxy.requests.length).toBeGreaterThan(0)
 
     await extensionPage.evaluate(async () => {

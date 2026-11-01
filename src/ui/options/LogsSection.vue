@@ -4,8 +4,9 @@ import { shallowRef } from 'vue'
 import type { AppRuntimeState, RuntimeRequest } from '../../application/runtime/contracts'
 import type { LogQuery } from '../../application/logging/log-types'
 import { t } from '../../i18n/messages'
+import { confirmController } from '../confirm/confirm-controller'
 
-defineProps<{
+const props = defineProps<{
   state: AppRuntimeState
   busy: boolean
 }>()
@@ -44,10 +45,12 @@ const older = (): void => {
   load()
 }
 
-const clear = (): void => {
-  if (window.confirm(t('clearLogsWarning'))) {
-    emit('command', { includePrivate: true, type: 'CLEAR_LOGS' })
-  }
+const clear = async (): Promise<void> => {
+  const confirmed = await confirmController.destructive(
+    { confirmLabel: t('clearLogs'), message: t('clearLogsWarning'), title: t('clearLogsTitle') },
+    props.state.config.general.confirmDangerousActions,
+  )
+  if (confirmed) emit('command', { includePrivate: true, type: 'CLEAR_LOGS' })
 }
 </script>
 
@@ -61,7 +64,7 @@ const clear = (): void => {
         <h2>{{ t('routingLogs') }}</h2>
         <p>{{ t('routingLogsDescription') }}</p>
       </div>
-      <button class="danger-text" type="button" :disabled="busy" @click="clear">
+      <button class="danger-text" type="button" :disabled="busy" @click="void clear()">
         {{ t('clearLogs') }}
       </button>
     </div>

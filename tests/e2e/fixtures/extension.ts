@@ -1,4 +1,4 @@
-import { chromium, test as base, type BrowserContext, type Page } from '@playwright/test'
+import { chromium, expect, test as base, type BrowserContext, type Page } from '@playwright/test'
 import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
@@ -90,4 +90,11 @@ export const test = base.extend<ExtensionTestFixtures, ExtensionWorkerFixtures>(
   },
 })
 
-export { expect } from '@playwright/test'
+/** Accepts the in-page ConfirmDialog opened by the previous action and waits for it to close. */
+export const acceptConfirm = async (page: Page): Promise<void> => {
+  const dialog = page.getByRole('dialog')
+  await dialog.locator('[data-confirm-accept]').click()
+  await expect(dialog).toHaveCount(0)
+}
+
+export { expect }

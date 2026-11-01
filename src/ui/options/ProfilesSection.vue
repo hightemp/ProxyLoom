@@ -4,6 +4,7 @@ import { computed, nextTick, reactive, shallowRef, watch } from 'vue'
 import type { AppRuntimeState, RuntimeRequest } from '../../application/runtime/contracts'
 import type { ProxyEndpoint, ProxyProfile, ProxyTransport } from '../../domain/types/entities'
 import { t } from '../../i18n/messages'
+import { confirmController } from '../confirm/confirm-controller'
 
 const props = defineProps<{
   state: AppRuntimeState
@@ -138,19 +139,25 @@ const save = (): void => {
   closeEditor()
 }
 
-const remove = (profile: ProxyProfile): void => {
+const remove = async (profile: ProxyProfile): Promise<void> => {
   const usedBy = props.state.config.rules.filter(
     (rule) => rule.action.targetProxyProfileId === profile.id,
-  )
-  const impact = [
-    props.state.config.general.activeProxyProfileId === profile.id ? t('activeGlobalRoute') : '',
-    usedBy.length > 0 ? `${usedBy.length} ${t('rulesAffected')}` : '',
+  ).length
+  const details = [
+    props.state.config.general.activeProxyProfileId === profile.id
+      ? t('deleteProfileImpactGlobal')
+      : '',
+    usedBy > 0 ? t('deleteProfileImpactRules', String(usedBy)) : '',
   ].filter(Boolean)
-  const confirmed =
-    impact.length === 0 ||
-    window.confirm(
-      `${t('deleteProfileBeforeName')} “${profile.name}”? ${t('deleteProfileAffects')} ${impact.join(` ${t('and')} `)}. ${t('deleteProfileInvalidRules')}`,
-    )
+  const confirmed = await confirmController.destructive(
+    {
+      confirmLabel: t('delete'),
+      details,
+      message: t('deleteProfileMessage', profile.name),
+      title: t('deleteProfileTitle'),
+    },
+    props.state.config.general.confirmDangerousActions,
+  )
   if (confirmed) {
     emit('command', {
       confirmed: true,
@@ -160,14 +167,14 @@ const remove = (profile: ProxyProfile): void => {
   }
 }
 
-const check = (profile: ProxyProfile): void => {
-  if (
-    !window.confirm(
-      `${t('manualCheckBeforeUrl')} ${profile.checkUrl} ${t('manualCheckThrough')} “${profile.name}”? ${t('manualCheckDisclosure')}`,
-    )
-  ) {
-    return
-  }
+const check = async (profile: ProxyProfile): Promise<void> => {
+  const confirmed = await confirmController.request({
+    confirmLabel: t('runCheck'),
+    details: [t('manualCheckDisclosure')],
+    message: t('manualCheckMessage', [profile.checkUrl, profile.name]),
+    title: t('manualCheckTitle'),
+  })
+  if (!confirmed) return
   checkingId.value = profile.id
   emit('command', { profileId: profile.id, type: 'CHECK_PROFILE' })
 }
@@ -281,11 +288,11 @@ watch(() => props.busy, restoreFocus)
           <button
             type="button"
             :disabled="busy && checkingId !== profile.id"
-            @click="checkingId === profile.id && busy ? cancelCheck() : check(profile)"
+            @click="checkingId === profile.id && busy ? cancelCheck() : void check(profile)"
           >
             {{ checkingId === profile.id && busy ? t('cancelCheck') : t('check') }}
           </button>
-          <button class="danger-text" type="button" :disabled="busy" @click="remove(profile)">
+          <button class="danger-text" type="button" :disabled="busy" @click="void remove(profile)">
             {{ t('delete') }}
           </button>
         </div>

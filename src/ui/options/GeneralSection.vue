@@ -119,6 +119,14 @@ const save = (): void => {
         </span>
       </label>
 
+      <label class="check-row">
+        <input v-model="settings.confirmDangerousActions" type="checkbox" />
+        <span>
+          <strong>{{ t('confirmDangerousActions') }}</strong>
+          <small>{{ t('confirmDangerousActionsDescription') }}</small>
+        </span>
+      </label>
+
       <div class="form-grid">
         <label>
           {{ t('manualCheckEndpoint') }}

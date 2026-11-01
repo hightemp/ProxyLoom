@@ -86,8 +86,15 @@ permanent`, `Remove`. Глобально: `Clear all`. Empty state с объяс
   `Escape`/`Cancel`, возврат фокуса на инициатор, `aria-describedby` для impact.
 - Учитывает `general.confirmDangerousActions` в одном месте; non-destructive preview (Once/Always)
   показывается всегда.
-- Popup: preview Once/Always — inline-панель внутри popup (pattern моноширинно, route, warning
-  Chromium), без системного диалога.
+- Popup: preview Once/Always — тот же встроенный `ConfirmDialog` внутри документа popup (pattern
+  моноширинно, route, warning Chromium); системный диалог больше не закрывает popup.
+- Найдено при реализации: `confirmDangerousActions` (FR-013/FR-026) был в schema, но UI его не
+  читал и не показывал, а удаление правила шло без подтверждения. Добавлен переключатель
+  `Confirm destructive actions` в General; destructive-подтверждения (удаление профиля/правила,
+  очистка логов, replace import) учитывают его, privacy disclosures (manual check, credential
+  export, Full URL в Chromium, Once/Always preview) показываются всегда.
+- Для component tests добавлен `@vitejs/plugin-vue` (та же 6.0.8, что уже приходит через
+  `@wxt-dev/module-vue`) в vitest config; `@vue/test-utils` уже был в devDependencies.
 - Заменить все вызовы `window.confirm` (popup, Profiles, Rules, Import/Export) и добавить lint-
   запрет `no-restricted-globals: confirm/alert/prompt` для `entrypoints/` и `src/ui/`.
 

@@ -20,6 +20,7 @@
   --color-primary-soft: #eef0ff;
   --color-danger: #c93448;
   --color-danger-soft: #fff0f2;
+  --color-danger-fill: #c93448;
   --color-success: #1c9363;
   --color-success-strong: #116344;
   --color-success-soft: #eaf9f2;
@@ -162,6 +163,13 @@ button.primary {
   border-color: var(--color-primary-fill);
   color: var(--color-on-primary);
   background: var(--color-primary-fill);
+}
+
+button.danger {
+  width: fit-content;
+  border-color: var(--color-danger-fill);
+  color: var(--color-on-primary);
+  background: var(--color-danger-fill);
 }
 
 button.danger-text {

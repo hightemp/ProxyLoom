@@ -40,6 +40,26 @@ export default tseslint.config(
     },
   },
   {
+    files: ['entrypoints/**/*.{ts,vue}', 'src/ui/**/*.{ts,vue}'],
+    rules: {
+      'no-restricted-globals': [
+        'error',
+        ...['alert', 'confirm', 'prompt'].map((name) => ({
+          name,
+          message: 'Use confirmController with ConfirmDialog instead of blocking browser dialogs.',
+        })),
+      ],
+      'no-restricted-properties': [
+        'error',
+        ...['alert', 'confirm', 'prompt'].map((property) => ({
+          object: 'window',
+          property,
+          message: 'Use confirmController with ConfirmDialog instead of blocking browser dialogs.',
+        })),
+      ],
+    },
+  },
+  {
     files: ['src/domain/**/*.ts'],
     rules: {
       'no-restricted-imports': [
