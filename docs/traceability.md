@@ -55,31 +55,33 @@ complete acceptance evidence exists.
 | PL-136        | A      | OverridesSection component tests and Chromium E2E list/edit/promote/clear through the options page                                | None beyond aggregate release gates                                |
 | PL-137        | A      | Site override matching and SiteOverrides component tests plus Chromium popup Once → Update Once → Remove E2E                      | Firefox tab-scoped popup smoke in PL-122 matrix                    |
 | PL-138        | A      | Table tests ported from ProxyStringParserTest.kt plus IPv6, IDN, ambiguity, injection and no-echo cases                           | Round-trip property test lands with the PL-141 formatter           |
-| PL-139…PL-145 | P      | Planned in `docs/IMPROVEMENT_PLAN.md`; no implementation evidence yet                                                             | Full task acceptance                                               |
+| PL-139        | A      | Line-import planner/apply unit tests, panel component tests and Chromium E2E paste → preview → import → update                    | Firefox smoke in PL-122 matrix                                     |
+| PL-140…PL-145 | P      | Planned in `docs/IMPROVEMENT_PLAN.md`; no implementation evidence yet                                                             | Full task acceptance                                               |
 | PL-146        | A      | Brand asset unit test, Chromium-rendered icons, dual build manifest validation and accessibility/foundation E2E                   | Visual toolbar check on signed packages in release matrices        |
 | PL-147…PL-150 | P      | Planned in `docs/IMPROVEMENT_PLAN.md`; no implementation evidence yet                                                             | Full task acceptance                                               |
 | PL-151        | A      | about:blank completion regression unit test and repeated full Chromium E2E runs without proxy-check failures                      | None beyond aggregate release gates                                |
 
 ## Product requirement evidence
 
-| Requirements          | Implementation and verification evidence                                                             |
-| --------------------- | ---------------------------------------------------------------------------------------------------- |
-| FR-001…FR-014         | General mode, profile/rule CRUD, diagnostics and localization UI; unit and core E2E                  |
-| FR-015…FR-024         | Shared resolver, endpoint mapping, control status and error coordination; parity/integration/E2E     |
-| FR-025…FR-040         | Ordered Origin/Full URL rules, filters, templates and bounded regex tester                           |
-| FR-041…FR-053         | Profile endpoint validation, checks, authentication and badge/status flows                           |
-| FR-054…FR-059         | Popup inspection, Once/Always/Edit/Retry and isolated session overrides                              |
-| FR-060…FR-072         | Logs, proxy check, native import/export and fixture-backed FoxyProxy import                          |
-| FR-073…FR-080         | Incognito model, help/status, privacy, docs and release artifacts                                    |
-| FR-081                | Override service update/promote/clear/cleanup, caller-session scoping and background override E2E    |
-| NFR-001…NFR-017       | Strict builds, performance budgets, accessibility, local infrastructure, diagnostics and CI          |
-| COMPAT-001…COMPAT-014 | Dual WXT adapters/builds, capability UI, ADRs and platform-specific tests                            |
-| COMPAT-015            | Automated Chromium/Firefox gates and four branded-browser smokes; full signoff remains PL-121…PL-123 |
-| SEC-001…SEC-018       | Regex/PAC/import/auth/storage/privacy controls and security reports under `docs/security/`           |
-| PRIV-001…PRIV-012     | In-memory private logs, redaction, Firefox/Edge canary scans and safe export/diagnostics             |
-| REL-001…REL-003       | Manual-store policy, pinned/frozen quality workflow and browser jobs                                 |
-| REL-004…REL-007       | Stable tag validation, dual exact ZIPs, source review package and SHA-256                            |
-| REL-008               | Manual publication boundary, listing copy/assets and release-owner checklist                         |
+| Requirements          | Implementation and verification evidence                                                                     |
+| --------------------- | ------------------------------------------------------------------------------------------------------------ |
+| FR-001…FR-014         | General mode, profile/rule CRUD, diagnostics and localization UI; unit and core E2E                          |
+| FR-015…FR-024         | Shared resolver, endpoint mapping, control status and error coordination; parity/integration/E2E             |
+| FR-025…FR-040         | Ordered Origin/Full URL rules, filters, templates and bounded regex tester                                   |
+| FR-041…FR-053         | Profile endpoint validation, checks, authentication and badge/status flows                                   |
+| FR-054…FR-059         | Popup inspection, Once/Always/Edit/Retry and isolated session overrides                                      |
+| FR-060…FR-072         | Logs, proxy check, native import/export and fixture-backed FoxyProxy import                                  |
+| FR-073…FR-080         | Incognito model, help/status, privacy, docs and release artifacts                                            |
+| FR-082                | Pure parser and line-import planner tests, import panel component tests and Chromium paste/import/update E2E |
+| FR-081                | Override service update/promote/clear/cleanup, caller-session scoping and background override E2E            |
+| NFR-001…NFR-017       | Strict builds, performance budgets, accessibility, local infrastructure, diagnostics and CI                  |
+| COMPAT-001…COMPAT-014 | Dual WXT adapters/builds, capability UI, ADRs and platform-specific tests                                    |
+| COMPAT-015            | Automated Chromium/Firefox gates and four branded-browser smokes; full signoff remains PL-121…PL-123         |
+| SEC-001…SEC-018       | Regex/PAC/import/auth/storage/privacy controls and security reports under `docs/security/`                   |
+| PRIV-001…PRIV-012     | In-memory private logs, redaction, Firefox/Edge canary scans and safe export/diagnostics                     |
+| REL-001…REL-003       | Manual-store policy, pinned/frozen quality workflow and browser jobs                                         |
+| REL-004…REL-007       | Stable tag validation, dual exact ZIPs, source review package and SHA-256                                    |
+| REL-008               | Manual publication boundary, listing copy/assets and release-owner checklist                                 |
 
 ## Machine gate
 

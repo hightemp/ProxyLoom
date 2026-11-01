@@ -15,6 +15,7 @@ import { OverrideApplicationService } from '../../application/overrides/override
 import type { ProxyPlatformAdapter } from '../../application/ports/proxy-platform'
 import type { LogStorePort } from '../../application/ports/log-store'
 import { ProfileApplicationService } from '../../application/profiles/profile-service'
+import { ProxyLineImportService } from '../../application/profiles/proxy-line-import'
 import {
   ProxyCheckService,
   type ProxyCheckRequestPort,
@@ -102,6 +103,7 @@ export class RuntimeController {
   readonly #ids = { next: () => crypto.randomUUID() }
   readonly #profiles = new ProfileApplicationService(this.#ids, this.#clock)
   readonly #rules = new RuleApplicationService(this.#ids, this.#clock)
+  readonly #lineImport = new ProxyLineImportService(this.#ids, this.#clock)
   readonly #general = new GeneralSettingsService()
   readonly #nativeImport = new NativeImportService(this.#ids)
   readonly #foxyImporter = new FoxyProxyImporter(this.#ids, this.#clock)
@@ -265,6 +267,17 @@ export class RuntimeController {
             await this.callerSession(sender, request.tabId),
             request.tabId,
           )
+        case 'APPLY_PROXY_LINES': {
+          let counts: { created: number; updated: number; skipped: number } | null = null
+          const applied = await this.mutate((config) => {
+            const imported = this.#lineImport.apply(config, request.text, request.options)
+            if (!imported.ok) return imported
+            const { config: next, ...rest } = imported.value
+            counts = rest
+            return { ok: true, value: { config: next } }
+          })
+          return applied.ok ? { ok: true, value: counts } : applied
+        }
         case 'CLEAR_OVERRIDES':
           await this.#overrides.clear(await this.callerSession(sender, request.tabId))
           await this.options.applyConfiguration()

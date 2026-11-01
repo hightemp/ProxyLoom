@@ -208,6 +208,8 @@ onBeforeUnmount(() => {
           :state="state"
           :busy="busy"
           @command="execute"
+          @refresh="load"
+          @status="setStatus"
         />
         <RulesSection
           v-else-if="selected === 'rules'"

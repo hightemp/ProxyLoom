@@ -116,6 +116,24 @@ credentials, logs, or private state.
 
 ## 6. Import and export
 
+### Proxies from text
+
+**Proxies → Import from text** (also on **Import & Export**) accepts one proxy per line, pasted or
+loaded from a `.txt`/`.csv` file up to 1 MiB and 1000 records. Lines starting with `#` or `//`
+are ignored. Supported forms include `http://user:pass@host:port`, `https://host:port`,
+`host:port`, `user:pass@host:port`, `host:port:user:pass`, `user:pass:host:port`, a protocol word
+before or after the record, space-separated fields and CSV/TSV/semicolon rows; IPv6 hosts go in
+brackets. Lines without a protocol use the selected default; nothing is probed over the network.
+SOCKS lines are reported as unsupported.
+
+The preview shows each line as New, Update, Unchanged, Duplicate (a later line with the same host,
+port and username wins) or Error with the reason; passwords are never shown. For `a:b:c:d` lines
+that are valid both ways, choose the field order. New profiles are named `host:port` and use one
+endpoint for all schemes; an update changes only the password and protocol of the matching
+profile. Import applies all lines at once or nothing.
+
+### Native backup
+
 Native export includes profiles, rules, general settings, and appearance. Credentials are
 absent by default; including them requires an explicit plaintext warning. Import validates hostile
 JSON before preview, then supports merge or confirmed replace with a local recovery backup.

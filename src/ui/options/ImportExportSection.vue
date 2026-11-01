@@ -10,6 +10,7 @@ import { t } from '../../i18n/messages'
 import { errorText, foxyProxySkipLabel } from '../labels'
 import { confirmController } from '../confirm/confirm-controller'
 import { runtimeClient } from '../runtime/client'
+import ProxyLineImportPanel from './ProxyLineImportPanel.vue'
 
 const props = defineProps<{
   state: AppRuntimeState
@@ -144,6 +145,12 @@ const applyFoxy = async (): Promise<void> => {
 
 <template>
   <div class="stack">
+    <ProxyLineImportPanel
+      :state="state"
+      :busy="busy"
+      @status="(message, error) => emit('status', message, error)"
+      @refresh="emit('refresh')"
+    />
     <article class="surface card stack">
       <div>
         <p class="eyebrow">

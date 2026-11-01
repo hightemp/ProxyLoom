@@ -25,6 +25,12 @@ export const message = (key: string, substitutions?: string | readonly string[])
 }
 
 const sentMessages: unknown[] = []
+let responder: (request: unknown) => unknown = () => ({ ok: true, value: null })
+
+/** Sets what the stubbed background answers to `runtime.sendMessage`. */
+export const setRuntimeResponder = (next: (request: unknown) => unknown): void => {
+  responder = next
+}
 
 Object.assign(globalThis, {
   chrome: {
@@ -33,7 +39,7 @@ Object.assign(globalThis, {
       id: 'test-extension',
       sendMessage: (request: unknown) => {
         sentMessages.push(request)
-        return Promise.resolve({ ok: true, value: null })
+        return Promise.resolve(responder(request))
       },
     },
   },

@@ -1,3 +1,4 @@
+import type { ProxyLineImportOptions } from '../profiles/proxy-line-import'
 import type { EditableProfile } from '../profiles/profile-service'
 import type { EditableRule } from '../rules/rule-service'
 import type { LogEntry, LogQuery } from '../logging/log-types'
@@ -144,6 +145,11 @@ export type RuntimeRequest =
     }
   | { readonly type: 'PROMOTE_OVERRIDE'; readonly overrideId: string; readonly tabId?: number }
   | { readonly type: 'CLEAR_OVERRIDES'; readonly tabId?: number }
+  | {
+      readonly type: 'APPLY_PROXY_LINES'
+      readonly text: string
+      readonly options: ProxyLineImportOptions
+    }
   | { readonly type: 'CLEAR_LOGS'; readonly includePrivate: boolean }
   | {
       readonly type: 'EXPORT_NATIVE'

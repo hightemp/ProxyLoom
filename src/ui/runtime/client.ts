@@ -1,5 +1,6 @@
 import { browser } from 'wxt/browser'
 
+import type { ProxyLineImportOptions } from '../../application/profiles/proxy-line-import'
 import type { LogQuery } from '../../application/logging/log-types'
 import type {
   AppRuntimeState,
@@ -26,6 +27,12 @@ export const runtimeClient = {
       replaceConfirmed,
       text,
       type: 'APPLY_NATIVE_IMPORT',
+    }),
+  applyProxyLines: (text: string, options: ProxyLineImportOptions) =>
+    send<{ created: number; updated: number; skipped: number }>({
+      options,
+      text,
+      type: 'APPLY_PROXY_LINES',
     }),
   clearLogs: (includePrivate = true) => send<null>({ includePrivate, type: 'CLEAR_LOGS' }),
   command: <T = AppRuntimeState>(request: RuntimeRequest) => send<T>(request),

@@ -1428,5 +1428,166 @@
         "content": "$1"
       }
     }
+  },
+  "importStatusNew": {
+    "message": "New"
+  },
+  "importStatusUpdate": {
+    "message": "Update"
+  },
+  "importStatusUnchanged": {
+    "message": "Unchanged"
+  },
+  "importStatusDuplicate": {
+    "message": "Duplicate"
+  },
+  "importStatusError": {
+    "message": "Error"
+  },
+  "proxyStringEmpty": {
+    "message": "Empty line"
+  },
+  "proxyStringTooLong": {
+    "message": "Line is too long"
+  },
+  "proxyStringControl": {
+    "message": "Contains control characters"
+  },
+  "proxyStringFormat": {
+    "message": "Unrecognized format"
+  },
+  "proxyStringPortRequired": {
+    "message": "Port is missing"
+  },
+  "proxyStringPortInvalid": {
+    "message": "Port must be 1–65535"
+  },
+  "proxyStringHostRequired": {
+    "message": "Host is missing"
+  },
+  "proxyStringHostInvalid": {
+    "message": "Invalid host name"
+  },
+  "proxyStringIpv4Invalid": {
+    "message": "Invalid IPv4 address"
+  },
+  "proxyStringIpv6Invalid": {
+    "message": "Invalid IPv6 address"
+  },
+  "proxyStringSchemeUnsupported": {
+    "message": "Unsupported scheme; use http or https"
+  },
+  "proxyStringSocks5Unsupported": {
+    "message": "SOCKS5 is not supported yet"
+  },
+  "proxyStringSocks4Unsupported": {
+    "message": "SOCKS4 is not supported"
+  },
+  "proxyStringSocksAmbiguous": {
+    "message": "SOCKS is not supported"
+  },
+  "proxyStringProtocolConflict": {
+    "message": "Protocol word conflicts with the URL scheme"
+  },
+  "proxyStringProtocolColumn": {
+    "message": "Last column must be http or https"
+  },
+  "proxyStringPathNotAllowed": {
+    "message": "Proxy URL must not contain a path, query, or fragment"
+  },
+  "proxyStringPercentInvalid": {
+    "message": "Invalid percent-encoding"
+  },
+  "proxyStringUtf8Invalid": {
+    "message": "Credentials are not valid UTF-8"
+  },
+  "proxyStringUsernameRequired": {
+    "message": "Password without a username"
+  },
+  "proxyStringCredentialsControl": {
+    "message": "Credentials contain control characters"
+  },
+  "proxyStringFourFields": {
+    "message": "Not host:port:user:pass or user:pass:host:port"
+  },
+  "importFromText": {
+    "message": "Import from text"
+  },
+  "importFromTextDescription": {
+    "message": "Paste one proxy per line or load a .txt or .csv file. Lines starting with # or // are ignored. Nothing is checked over the network."
+  },
+  "proxyLines": {
+    "message": "Proxy lines"
+  },
+  "loadFile": {
+    "message": "Load file"
+  },
+  "defaultTransport": {
+    "message": "Protocol for lines without one"
+  },
+  "fieldOrder": {
+    "message": "Order of a:b:c:d lines"
+  },
+  "hostFirstOrder": {
+    "message": "host:port:user:pass"
+  },
+  "credentialsFirstOrder": {
+    "message": "user:pass:host:port"
+  },
+  "importLine": {
+    "message": "Line"
+  },
+  "importProxy": {
+    "message": "Proxy"
+  },
+  "importNote": {
+    "message": "Note"
+  },
+  "ambiguousLine": {
+    "message": "Ambiguous; read with the order above"
+  },
+  "supportedFormats": {
+    "message": "Supported formats"
+  },
+  "importProxies": {
+    "message": "Import ($COUNT$)",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "proxyImportResult": {
+    "message": "Imported: $CREATED$ created, $UPDATED$ updated, $SKIPPED$ skipped.",
+    "placeholders": {
+      "created": {
+        "content": "$1"
+      },
+      "updated": {
+        "content": "$2"
+      },
+      "skipped": {
+        "content": "$3"
+      }
+    }
+  },
+  "updatesProfile": {
+    "message": "Updates $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "droppedLines": {
+    "message": "$COUNT$ lines beyond the 1000-line limit were skipped.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorNothingToImport": {
+    "message": "There are no new or changed proxies to import."
   }
 }

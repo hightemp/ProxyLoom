@@ -527,6 +527,10 @@ Adapter parsers распознают только документированн
 - `FR-071`: duplicate names получают deterministic suggested rename и user-confirmed resolution.
 - `FR-072`: обещание поддержки всех исторических форматов отсутствует.
 
+### 23.3 Proxy lines
+
+- `FR-082`: пользователь импортирует proxy profiles из текста (вставка или `.txt`/`.csv` ≤ 1 MiB, ≤ 1000 записей) в форматах proxy_switcher_vpn: URI, `host:port`, `user:pass@host:port`, `host:port:user:pass`/`user:pass:host:port` с выбором порядка при неоднозначности, protocol word, whitespace и CSV/TSV/`;`, IPv6 в скобках. Строки без протокола получают выбранный HTTP/HTTPS — сетевого автоопределения нет. Preview показывает статус New/Update/Unchanged/Duplicate/Error без паролей; совпадение по host+port+username обновляет только password/transport; apply атомарен. SOCKS-строки — typed error до решения по SOCKS5.
+
 ## 24. Incognito
 
 - `FR-073`: UI показывает browser-specific инструкцию, если пользователь не разрешил incognito/private access; расширение не утверждает, что может включить permission само.

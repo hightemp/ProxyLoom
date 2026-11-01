@@ -1,4 +1,5 @@
 import type { SupportedRequestType, ActualProxyInfo } from '../application/logging/log-types'
+import type { ProxyImportStatus } from '../application/profiles/proxy-line-import'
 import type { IpGeoProviderErrorCode } from '../application/proxy-check/ip-geo-provider'
 import type { RuntimeCommandError } from '../application/runtime/contracts'
 import type {
@@ -6,6 +7,7 @@ import type {
   RoutingDecisionSource,
   RuleTraceStatus,
 } from '../domain/routing/resolver'
+import type { ProxyStringErrorCode } from '../domain/profiles/proxy-string'
 import type {
   BrowserPlatform,
   ControlStatus,
@@ -89,6 +91,39 @@ export const platformLabel = labeler<BrowserPlatform>({
   FIREFOX: 'firefox',
 })
 
+export const importStatusLabel = labeler<ProxyImportStatus>({
+  DUPLICATE: 'importStatusDuplicate',
+  ERROR: 'importStatusError',
+  NEW: 'importStatusNew',
+  UNCHANGED: 'importStatusUnchanged',
+  UPDATE: 'importStatusUpdate',
+})
+
+export const proxyStringErrorLabel = labeler<ProxyStringErrorCode>({
+  CONTROL_CHARACTER: 'proxyStringControl',
+  CREDENTIALS_CONTROL: 'proxyStringCredentialsControl',
+  EMPTY: 'proxyStringEmpty',
+  FORMAT: 'proxyStringFormat',
+  FOUR_FIELDS_INVALID: 'proxyStringFourFields',
+  HOST_INVALID: 'proxyStringHostInvalid',
+  HOST_REQUIRED: 'proxyStringHostRequired',
+  IPV4_INVALID: 'proxyStringIpv4Invalid',
+  IPV6_INVALID: 'proxyStringIpv6Invalid',
+  PATH_NOT_ALLOWED: 'proxyStringPathNotAllowed',
+  PERCENT_ENCODING_INVALID: 'proxyStringPercentInvalid',
+  PORT_INVALID: 'proxyStringPortInvalid',
+  PORT_REQUIRED: 'proxyStringPortRequired',
+  PROTOCOL_COLUMN_INVALID: 'proxyStringProtocolColumn',
+  PROTOCOL_CONFLICT: 'proxyStringProtocolConflict',
+  SCHEME_UNSUPPORTED: 'proxyStringSchemeUnsupported',
+  SOCKS4_UNSUPPORTED: 'proxyStringSocks4Unsupported',
+  SOCKS5_UNSUPPORTED: 'proxyStringSocks5Unsupported',
+  SOCKS_AMBIGUOUS: 'proxyStringSocksAmbiguous',
+  TOO_LONG: 'proxyStringTooLong',
+  USERNAME_REQUIRED: 'proxyStringUsernameRequired',
+  UTF8_INVALID: 'proxyStringUtf8Invalid',
+})
+
 const checkErrorKeys: Record<IpGeoProviderErrorCode, MessageKey> = {
   HTTP_ERROR: 'checkHttpError',
   INVALID_COUNTRY: 'checkInvalidCountry',
@@ -128,6 +163,7 @@ const errorKeys: Record<string, MessageKey> = {
   INVALID_CONFIG: 'errorInvalidConfig',
   INVALID_URL: 'errorInvalidUrl',
   NO_ACTIVE_TAB: 'errorNoActiveTab',
+  NOTHING_TO_IMPORT: 'errorNothingToImport',
   NOT_CONTROLLABLE: 'errorNotControllable',
   PATTERN_INVALID: 'errorPatternInvalid',
   PROFILE_INVALID: 'errorProfileInvalid',

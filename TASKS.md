@@ -1559,9 +1559,9 @@
   - **Тесты:** table tests, IPv6/IDN/injection corpus, property round-trip с formatter PL-141.
   - **Готово, когда:** unit/typecheck/lint зелёные, version 0.1.9.
 
-- [ ] **PL-139 — Bulk import прокси из текста с preview**
+- [x] **PL-139 — Bulk import прокси из текста с preview**
   - **Цель:** создать/обновить много профилей из многострочного текста или `.txt/.csv`.
-  - **Требования:** FR-002, FR-041, FR-069–FR-070, FR-078, NFR-008, SEC-003.
+  - **Требования:** FR-002, FR-041, FR-069–FR-070, FR-078, FR-082, NFR-008, SEC-003.
   - **Действия:** application preview/apply (лимиты 1000 строк, 1 MiB), статусы NEW/UPDATE/
     UNCHANGED/DUPLICATE/ERROR, ambiguity order, default transport, имя `host:port` с разрешением
     коллизий; атомарный apply; UI панель в Proxies и пункт в Import & Export; help форматов.

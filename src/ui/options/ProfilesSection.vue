@@ -6,6 +6,7 @@ import type { ProxyEndpoint, ProxyProfile, ProxyTransport } from '../../domain/t
 import { t } from '../../i18n/messages'
 import { confirmController } from '../confirm/confirm-controller'
 import { checkErrorLabel } from '../labels'
+import ProxyLineImportPanel from './ProxyLineImportPanel.vue'
 
 const props = defineProps<{
   state: AppRuntimeState
@@ -13,7 +14,11 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{
   command: [request: RuntimeRequest]
+  status: [message: string, error?: boolean]
+  refresh: []
 }>()
+
+const importOpen = shallowRef(false)
 
 interface EndpointDraft {
   transport: ProxyTransport
@@ -198,10 +203,23 @@ watch(() => props.busy, restoreFocus)
         <h2>{{ t('proxyProfiles') }}</h2>
         <p>{{ t('proxyProfilesDescription') }}</p>
       </div>
-      <button class="primary" type="button" :disabled="busy" @click="create($event)">
-        {{ t('addProfile') }}
-      </button>
+      <div class="button-row">
+        <button type="button" :aria-expanded="importOpen" @click="importOpen = !importOpen">
+          {{ t('importFromText') }}
+        </button>
+        <button class="primary" type="button" :disabled="busy" @click="create($event)">
+          {{ t('addProfile') }}
+        </button>
+      </div>
     </div>
+
+    <ProxyLineImportPanel
+      v-if="importOpen"
+      :state="state"
+      :busy="busy"
+      @status="(message, error) => emit('status', message, error)"
+      @refresh="emit('refresh')"
+    />
 
     <p class="notice">
       {{ t('credentialsStorageNotice') }}
