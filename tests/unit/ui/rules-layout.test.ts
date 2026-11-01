@@ -68,8 +68,10 @@ describe('rule rows', () => {
     expect(work.find(`button[aria-label="${message('moveRuleDown', 'Work')}"]`).exists()).toBe(true)
     await work.get('button[aria-haspopup="menu"]').trigger('click')
     await nextTick()
+    expect(work.find(`button[aria-label="${message('editRuleNamed', 'Work')}"]`).exists()).toBe(
+      true,
+    )
     expect(work.findAll('[role="menuitem"]').map((item) => item.text())).toEqual([
-      message('edit'),
       message('duplicate'),
       message('disableFor5Minutes'),
       message('disableFor15Minutes'),
@@ -108,11 +110,12 @@ describe('rule filters and bulk actions', () => {
     })
   })
 
-  it('opens the rule editor in a labelled drawer', async () => {
+  it('opens the rule editor in a labelled modal with the save button in the footer', async () => {
     const wrapper = mountRules()
     await button(wrapper, message('addRule')).trigger('click')
     await nextTick()
-    const dialog = wrapper.get('dialog.drawer')
+    const dialog = wrapper.get('dialog.modal')
+    expect(dialog.find('.modal-footer').text()).toContain(message('saveRule'))
     expect(wrapper.get(`#${dialog.attributes('aria-labelledby')}`).text()).toBe(message('addRule'))
   })
 })

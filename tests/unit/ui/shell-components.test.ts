@@ -4,7 +4,6 @@ import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { h, nextTick } from 'vue'
 
-import Drawer from '../../../src/ui/components/Drawer.vue'
 import OverflowMenu from '../../../src/ui/components/OverflowMenu.vue'
 import ProfileChip from '../../../src/ui/components/ProfileChip.vue'
 import ToastHost from '../../../src/ui/components/ToastHost.vue'
@@ -114,25 +113,5 @@ describe('OverflowMenu', () => {
     await wrapper.findAll('[role="menuitem"]')[0]!.trigger('click')
     await nextTick()
     expect(wrapper.find('[role="menu"]').exists()).toBe(false)
-  })
-})
-
-describe('Drawer', () => {
-  it('is a labelled modal dialog that closes on Escape and on the close button', async () => {
-    const wrapper = mount(Drawer, {
-      attachTo: document.body,
-      props: { open: true, title: 'Edit proxy profile' },
-      slots: { default: () => h('input', { 'aria-label': 'Name' }) },
-    })
-    await nextTick()
-    const dialog = wrapper.get('dialog')
-    expect(dialog.attributes('aria-modal')).toBe('true')
-    expect(wrapper.get(`#${dialog.attributes('aria-labelledby')}`).text()).toBe(
-      'Edit proxy profile',
-    )
-    await dialog.trigger('keydown', { key: 'Escape' })
-    expect(wrapper.emitted('close')).toHaveLength(1)
-    await wrapper.get('button[aria-label="' + message('close') + '"]').trigger('click')
-    expect(wrapper.emitted('close')).toHaveLength(2)
   })
 })

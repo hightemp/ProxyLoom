@@ -1984,5 +1984,19 @@
   },
   "pasteProxyStringPlaceholder": {
     "message": "http://user:pass@host:port"
+  },
+  "editRuleNamed": {
+    "message": "Edit $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "editorMatch": {
+    "message": "Match"
+  },
+  "editorRoute": {
+    "message": "Route"
   }
 }

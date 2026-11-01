@@ -1791,7 +1791,7 @@ rules`, compact check pill; `Use globally`/`Check` + «⋯» (Edit, Duplicate, C
     Edit доступен одной кнопкой; фокус возвращается после закрытия окна.
   - **Готово, когда:** unit/E2E/typecheck/lint/dual builds зелёные, version 0.1.21.
 
-- [ ] **PL-156 — Rules: иконки и модальный редактор**
+- [x] **PL-156 — Rules: иконки и модальный редактор**
   - **Требования:** FR-003, FR-030–FR-040, NFR-007.
   - **Зависимости:** PL-153, PL-154.
   - **Готово, когда:** unit/E2E/typecheck/lint/dual builds зелёные, version 0.1.22.

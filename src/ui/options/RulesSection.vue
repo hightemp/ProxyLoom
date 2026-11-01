@@ -1,4 +1,22 @@
 <script setup lang="ts">
+import {
+  ChevronDown,
+  ChevronUp,
+  CopyPlus,
+  FlaskConical,
+  GripVertical,
+  Info,
+  Pencil,
+  Play,
+  Plus,
+  Route,
+  Search,
+  SlidersHorizontal,
+  TimerOff,
+  TimerReset,
+  Trash2,
+  WandSparkles,
+} from '@lucide/vue'
 import { computed, nextTick, reactive, shallowRef, watch } from 'vue'
 
 import { RegexBatchTester } from '../../application/regex-tester/regex-batch-tester'
@@ -26,7 +44,8 @@ import {
 } from '../labels'
 import { confirmController } from '../confirm/confirm-controller'
 import { createRegexWorker } from '../runtime/regex-worker-factory'
-import Drawer from '../components/Drawer.vue'
+import IconButton from '../components/IconButton.vue'
+import Modal from '../components/Modal.vue'
 import OverflowMenu from '../components/OverflowMenu.vue'
 import ProfileChip from '../components/ProfileChip.vue'
 
@@ -409,28 +428,33 @@ watch(() => props.busy, restoreFocus)
   <div class="stack">
     <div class="section-heading">
       <div>
-        <p class="eyebrow">
-          {{ t('firstMatchWins') }}
-        </p>
         <h2>{{ t('orderedRules') }}</h2>
         <p>{{ t('orderedRulesDescription') }}</p>
       </div>
       <button class="primary" type="button" :disabled="busy" @click="create($event)">
+        <Plus :size="16" aria-hidden="true" />
         {{ t('addRule') }}
       </button>
     </div>
 
-    <article class="surface card stack">
+    <div class="stack rule-toolbar">
       <div class="rule-filter-row">
-        <label>
-          {{ t('search') }}
-          <input v-model="search" type="search" :placeholder="t('nameOrPattern')" />
+        <label class="search-field">
+          <span class="sr-only">{{ t('search') }}</span>
+          <Search :size="16" aria-hidden="true" />
+          <input
+            v-model="search"
+            type="search"
+            :placeholder="t('nameOrPattern')"
+            :aria-label="t('search')"
+          />
         </label>
         <button
           type="button"
           :aria-expanded="moreFiltersOpen ? 'true' : 'false'"
           @click="moreFiltersOpen = !moreFiltersOpen"
         >
+          <SlidersHorizontal :size="16" aria-hidden="true" />
           {{ moreFiltersOpen ? t('fewerFilters') : t('moreFilters') }}
         </button>
       </div>
@@ -503,7 +527,7 @@ watch(() => props.busy, restoreFocus)
           </button>
         </template>
       </div>
-    </article>
+    </div>
 
     <div v-if="filteredRules.length === 0" class="surface empty-state">
       <strong>{{ t('noMatchingRules') }}</strong>
@@ -533,7 +557,7 @@ watch(() => props.busy, restoreFocus)
             )
           "
         />
-        <span class="drag-handle" aria-hidden="true"> {{ t('dragHandleSymbol') }} </span>
+        <GripVertical class="drag-handle" :size="16" aria-hidden="true" />
         <span class="position">{{ rule.position + 1 }}</span>
         <div class="rule-main">
           <div class="rule-title">
@@ -595,29 +619,35 @@ watch(() => props.busy, restoreFocus)
         <div class="row-actions">
           <button
             type="button"
+            class="ghost icon-button small"
             :disabled="busy || filtersActive || rule.position === 0"
             :aria-label="t('moveRuleUp', rule.name)"
             @click="move(rule, -1)"
           >
-            {{ t('upSymbol') }}
+            <ChevronUp :size="16" aria-hidden="true" />
           </button>
           <button
             type="button"
+            class="ghost icon-button small"
             :disabled="busy || filtersActive || rule.position === state.config.rules.length - 1"
             :aria-label="t('moveRuleDown', rule.name)"
             @click="move(rule, 1)"
           >
-            {{ t('downSymbol') }}
+            <ChevronDown :size="16" aria-hidden="true" />
           </button>
+          <IconButton
+            :icon="Pencil"
+            size="small"
+            :label="t('editRuleNamed', rule.name)"
+            @click="edit(rule, $event)"
+          />
           <OverflowMenu :label="t('ruleActionsFor', rule.name)">
-            <button role="menuitem" type="button" @click="edit(rule, $event)">
-              {{ t('edit') }}
-            </button>
             <button
               role="menuitem"
               type="button"
               @click="emit('command', { ruleId: rule.id, type: 'DUPLICATE_RULE' })"
             >
+              <CopyPlus :size="16" aria-hidden="true" />
               {{ t('duplicate') }}
             </button>
             <template v-if="temporaryDisableText(rule) === null">
@@ -635,6 +665,7 @@ watch(() => props.busy, restoreFocus)
                   })
                 "
               >
+                <TimerOff :size="16" aria-hidden="true" />
                 {{ t(choice.label) }}
               </button>
             </template>
@@ -645,6 +676,7 @@ watch(() => props.busy, restoreFocus)
               :disabled="busy"
               @click="emit('command', { ruleId: rule.id, type: 'CLEAR_RULE_TEMPORARY_DISABLE' })"
             >
+              <TimerReset :size="16" aria-hidden="true" />
               {{ t('reenableNow') }}
             </button>
             <button
@@ -653,6 +685,7 @@ watch(() => props.busy, restoreFocus)
               type="button"
               @click="void removeRule(rule)"
             >
+              <Trash2 :size="16" aria-hidden="true" />
               {{ t('delete') }}
             </button>
           </OverflowMenu>
@@ -660,118 +693,147 @@ watch(() => props.busy, restoreFocus)
       </li>
     </ol>
 
-    <Drawer
+    <Modal
       :open="formOpen"
       :title="editingId === null ? t('addRule') : t('editRule')"
+      size="large"
       @close="closeEditor"
     >
-      <form class="stack editor" @submit.prevent="void save()">
-        <div class="form-grid">
+      <form id="rule-form" class="rule-editor" @submit.prevent="void save()">
+        <section class="editor-section">
+          <div class="name-row">
+            <label>
+              {{ t('name') }}
+              <input ref="editorNameInput" v-model="draft.name" maxlength="256" required />
+            </label>
+            <label class="switch">
+              <input v-model="draft.enabled" type="checkbox" role="switch" />
+              {{ t('enabled') }}
+            </label>
+          </div>
+        </section>
+
+        <section class="editor-section">
+          <h3>{{ t('editorMatch') }}</h3>
+          <div class="match-row">
+            <label>
+              {{ t('matcherTarget') }}
+              <select v-model="draft.matcherType">
+                <option value="ORIGIN">{{ t('originPortable') }}</option>
+                <option value="FULL_URL">{{ t('fullUrlFirefoxOnly') }}</option>
+              </select>
+            </label>
+            <label>
+              {{ t('flags') }}
+              <input v-model="draft.flags" maxlength="2" pattern="[im]*" />
+            </label>
+          </div>
           <label>
-            {{ t('name') }}
-            <input ref="editorNameInput" v-model="draft.name" maxlength="256" required />
-          </label>
-          <label>
-            {{ t('matcherTarget') }}
-            <select v-model="draft.matcherType">
-              <option value="ORIGIN">{{ t('originPortable') }}</option>
-              <option value="FULL_URL">{{ t('fullUrlFirefoxOnly') }}</option>
-            </select>
-          </label>
-          <label>
-            {{ t('flags') }}
-            <input v-model="draft.flags" maxlength="2" pattern="[im]*" />
-          </label>
-        </div>
-        <label>
-          {{ t('description') }}
-          <textarea v-model="draft.description" rows="2" maxlength="4096" />
-        </label>
-        <label>
-          {{ t('regularExpression') }}
-          <textarea v-model="draft.pattern" rows="3" maxlength="2048" spellcheck="false" required />
-        </label>
-        <p class="notice">
-          {{ t('regexGuidance') }}
-        </p>
-        <div class="form-grid">
-          <label>
-            {{ t('template') }}
-            <select v-model="templateId" :aria-label="t('template')">
-              <option value="EXACT_HOSTNAME">{{ t('exactHostname') }}</option>
-              <option value="DOMAIN_AND_SUBDOMAINS">{{ t('domainSubdomains') }}</option>
-              <option value="DOMAIN_SUFFIXES">{{ t('domainSuffixes') }}</option>
-              <option value="RUSSIAN_DOMAINS">{{ t('russianSitesExample') }}</option>
-              <option value="SOCIAL_NETWORKS">{{ t('socialNetworksExample') }}</option>
-              <option value="EXACT_ORIGIN">{{ t('exactOrigin') }}</option>
-              <option value="HTTP_ONLY">{{ t('httpOnly') }}</option>
-              <option value="HTTPS_ONLY">{{ t('httpsOnly') }}</option>
-              <option value="CUSTOM_PORT">{{ t('customPort') }}</option>
-              <option value="LOCALHOST">{{ t('localhost') }}</option>
-              <option value="PRIVATE_IPV4">{{ t('privateIpv4') }}</option>
-              <option value="FIREFOX_URL_PATH">{{ t('firefoxUrlPath') }}</option>
-              <option value="FIREFOX_QUERY_PARAMETER">{{ t('firefoxQueryParameter') }}</option>
-            </select>
-          </label>
-          <label
-            v-if="
-              templateId !== 'DOMAIN_SUFFIXES' &&
-              templateId !== 'RUSSIAN_DOMAINS' &&
-              templateId !== 'SOCIAL_NETWORKS'
-            "
-          >
-            {{ t('templateHostname') }}
-            <input v-model="templateHost" />
-          </label>
-          <label v-else-if="templateId === 'DOMAIN_SUFFIXES'">
-            {{ t('domainSuffixes') }}
+            {{ t('regularExpression') }}
             <textarea
-              v-model="templateDomainSuffixes"
-              rows="2"
-              :placeholder="t('domainSuffixesPlaceholder')"
+              v-model="draft.pattern"
+              class="pattern-input"
+              rows="3"
+              maxlength="2048"
+              spellcheck="false"
+              required
             />
           </label>
-          <button type="button" @click="applyTemplate">
-            {{ t('generateEditablePattern') }}
-          </button>
-        </div>
-        <label>
-          {{ t('routeVia') }}
-          <select v-model="draft.routeTarget" required>
-            <option value="" disabled>{{ t('selectRoute') }}</option>
-            <option value="DIRECT">{{ t('directConnection') }}</option>
-            <option v-if="routeSelectionMissing" :value="draft.routeTarget" disabled>
-              {{ t('missingProxyRoute') }}
-            </option>
-            <option
-              v-for="profile in state.config.profiles"
-              :key="profile.id"
-              :value="profileRouteTarget(profile.id)"
+          <p class="notice">
+            <Info :size="16" aria-hidden="true" />
+            {{ t('regexGuidance') }}
+          </p>
+          <div class="template-box">
+            <label>
+              {{ t('template') }}
+              <select v-model="templateId" :aria-label="t('template')">
+                <option value="EXACT_HOSTNAME">{{ t('exactHostname') }}</option>
+                <option value="DOMAIN_AND_SUBDOMAINS">{{ t('domainSubdomains') }}</option>
+                <option value="DOMAIN_SUFFIXES">{{ t('domainSuffixes') }}</option>
+                <option value="RUSSIAN_DOMAINS">{{ t('russianSitesExample') }}</option>
+                <option value="SOCIAL_NETWORKS">{{ t('socialNetworksExample') }}</option>
+                <option value="EXACT_ORIGIN">{{ t('exactOrigin') }}</option>
+                <option value="HTTP_ONLY">{{ t('httpOnly') }}</option>
+                <option value="HTTPS_ONLY">{{ t('httpsOnly') }}</option>
+                <option value="CUSTOM_PORT">{{ t('customPort') }}</option>
+                <option value="LOCALHOST">{{ t('localhost') }}</option>
+                <option value="PRIVATE_IPV4">{{ t('privateIpv4') }}</option>
+                <option value="FIREFOX_URL_PATH">{{ t('firefoxUrlPath') }}</option>
+                <option value="FIREFOX_QUERY_PARAMETER">{{ t('firefoxQueryParameter') }}</option>
+              </select>
+            </label>
+            <label
+              v-if="
+                templateId !== 'DOMAIN_SUFFIXES' &&
+                templateId !== 'RUSSIAN_DOMAINS' &&
+                templateId !== 'SOCIAL_NETWORKS'
+              "
             >
-              {{ t('proxyRouteOption', profile.name) }}
-            </option>
-          </select>
-        </label>
-        <p v-if="routeSelectionMissing" class="notice danger-text" role="alert">
-          {{ t('chooseAvailableRoute') }}
-        </p>
-        <label class="check-row">
-          <input v-model="draft.enabled" type="checkbox" />
-          <span>{{ t('enabled') }}</span>
-        </label>
+              {{ t('templateHostname') }}
+              <input v-model="templateHost" />
+            </label>
+            <label v-else-if="templateId === 'DOMAIN_SUFFIXES'">
+              {{ t('domainSuffixes') }}
+              <textarea
+                v-model="templateDomainSuffixes"
+                rows="2"
+                :placeholder="t('domainSuffixesPlaceholder')"
+              />
+            </label>
+            <button type="button" @click="applyTemplate">
+              <WandSparkles :size="16" aria-hidden="true" />
+              {{ t('generateEditablePattern') }}
+            </button>
+          </div>
+        </section>
+
+        <section class="editor-section">
+          <h3>{{ t('editorRoute') }}</h3>
+          <label>
+            {{ t('routeVia') }}
+            <select v-model="draft.routeTarget" required>
+              <option value="" disabled>{{ t('selectRoute') }}</option>
+              <option value="DIRECT">{{ t('directConnection') }}</option>
+              <option v-if="routeSelectionMissing" :value="draft.routeTarget" disabled>
+                {{ t('missingProxyRoute') }}
+              </option>
+              <option
+                v-for="profile in state.config.profiles"
+                :key="profile.id"
+                :value="profileRouteTarget(profile.id)"
+              >
+                {{ t('proxyRouteOption', profile.name) }}
+              </option>
+            </select>
+          </label>
+          <p v-if="routeSelectionMissing" class="notice danger" role="alert">
+            {{ t('chooseAvailableRoute') }}
+          </p>
+        </section>
+
+        <details class="editor-section advanced">
+          <summary>{{ t('description') }}</summary>
+          <label>
+            <span class="sr-only">{{ t('description') }}</span>
+            <textarea v-model="draft.description" rows="2" maxlength="4096" />
+          </label>
+        </details>
 
         <details class="tester-panel">
           <summary>{{ t('singleMultipleTester') }}</summary>
-          <p>{{ t('testerPrivacyDescription') }}</p>
+          <p class="muted">
+            {{ t('testerPrivacyDescription') }}
+          </p>
           <label>
             {{ t('urlsOnePerLine') }}
-            <textarea v-model="testLines" rows="5" />
+            <textarea v-model="testLines" rows="4" />
           </label>
           <div class="button-row">
             <button type="button" @click="runRegexTest">
+              <FlaskConical :size="16" aria-hidden="true" />
               {{ t('testPattern') }}
             </button>
-            <button type="button" @click="tester.cancel()">
+            <button type="button" class="ghost" @click="tester.cancel()">
               {{ t('cancel') }}
             </button>
             <span class="muted" aria-live="polite">
@@ -793,24 +855,29 @@ watch(() => props.busy, restoreFocus)
             </li>
           </ul>
         </details>
-
-        <div class="button-row">
-          <button class="primary" type="submit" :disabled="busy || !routeSelectionValid">
-            {{ t('saveRule') }}
-          </button>
-          <button type="button" @click="closeEditor">
-            {{ t('cancel') }}
-          </button>
-        </div>
       </form>
-    </Drawer>
+      <template #footer>
+        <button type="button" @click="closeEditor">
+          {{ t('cancel') }}
+        </button>
+        <button
+          class="primary"
+          type="submit"
+          form="rule-form"
+          :disabled="busy || !routeSelectionValid"
+        >
+          {{ t('saveRule') }}
+        </button>
+      </template>
+    </Modal>
 
     <article class="surface card stack">
-      <div>
-        <p class="eyebrow">
-          {{ t('authoritativeResolver') }}
-        </p>
-        <h3>{{ t('globalRoutingTester') }}</h3>
+      <div class="card-heading">
+        <Route :size="18" aria-hidden="true" />
+        <div>
+          <h3>{{ t('globalRoutingTester') }}</h3>
+          <small>{{ t('authoritativeResolver') }}</small>
+        </div>
       </div>
       <div class="inline-form">
         <label>
@@ -818,6 +885,7 @@ watch(() => props.busy, restoreFocus)
           <input v-model="routeUrl" type="url" />
         </label>
         <button type="button" @click="runRoutingTest">
+          <Play :size="16" aria-hidden="true" />
           {{ t('resolveRoute') }}
         </button>
       </div>
@@ -837,3 +905,95 @@ watch(() => props.busy, restoreFocus)
     </article>
   </div>
 </template>
+
+<style scoped>
+.rule-toolbar {
+  gap: var(--space-3);
+}
+
+.search-field {
+  position: relative;
+  display: block;
+  color: var(--color-muted);
+}
+
+.search-field svg {
+  position: absolute;
+  top: 50%;
+  left: 11px;
+  transform: translateY(-50%);
+}
+
+.search-field input {
+  padding-left: 34px;
+}
+
+.card-heading {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  color: var(--color-primary);
+}
+
+.card-heading div {
+  display: grid;
+  color: var(--color-text);
+}
+
+.rule-editor {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.editor-section {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.name-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-4);
+  align-items: end;
+}
+
+.name-row .switch {
+  min-height: var(--control-height);
+}
+
+.match-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px;
+  gap: var(--space-3);
+}
+
+.pattern-input {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.template-box {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: end;
+  padding: var(--space-3) var(--space-4);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius);
+  background: var(--color-surface-2);
+}
+
+.advanced summary,
+.tester-panel summary {
+  color: var(--color-muted);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .template-box,
+  .match-row {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

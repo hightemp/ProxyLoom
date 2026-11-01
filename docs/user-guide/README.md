@@ -46,12 +46,12 @@ configuration error and never silently becomes direct.
 
 Each rule row shows its position, name, route (Direct or the profile chip), compatibility and
 validity badges, a shortened pattern you can expand, and an **Enabled** switch. ↑/↓ reorder from
-the keyboard; **⋯** holds Edit, Duplicate and Delete. Search is always visible; **More filters**
+the keyboard and the pencil opens the editor; **⋯** holds Duplicate, temporary disable and Delete. Search is always visible; **More filters**
 opens action, profile, enabled and compatibility filters. **⋯** also offers **Disable for 5
 minutes**, **15 minutes**, **1 hour** or **until browser restart**; the rule then shows
 `Disabled until …`, is skipped by routing and the tester, and keeps its Enabled switch. **Re-enable
 now** ends it early. Temporary disables last only for the browser session and are not exported. Select rules to enable, disable or
-delete them together. The editor opens in a side panel.
+delete them together. The editor opens in a centered dialog with Match, Route, Description and tester sections.
 
 Rules have one global numeric priority. The first enabled, compatible, non-expired match wins.
 Rules are evaluated strictly in their displayed global order. Categories and hidden specificity

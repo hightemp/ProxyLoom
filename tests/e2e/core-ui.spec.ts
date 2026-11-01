@@ -213,8 +213,7 @@ test('duplicates a profile and safely invalidates referring routes when deleting
     extensionPage.getByRole('listitem').filter({ hasText: 'Referring route' }),
   ).toContainText('Invalid proxy reference')
   const referring = extensionPage.getByRole('listitem').filter({ hasText: 'Referring route' })
-  await referring.getByRole('button', { name: 'More actions for Referring route' }).click()
-  await referring.getByRole('menuitem', { name: 'Edit' }).click()
+  await referring.getByRole('button', { name: 'Edit Referring route' }).click()
   await expect(extensionPage.getByRole('alert')).toContainText('no longer exists')
   await expect(extensionPage.getByRole('button', { name: 'Save rule' })).toBeDisabled()
 })
