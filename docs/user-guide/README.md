@@ -63,8 +63,12 @@ or another proxy.
 
 ## 4. Current-site actions
 
-The popup separates global controls from site controls. Choose Exact hostname or Domain +
-subdomains, then Direct or a profile:
+The popup starts with the current site: its hostname, the route it takes (Direct or the proxy
+profile) and what decided it — the global mode, a Once override, the matching rule by name, or no
+matching rule. Below are the site's Once overrides and the site actions, then the global mode with
+a one-line explanation, the global proxy with its last check and **Copy URL**, and links to
+Settings and Logs. For a site action choose Exact hostname or Domain + subdomains and a route
+(Direct or a profile):
 
 - **Once** creates session-only state above rules.
 - **Always** previews and creates a permanent Origin Rule.

@@ -1740,5 +1740,28 @@
   },
   "applyStateFailed": {
     "message": "Apply failed"
+  },
+  "modeDescriptionDirect": {
+    "message": "All traffic goes direct. Rules and overrides are kept but not used."
+  },
+  "modeDescriptionProxy": {
+    "message": "Once overrides, then the first matching rule, then the global proxy."
+  },
+  "modeDescriptionRules": {
+    "message": "Once overrides, then the first matching rule; anything else goes direct."
+  },
+  "sourceRuleNamed": {
+    "message": "Rule: $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "siteActionsTitle": {
+    "message": "Route this site"
+  },
+  "logsLink": {
+    "message": "Logs"
   }
 }

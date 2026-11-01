@@ -1,69 +1,124 @@
 <script setup lang="ts">
 import { computed, onMounted, shallowRef } from 'vue'
 
-import type { AppRuntimeState, RuntimeRequest } from '../../src/application/runtime/contracts'
-import { asProxyProfileId } from '../../src/domain/types/brand'
-import type { OverrideScope, RuleAction } from '../../src/domain/types/entities'
-import { t } from '../../src/i18n/messages'
 import type { OverridePreview } from '../../src/application/overrides/override-service'
 import { overridesForSite } from '../../src/application/overrides/site-overrides'
-import ConfirmDialog from '../../src/ui/components/ConfirmDialog.vue'
-import SiteOverrides from '../../src/ui/popup/SiteOverrides.vue'
-import { copyText } from '../../src/ui/clipboard'
+import type { AppRuntimeState, RuntimeRequest } from '../../src/application/runtime/contracts'
 import { formatProfile } from '../../src/domain/profiles/proxy-format'
+import { asProxyProfileId } from '../../src/domain/types/brand'
+import type { GlobalMode, OverrideScope, RuleAction } from '../../src/domain/types/entities'
+import { t, type MessageKey } from '../../src/i18n/messages'
+import { copyText } from '../../src/ui/clipboard'
+import ConfirmDialog from '../../src/ui/components/ConfirmDialog.vue'
+import ProfileChip from '../../src/ui/components/ProfileChip.vue'
 import { confirmController } from '../../src/ui/confirm/confirm-controller'
 import {
+  checkErrorLabel,
   decisionActionLabel,
   decisionSourceLabel,
   errorText,
   inspectionReasonLabel,
   modeLabel,
 } from '../../src/ui/labels'
+import SiteOverrides from '../../src/ui/popup/SiteOverrides.vue'
 import { runtimeClient } from '../../src/ui/runtime/client'
+
+const PROFILE_PREFIX = 'PROFILE:'
+type RouteValue = 'DIRECT' | `PROFILE:${string}`
+
+const MODE_DESCRIPTIONS: Record<GlobalMode, MessageKey> = {
+  DIRECT: 'modeDescriptionDirect',
+  PROXY: 'modeDescriptionProxy',
+  RULES: 'modeDescriptionRules',
+}
 
 const state = shallowRef<AppRuntimeState | null>(null)
 const busy = shallowRef(false)
 const error = shallowRef('')
 const info = shallowRef('')
 const scope = shallowRef<OverrideScope>('EXACT_HOSTNAME')
-const actionType = shallowRef<'DIRECT' | 'PROXY'>('DIRECT')
-const profileId = shallowRef('')
+const siteRoute = shallowRef<RouteValue>('DIRECT')
 const requestedTabId = (() => {
   const raw = new URLSearchParams(window.location.search).get('tab')
   if (raw === null || !/^\d+$/u.test(raw)) return undefined
   const parsed = Number(raw)
   return Number.isSafeInteger(parsed) ? parsed : undefined
 })()
+const tabContext = requestedTabId === undefined ? {} : { tabId: requestedTabId }
 
 const inspection = computed(() => state.value?.inspection ?? null)
-const routeLabel = computed(() => {
+const profileById = (id: string | null) =>
+  id === null ? undefined : state.value?.config.profiles.find((profile) => profile.id === id)
+
+const decision = computed(() => {
   const current = inspection.value
-  if (current === null || !current.supported) return t('noSupportedTab')
-  const decision = current.decision
-  if (decision.action === 'PROXY') {
-    const profile = state.value?.config.profiles.find(
-      (candidate) => candidate.id === decision.profileId,
-    )
-    return profile === undefined ? t('invalidProxyRoute') : `${t('via')} ${profile.name}`
-  }
-  return decision.action === 'DIRECT' ? t('directConnection') : t('configurationError')
+  return current?.supported === true ? current.decision : null
 })
-const matchedRuleName = computed(() => {
-  const current = inspection.value
-  if (current === null || !current.supported || current.decision.matchedRuleId === null) {
-    return null
+const decisionProfile = computed(() => profileById(decision.value?.profileId ?? null) ?? null)
+const sourceText = computed(() => {
+  const current = decision.value
+  if (current === null) return ''
+  if (current.source !== 'RULE' || current.matchedRuleId === null) {
+    return decisionSourceLabel(current.source)
   }
-  return (
-    state.value?.config.rules.find((rule) => rule.id === current.decision.matchedRuleId)?.name ??
-    t('missingRule')
-  )
+  const rule = state.value?.config.rules.find((entry) => entry.id === current.matchedRuleId)
+  return t('sourceRuleNamed', rule?.name ?? t('missingRule'))
 })
 
 const activeProfile = computed(() =>
-  state.value?.config.profiles.find(
-    (profile) => profile.id === state.value?.config.general.activeProxyProfileId,
-  ),
+  profileById(state.value?.config.general.activeProxyProfileId ?? null),
 )
+const lastCheckText = computed(() => {
+  const check = activeProfile.value?.lastCheck
+  if (check === undefined) return ''
+  if (check === null) return t('neverChecked')
+  const duration = `${Math.round(check.totalDurationMs)} ${t('millisecondsShort')}`
+  return check.availability
+    ? [t('available'), duration, check.country].filter(Boolean).join(' · ')
+    : [t('unavailable'), check.errorCode === null ? '' : checkErrorLabel(check.errorCode)]
+        .filter(Boolean)
+        .join(' · ')
+})
+
+const hasOwnOverride = computed(() => {
+  const current = inspection.value
+  if (state.value === null || current === null || !current.supported) return false
+  return overridesForSite(state.value.overrides, current.hostname).some(
+    (override) => override.sourceTabId === state.value?.activeTabId,
+  )
+})
+
+const action = (): RuleAction =>
+  siteRoute.value === 'DIRECT'
+    ? { targetProxyProfileId: null, type: 'DIRECT' }
+    : {
+        targetProxyProfileId: asProxyProfileId(siteRoute.value.slice(PROFILE_PREFIX.length)),
+        type: 'PROXY',
+      }
+
+const load = async (): Promise<void> => {
+  const result = await runtimeClient.getState(undefined, requestedTabId)
+  if (!result.ok) {
+    error.value = errorText(result.error)
+    return
+  }
+  state.value = result.value
+  document.documentElement.dataset.theme =
+    result.value.config.appearance.theme.toLocaleLowerCase('en-US')
+}
+
+const execute = async (request: RuntimeRequest): Promise<void> => {
+  busy.value = true
+  error.value = ''
+  info.value = ''
+  const result = await runtimeClient.command<unknown>(request)
+  busy.value = false
+  if (!result.ok) {
+    error.value = errorText(result.error)
+    return
+  }
+  await load()
+}
 
 const copyActiveUrl = async (): Promise<void> => {
   const profile = activeProfile.value
@@ -78,52 +133,10 @@ const copyActiveUrl = async (): Promise<void> => {
   info.value = withPassword ? t('copiedWithPassword') : t('copied')
 }
 
-const hasOwnOverride = computed(() => {
-  const current = inspection.value
-  if (state.value === null || current === null || !current.supported) return false
-  return overridesForSite(state.value.overrides, current.hostname).some(
-    (override) => override.sourceTabId === state.value?.activeTabId,
-  )
-})
-
-const action = (): RuleAction => ({
-  targetProxyProfileId: actionType.value === 'PROXY' ? asProxyProfileId(profileId.value) : null,
-  type: actionType.value,
-})
-
-const load = async (): Promise<void> => {
-  const result = await runtimeClient.getState(undefined, requestedTabId)
-  if (!result.ok) {
-    error.value = errorText(result.error)
-    return
-  }
-  state.value = result.value
-  profileId.value =
-    result.value.config.general.activeProxyProfileId ?? result.value.config.profiles[0]?.id ?? ''
-  document.documentElement.dataset.theme =
-    result.value.config.appearance.theme.toLocaleLowerCase('en-US')
-}
-
-const execute = async (request: RuntimeRequest): Promise<void> => {
-  busy.value = true
-  error.value = ''
-  const result = await runtimeClient.command<unknown>(request)
-  busy.value = false
-  if (!result.ok) {
-    error.value = errorText(result.error)
-    return
-  }
-  await load()
-}
-
 const siteAction = async (persistent: boolean): Promise<void> => {
-  if (actionType.value === 'PROXY' && profileId.value === '') {
-    error.value = t('selectProxyFirst')
-    return
-  }
   const previewResult = await runtimeClient.command<OverridePreview>({
     scope: scope.value,
-    ...(requestedTabId === undefined ? {} : { tabId: requestedTabId }),
+    ...tabContext,
     type: 'PREVIEW_SITE_ACTION',
   })
   if (!previewResult.ok) {
@@ -131,11 +144,13 @@ const siteAction = async (persistent: boolean): Promise<void> => {
     return
   }
   const preview = previewResult.value
+  const route = action()
+  const routeProfile = profileById(route.targetProxyProfileId)
   const confirmed = await confirmController.request({
     code: preview.generatedPattern,
     confirmLabel: t('create'),
     details: [
-      `${t('action')}: ${decisionActionLabel(actionType.value)}`,
+      `${t('route')}: ${routeProfile === undefined ? decisionActionLabel('DIRECT') : routeProfile.name}`,
       ...(preview.chromiumScopeWarning && !persistent ? [t('temporaryOverrideWarning')] : []),
     ],
     message: t('siteActionMessage'),
@@ -143,9 +158,9 @@ const siteAction = async (persistent: boolean): Promise<void> => {
   })
   if (!confirmed) return
   await execute({
-    action: action(),
+    action: route,
     scope: scope.value,
-    ...(requestedTabId === undefined ? {} : { tabId: requestedTabId }),
+    ...tabContext,
     type: persistent ? 'CREATE_SITE_RULE' : 'CREATE_OVERRIDE',
   })
 }
@@ -158,16 +173,12 @@ onMounted(() => {
 <template>
   <main class="popup">
     <header class="popup-header">
-      <div>
-        <span class="eyebrow">{{ t('extensionName') }}</span>
-        <strong>{{ routeLabel }}</strong>
-      </div>
+      <img src="/icon.svg" alt="" width="20" height="20" />
+      <strong>{{ t('extensionName') }}</strong>
       <span
         v-if="state"
         class="status-pill"
-        :class="{
-          danger: state.diagnostics.lastApplyError !== null,
-        }"
+        :class="{ danger: state.diagnostics.lastApplyError !== null }"
       >
         {{ modeLabel(state.config.general.mode) }}
       </span>
@@ -177,65 +188,38 @@ onMounted(() => {
       {{ error || t('loading') }}
     </div>
     <template v-else>
-      <fieldset class="segmented" :disabled="busy">
-        <legend class="sr-only">
-          {{ t('globalMode') }}
-        </legend>
-        <button
-          v-for="mode in ['DIRECT', 'PROXY', 'RULES'] as const"
-          :key="mode"
-          type="button"
-          :aria-pressed="state.config.general.mode === mode"
-          @click="execute({ mode, type: 'SET_MODE' })"
-        >
-          {{ modeLabel(mode) }}
-        </button>
-      </fieldset>
-
-      <label>
-        {{ t('useProxyGlobally') }}
-        <select
-          :value="state.config.general.activeProxyProfileId ?? ''"
-          :disabled="busy || state.config.profiles.length === 0"
-          @change="
-            execute({
-              profileId: ($event.target as HTMLSelectElement).value,
-              type: 'USE_PROFILE',
-            })
-          "
-        >
-          <option value="" disabled>{{ t('selectProfileShort') }}</option>
-          <option v-for="profile in state.config.profiles" :key="profile.id" :value="profile.id">
-            {{ profile.name }}
-          </option>
-        </select>
-      </label>
-      <button
-        type="button"
-        class="link-button"
-        :disabled="activeProfile === undefined"
-        @click="void copyActiveUrl()"
-      >
-        {{ t('copyUrl') }}
-      </button>
-
-      <section class="surface current-site">
+      <section class="surface current-site" :aria-label="t('currentSite')">
         <span class="eyebrow">{{ t('currentSite') }}</span>
-        <template v-if="inspection?.supported">
-          <strong>{{ inspection.hostname }}</strong>
-          <small>
-            {{ decisionActionLabel(inspection.decision.action) }} ·
-            {{ decisionSourceLabel(inspection.decision.source) }}
-            {{ matchedRuleName === null ? '' : `· ${matchedRuleName}` }}
+        <template v-if="inspection?.supported && decision">
+          <h1>{{ inspection.hostname }}</h1>
+          <small class="route-line">
+            <span v-if="decision.action === 'CONFIG_ERROR'" class="profile-error">
+              {{ decisionActionLabel('CONFIG_ERROR') }}
+            </span>
+            <ProfileChip
+              v-else
+              :profile="decisionProfile"
+              :missing="decision.action === 'PROXY' && decisionProfile === null"
+            />
+            · {{ sourceText }}
           </small>
-          <p v-if="inspection.scopeWarning" class="notice">
-            {{ t('temporaryOverrideWarning') }}
-          </p>
+          <button
+            v-if="decision.matchedRuleId"
+            class="link-button"
+            type="button"
+            @click="execute({ section: 'rules', type: 'OPEN_SETTINGS' })"
+          >
+            {{ t('editMatchedRule') }}
+          </button>
         </template>
         <template v-else>
-          <strong>{{ t('unsupportedPage') }}</strong>
+          <h1>{{ t('unsupportedPage') }}</h1>
           <small>
-            {{ inspection ? inspectionReasonLabel(inspection.reason) : t('noActiveTab') }}
+            {{
+              inspection && !inspection.supported
+                ? inspectionReasonLabel(inspection.reason)
+                : t('noActiveTab')
+            }}
           </small>
         </template>
       </section>
@@ -251,53 +235,87 @@ onMounted(() => {
         @command="execute"
       />
 
-      <section class="site-actions" :aria-disabled="!inspection?.supported">
+      <section
+        v-if="inspection?.supported"
+        class="site-actions"
+        :aria-label="t('siteActionsTitle')"
+      >
         <div class="form-grid">
           <label>
             {{ t('scope') }}
-            <select v-model="scope" :disabled="!inspection?.supported">
+            <select v-model="scope">
               <option value="EXACT_HOSTNAME">{{ t('exactHostname') }}</option>
               <option value="REGISTRABLE_DOMAIN">{{ t('domainSubdomains') }}</option>
             </select>
           </label>
           <label>
             {{ t('route') }}
-            <select v-model="actionType" :disabled="!inspection?.supported">
-              <option value="DIRECT">{{ t('directLabel') }}</option>
-              <option value="PROXY">{{ t('proxyLabel') }}</option>
+            <select v-model="siteRoute" name="site-route">
+              <option value="DIRECT">{{ decisionActionLabel('DIRECT') }}</option>
+              <option
+                v-for="profile in state.config.profiles"
+                :key="profile.id"
+                :value="`${PROFILE_PREFIX}${profile.id}`"
+              >
+                {{ profile.name }} ({{ profile.shortName ?? profile.generatedShortName }})
+              </option>
             </select>
           </label>
         </div>
-        <label v-if="actionType === 'PROXY'">
-          {{ t('proxyProfile') }}
-          <select v-model="profileId" :disabled="!inspection?.supported">
+        <p v-if="inspection.scopeWarning" class="hint">
+          {{ t('temporaryOverrideWarning') }}
+        </p>
+        <div class="button-row">
+          <button class="primary" type="button" :disabled="busy" @click="siteAction(false)">
+            {{ hasOwnOverride ? t('updateOnce') : t('once') }}
+          </button>
+          <button type="button" :disabled="busy" @click="siteAction(true)">
+            {{ t('alwaysCreateRule') }}
+          </button>
+        </div>
+      </section>
+
+      <section class="global" :aria-label="t('globalMode')">
+        <fieldset class="segmented" :disabled="busy">
+          <legend class="sr-only">
+            {{ t('globalMode') }}
+          </legend>
+          <button
+            v-for="mode in ['DIRECT', 'PROXY', 'RULES'] as const"
+            :key="mode"
+            type="button"
+            :aria-pressed="state.config.general.mode === mode"
+            @click="execute({ mode, type: 'SET_MODE' })"
+          >
+            {{ modeLabel(mode) }}
+          </button>
+        </fieldset>
+        <p class="hint">
+          {{ t(MODE_DESCRIPTIONS[state.config.general.mode]) }}
+        </p>
+        <label>
+          {{ t('useProxyGlobally') }}
+          <select
+            :value="state.config.general.activeProxyProfileId ?? ''"
+            :disabled="busy || state.config.profiles.length === 0"
+            @change="
+              execute({
+                profileId: ($event.target as HTMLSelectElement).value,
+                type: 'USE_PROFILE',
+              })
+            "
+          >
             <option value="" disabled>{{ t('selectProfileShort') }}</option>
             <option v-for="profile in state.config.profiles" :key="profile.id" :value="profile.id">
               {{ profile.name }}
             </option>
           </select>
         </label>
-        <div class="button-row">
-          <button
-            type="button"
-            :disabled="busy || !inspection?.supported"
-            @click="siteAction(false)"
-          >
-            {{ hasOwnOverride ? t('updateOnce') : t('once') }}
-          </button>
-          <button
-            type="button"
-            :disabled="busy || !inspection?.supported"
-            @click="siteAction(true)"
-          >
-            {{ t('alwaysCreateRule') }}
-          </button>
-          <button
-            v-if="inspection?.supported && inspection.decision.matchedRuleId"
-            type="button"
-            @click="execute({ section: 'rules', type: 'OPEN_SETTINGS' })"
-          >
-            {{ t('editMatchedRule') }}
+        <div v-if="activeProfile" class="global-status">
+          <ProfileChip :profile="activeProfile" />
+          <small>{{ lastCheckText }}</small>
+          <button class="link-button" type="button" @click="void copyActiveUrl()">
+            {{ t('copyUrl') }}
           </button>
         </div>
       </section>
@@ -315,9 +333,19 @@ onMounted(() => {
       <p v-if="error" class="notice danger" role="alert">
         {{ error }}
       </p>
-      <button class="settings" type="button" @click="execute({ type: 'OPEN_SETTINGS' })">
-        {{ t('openSettings') }}
-      </button>
+
+      <footer class="popup-footer">
+        <button class="link-button" type="button" @click="execute({ type: 'OPEN_SETTINGS' })">
+          {{ t('openSettings') }}
+        </button>
+        <button
+          class="link-button"
+          type="button"
+          @click="execute({ section: 'logs', type: 'OPEN_SETTINGS' })"
+        >
+          {{ t('logsLink') }}
+        </button>
+      </footer>
     </template>
     <ConfirmDialog />
   </main>
@@ -330,40 +358,77 @@ onMounted(() => {
   width: 390px;
   max-height: 600px;
   overflow-y: auto;
-  padding: 18px;
+  padding: 16px 18px;
 }
 
 .popup-header {
   display: flex;
-  justify-content: space-between;
-  gap: 14px;
+  gap: 8px;
   align-items: center;
 }
 
-.popup-header div {
-  display: grid;
-  gap: 3px;
+.popup-header strong {
+  flex: 1;
 }
 
 .current-site {
   display: grid;
-  gap: 5px;
+  gap: 6px;
   padding: 14px;
 }
 
-.current-site small {
+.current-site h1 {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.25;
+  word-break: break-all;
+}
+
+.current-site small,
+.route-line {
   color: var(--color-muted);
 }
 
-.site-actions {
+.route-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.profile-error {
+  color: var(--color-danger);
+  font-weight: 700;
+}
+
+.site-actions,
+.global {
   display: grid;
   gap: 10px;
 }
 
-.settings {
-  border-color: transparent;
-  color: var(--color-primary);
-  background: transparent;
+.hint {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.global-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.global-status small {
+  color: var(--color-muted);
+}
+
+.popup-footer {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 4px;
+  border-top: 1px solid var(--color-border);
 }
 
 .notice[role='alert'] {
@@ -372,11 +437,6 @@ onMounted(() => {
 }
 
 @media (max-width: 420px) {
-  .popup-header {
-    flex-wrap: wrap;
-    align-items: flex-start;
-  }
-
   .segmented {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
