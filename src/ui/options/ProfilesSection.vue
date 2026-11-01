@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   Activity,
+  Cable,
   CircleCheck,
   CircleStop,
   CircleX,
@@ -15,6 +16,7 @@ import {
   Plus,
   Search,
   Server,
+  Settings2,
   ShieldAlert,
   Terminal,
   Trash2,
@@ -45,6 +47,7 @@ import { checkErrorLabel, proxyStringErrorLabel } from '../labels'
 import ProxyLineImportPanel from './ProxyLineImportPanel.vue'
 import IconButton from '../components/IconButton.vue'
 import Modal from '../components/Modal.vue'
+import Tabs from '../components/Tabs.vue'
 import PasswordInput from '../components/PasswordInput.vue'
 import OverflowMenu from '../components/OverflowMenu.vue'
 
@@ -59,6 +62,10 @@ const emit = defineEmits<{
 }>()
 
 const importOpen = shallowRef(false)
+const profileTabs = [
+  { icon: Cable, id: 'connection', label: t('tabConnection') },
+  { icon: Settings2, id: 'advanced', label: t('editorAdvanced') },
+] as const
 const PROFILE_COLORS = [
   '#3A52E0',
   '#178A5C',
@@ -716,182 +723,197 @@ watch(() => props.busy, restoreFocus)
     <Modal
       :open="formOpen"
       :title="editingId === null ? t('addProxyProfile') : t('editProxyProfile')"
+      fixed-height
       @close="closeEditor"
     >
-      <form id="profile-form" class="editor" @submit.prevent="save">
-        <section class="paste-box">
-          <label>
-            {{ t('pasteProxyString') }}
-            <span class="paste-row">
-              <input
-                v-model="pasteText"
-                name="proxy-string"
-                autocomplete="off"
-                spellcheck="false"
-                :placeholder="t('pasteProxyStringPlaceholder')"
-                :aria-describedby="'proxy-string-help'"
-                @keydown.enter.prevent="fillFromString"
-              />
-              <button type="button" @click="fillFromString">
-                <ClipboardPaste :size="16" aria-hidden="true" />
-                {{ t('fillFromString') }}
-              </button>
-            </span>
-          </label>
-          <small id="proxy-string-help">{{ t('pasteProxyStringDescription') }}</small>
-          <p v-if="pasteError" class="notice danger" role="alert">
-            {{ pasteError }}
-          </p>
-          <fieldset v-if="pasteChoices" class="paste-choices">
-            <legend>{{ t('chooseReading') }}</legend>
-            <label v-for="(choice, index) in pasteChoices" :key="index" class="check-row compact">
-              <input v-model="pasteChoice" type="radio" name="paste-order" :value="index" />
-              <span>
-                <code>{{ readingLabel(choice) }}</code>
-              </span>
-            </label>
-            <button type="button" class="small" @click="applyParsed(pasteChoices[pasteChoice])">
-              {{ t('useReading') }}
-            </button>
-          </fieldset>
-        </section>
+      <form id="profile-form" @submit.prevent="save">
+        <Tabs :label="t('profileEditorTabs')" :tabs="profileTabs">
+          <template #connection>
+            <div class="editor">
+              <section class="paste-box">
+                <label>
+                  {{ t('pasteProxyString') }}
+                  <span class="paste-row">
+                    <input
+                      v-model="pasteText"
+                      name="proxy-string"
+                      autocomplete="off"
+                      spellcheck="false"
+                      :placeholder="t('pasteProxyStringPlaceholder')"
+                      :aria-describedby="'proxy-string-help'"
+                      @keydown.enter.prevent="fillFromString"
+                    />
+                    <button type="button" @click="fillFromString">
+                      <ClipboardPaste :size="16" aria-hidden="true" />
+                      {{ t('fillFromString') }}
+                    </button>
+                  </span>
+                </label>
+                <small id="proxy-string-help">{{ t('pasteProxyStringDescription') }}</small>
+                <p v-if="pasteError" class="notice danger" role="alert">
+                  {{ pasteError }}
+                </p>
+                <fieldset v-if="pasteChoices" class="paste-choices">
+                  <legend>{{ t('chooseReading') }}</legend>
+                  <label
+                    v-for="(choice, index) in pasteChoices"
+                    :key="index"
+                    class="check-row compact"
+                  >
+                    <input v-model="pasteChoice" type="radio" name="paste-order" :value="index" />
+                    <span>
+                      <code>{{ readingLabel(choice) }}</code>
+                    </span>
+                  </label>
+                  <button
+                    type="button"
+                    class="small"
+                    @click="applyParsed(pasteChoices[pasteChoice])"
+                  >
+                    {{ t('useReading') }}
+                  </button>
+                </fieldset>
+              </section>
 
-        <section class="editor-section">
-          <h3>{{ t('editorGeneral') }}</h3>
-          <div class="name-grid">
-            <label>
-              {{ t('name') }}
-              <input ref="editorNameInput" v-model="draft.name" required maxlength="256" />
-            </label>
-            <label>
-              {{ t('shortNameLabel') }}
-              <input
-                v-model="draft.shortName"
-                pattern="[A-Za-z0-9]{1,3}"
-                maxlength="3"
-                :placeholder="t('shortNamePlaceholder')"
-              />
-            </label>
-          </div>
-          <div class="color-field" role="group" :aria-label="t('color')">
-            <span class="field-label">{{ t('color') }}</span>
-            <div class="swatches">
-              <button
-                v-for="color in PROFILE_COLORS"
-                :key="color"
-                type="button"
-                class="swatch"
-                :style="{ backgroundColor: color }"
-                :aria-label="t('colorSwatch', color)"
-                :aria-pressed="draft.color.toUpperCase() === color ? 'true' : 'false'"
-                @click="draft.color = color"
-              />
-              <label class="swatch custom" :title="t('customColor')">
-                <span class="sr-only">{{ t('customColor') }}</span>
-                <input v-model="draft.color" type="color" />
-              </label>
-            </div>
-          </div>
-        </section>
+              <section class="editor-section">
+                <h3>{{ t('editorGeneral') }}</h3>
+                <div class="name-grid">
+                  <label>
+                    {{ t('name') }}
+                    <input ref="editorNameInput" v-model="draft.name" required maxlength="256" />
+                  </label>
+                  <label>
+                    {{ t('shortNameLabel') }}
+                    <input
+                      v-model="draft.shortName"
+                      pattern="[A-Za-z0-9]{1,3}"
+                      maxlength="3"
+                      :placeholder="t('shortNamePlaceholder')"
+                    />
+                  </label>
+                </div>
+                <div class="color-field" role="group" :aria-label="t('color')">
+                  <span class="field-label">{{ t('color') }}</span>
+                  <div class="swatches">
+                    <button
+                      v-for="color in PROFILE_COLORS"
+                      :key="color"
+                      type="button"
+                      class="swatch"
+                      :style="{ backgroundColor: color }"
+                      :aria-label="t('colorSwatch', color)"
+                      :aria-pressed="draft.color.toUpperCase() === color ? 'true' : 'false'"
+                      @click="draft.color = color"
+                    />
+                    <label class="swatch custom" :title="t('customColor')">
+                      <span class="sr-only">{{ t('customColor') }}</span>
+                      <input v-model="draft.color" type="color" />
+                    </label>
+                  </div>
+                </div>
+              </section>
 
-        <section class="editor-section">
-          <div class="section-title-row">
-            <h3>{{ t('editorEndpoint') }}</h3>
-            <label class="switch">
-              <input v-model="draft.useSameProxy" type="checkbox" role="switch" />
-              {{ t('useHttpForAllShort') }}
-            </label>
-          </div>
-          <fieldset class="endpoint-block">
-            <legend>{{ draft.useSameProxy ? t('allSchemes') : t('httpWsEndpoint') }}</legend>
-            <div class="endpoint-row">
+              <section class="editor-section">
+                <div class="section-title-row">
+                  <h3>{{ t('editorEndpoint') }}</h3>
+                  <label class="switch">
+                    <input v-model="draft.useSameProxy" type="checkbox" role="switch" />
+                    {{ t('useHttpForAllShort') }}
+                  </label>
+                </div>
+                <fieldset class="endpoint-block">
+                  <legend>{{ draft.useSameProxy ? t('allSchemes') : t('httpWsEndpoint') }}</legend>
+                  <div class="endpoint-row">
+                    <label>
+                      {{ t('transport') }}
+                      <select v-model="draft.httpEndpoint.transport">
+                        <option value="HTTP">{{ t('proxyInfoHttp') }}</option>
+                        <option value="HTTPS">{{ t('proxyInfoHttps') }}</option>
+                      </select>
+                    </label>
+                    <label>
+                      {{ t('host') }}
+                      <input v-model="draft.httpEndpoint.host" required autocomplete="off" />
+                    </label>
+                    <label>
+                      {{ t('port') }}
+                      <input
+                        v-model.number="draft.httpEndpoint.port"
+                        type="number"
+                        min="1"
+                        max="65535"
+                        required
+                      />
+                    </label>
+                  </div>
+                  <div class="auth-row">
+                    <label>
+                      {{ t('username') }}
+                      <input
+                        v-model="draft.httpEndpoint.username"
+                        autocomplete="off"
+                        spellcheck="false"
+                      />
+                    </label>
+                    <PasswordInput v-model="draft.httpEndpoint.password" :label="t('password')" />
+                  </div>
+                </fieldset>
+                <fieldset v-if="!draft.useSameProxy" class="endpoint-block">
+                  <legend>{{ t('httpsWssEndpoint') }}</legend>
+                  <div class="endpoint-row">
+                    <label>
+                      {{ t('transport') }}
+                      <select v-model="draft.httpsEndpoint.transport">
+                        <option value="HTTP">{{ t('proxyInfoHttp') }}</option>
+                        <option value="HTTPS">{{ t('proxyInfoHttps') }}</option>
+                      </select>
+                    </label>
+                    <label>
+                      {{ t('host') }}
+                      <input v-model="draft.httpsEndpoint.host" required autocomplete="off" />
+                    </label>
+                    <label>
+                      {{ t('port') }}
+                      <input
+                        v-model.number="draft.httpsEndpoint.port"
+                        type="number"
+                        min="1"
+                        max="65535"
+                        required
+                      />
+                    </label>
+                  </div>
+                  <div class="auth-row">
+                    <label>
+                      {{ t('username') }}
+                      <input
+                        v-model="draft.httpsEndpoint.username"
+                        autocomplete="off"
+                        spellcheck="false"
+                      />
+                    </label>
+                    <PasswordInput v-model="draft.httpsEndpoint.password" :label="t('password')" />
+                  </div>
+                </fieldset>
+                <small v-if="draft.useSameProxy">
+                  {{ t('useHttpForAllDescription') }}
+                </small>
+              </section>
+            </div>
+          </template>
+          <template #advanced>
+            <div class="stack">
               <label>
-                {{ t('transport') }}
-                <select v-model="draft.httpEndpoint.transport">
-                  <option value="HTTP">{{ t('proxyInfoHttp') }}</option>
-                  <option value="HTTPS">{{ t('proxyInfoHttps') }}</option>
-                </select>
+                {{ t('checkUrl') }}
+                <input v-model="draft.checkUrl" type="url" required />
               </label>
               <label>
-                {{ t('host') }}
-                <input v-model="draft.httpEndpoint.host" required autocomplete="off" />
-              </label>
-              <label>
-                {{ t('port') }}
-                <input
-                  v-model.number="draft.httpEndpoint.port"
-                  type="number"
-                  min="1"
-                  max="65535"
-                  required
-                />
+                {{ t('note') }}
+                <textarea v-model="draft.note" rows="3" maxlength="4096" />
               </label>
             </div>
-            <div class="auth-row">
-              <label>
-                {{ t('username') }}
-                <input
-                  v-model="draft.httpEndpoint.username"
-                  autocomplete="off"
-                  spellcheck="false"
-                />
-              </label>
-              <PasswordInput v-model="draft.httpEndpoint.password" :label="t('password')" />
-            </div>
-          </fieldset>
-          <fieldset v-if="!draft.useSameProxy" class="endpoint-block">
-            <legend>{{ t('httpsWssEndpoint') }}</legend>
-            <div class="endpoint-row">
-              <label>
-                {{ t('transport') }}
-                <select v-model="draft.httpsEndpoint.transport">
-                  <option value="HTTP">{{ t('proxyInfoHttp') }}</option>
-                  <option value="HTTPS">{{ t('proxyInfoHttps') }}</option>
-                </select>
-              </label>
-              <label>
-                {{ t('host') }}
-                <input v-model="draft.httpsEndpoint.host" required autocomplete="off" />
-              </label>
-              <label>
-                {{ t('port') }}
-                <input
-                  v-model.number="draft.httpsEndpoint.port"
-                  type="number"
-                  min="1"
-                  max="65535"
-                  required
-                />
-              </label>
-            </div>
-            <div class="auth-row">
-              <label>
-                {{ t('username') }}
-                <input
-                  v-model="draft.httpsEndpoint.username"
-                  autocomplete="off"
-                  spellcheck="false"
-                />
-              </label>
-              <PasswordInput v-model="draft.httpsEndpoint.password" :label="t('password')" />
-            </div>
-          </fieldset>
-          <small v-if="draft.useSameProxy">
-            {{ t('useHttpForAllDescription') }}
-          </small>
-        </section>
-
-        <details class="editor-section advanced">
-          <summary>{{ t('editorAdvanced') }}</summary>
-          <label>
-            {{ t('checkUrl') }}
-            <input v-model="draft.checkUrl" type="url" required />
-          </label>
-          <label>
-            {{ t('note') }}
-            <textarea v-model="draft.note" rows="3" maxlength="4096" />
-          </label>
-        </details>
+          </template>
+        </Tabs>
       </form>
       <template #footer>
         <button type="button" @click="closeEditor">

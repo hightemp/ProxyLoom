@@ -6,8 +6,14 @@ import { t } from '../../i18n/messages'
 import IconButton from './IconButton.vue'
 
 const props = withDefaults(
-  defineProps<{ open: boolean; title: string; size?: 'medium' | 'large' }>(),
-  { size: 'medium' },
+  defineProps<{
+    open: boolean
+    title: string
+    size?: 'medium' | 'large'
+    /** Keeps the height constant, e.g. so switching editor tabs does not make the dialog jump. */
+    fixedHeight?: boolean
+  }>(),
+  { fixedHeight: false, size: 'medium' },
 )
 const emit = defineEmits<{ close: [] }>()
 
@@ -39,7 +45,7 @@ const onKeydown = (event: KeyboardEvent): void => {
     v-if="open"
     ref="dialog"
     class="modal"
-    :class="size"
+    :class="[size, { 'fixed-height': fixedHeight }]"
     aria-modal="true"
     :aria-labelledby="titleId"
     @cancel.prevent="emit('close')"
@@ -73,6 +79,10 @@ const onKeydown = (event: KeyboardEvent): void => {
   color: var(--color-text);
   background: var(--color-surface);
   box-shadow: var(--shadow-lg);
+}
+
+.modal.fixed-height {
+  height: min(760px, calc(100vh - 48px));
 }
 
 .modal.large {

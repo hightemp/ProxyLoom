@@ -37,7 +37,7 @@ test('checks an inactive profile through that proxy, excludes the check from log
     await extensionPage.getByLabel('Name', { exact: true }).fill('Check proxy')
     await extensionPage.getByLabel('Host', { exact: true }).fill(proxy.host)
     await extensionPage.getByLabel('Port', { exact: true }).fill(String(proxy.port))
-    await extensionPage.locator('summary', { hasText: 'Advanced' }).click()
+    await extensionPage.getByRole('tab', { name: 'Advanced' }).click()
     await extensionPage.getByLabel('Check URL').fill(`${targetOrigin}/ip`)
     await extensionPage.getByRole('button', { name: 'Save profile' }).click()
 
@@ -128,7 +128,7 @@ test('cancels a hanging inactive-profile check and restores direct routing', asy
     await extensionPage.getByLabel('Name', { exact: true }).fill('Hanging proxy')
     await extensionPage.getByLabel('Host', { exact: true }).fill(proxy.host)
     await extensionPage.getByLabel('Port', { exact: true }).fill(String(proxy.port))
-    await extensionPage.locator('summary', { hasText: 'Advanced' }).click()
+    await extensionPage.getByRole('tab', { name: 'Advanced' }).click()
     await extensionPage.getByLabel('Check URL').fill(`${targetOrigin}/ip`)
     await extensionPage.getByRole('button', { name: 'Save profile' }).click()
 
@@ -168,7 +168,7 @@ test('recovers the committed route after the worker is interrupted during a chec
     await extensionPage.getByLabel('Name', { exact: true }).fill('Interrupted check')
     await extensionPage.getByLabel('Host', { exact: true }).fill(proxy.host)
     await extensionPage.getByLabel('Port', { exact: true }).fill(String(proxy.port))
-    await extensionPage.locator('summary', { hasText: 'Advanced' }).click()
+    await extensionPage.getByRole('tab', { name: 'Advanced' }).click()
     await extensionPage.getByLabel('Check URL').fill(`${targetOrigin}/ip`)
     await extensionPage.getByRole('button', { name: 'Save profile' }).click()
 

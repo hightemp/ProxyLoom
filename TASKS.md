@@ -1812,7 +1812,7 @@ rules`, compact check pill; `Use globally`/`Check` + «⋯» (Edit, Duplicate, C
   - **Тесты:** компонентные (debounce, switch, marker, spinner), E2E логов.
   - **Готово, когда:** unit/E2E/typecheck/lint/dual builds зелёные, version 0.1.25.
 
-- [ ] **PL-159 — Вкладки и замена всех `details`**
+- [x] **PL-159 — Вкладки и замена всех `details`**
   - **Цель:** редакторы правила и профиля на вкладках; остальные скрытые блоки — аккуратный
     раскрывающийся компонент или справка.
   - **Требования:** NFR-007–NFR-009.

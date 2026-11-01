@@ -2029,5 +2029,23 @@
   },
   "allPlatforms": {
     "message": "All platforms"
+  },
+  "tabRule": {
+    "message": "Rule"
+  },
+  "tabTest": {
+    "message": "Test"
+  },
+  "tabNotes": {
+    "message": "Notes"
+  },
+  "tabConnection": {
+    "message": "Connection"
+  },
+  "ruleEditorTabs": {
+    "message": "Rule editor sections"
+  },
+  "profileEditorTabs": {
+    "message": "Profile editor sections"
   }
 }

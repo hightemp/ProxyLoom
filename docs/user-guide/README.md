@@ -51,7 +51,7 @@ opens action, profile, enabled and compatibility filters. **⋯** also offers **
 minutes**, **15 minutes**, **1 hour** or **until browser restart**; the rule then shows
 `Disabled until …`, is skipped by routing and the tester, and keeps its Enabled switch. **Re-enable
 now** ends it early. Temporary disables last only for the browser session and are not exported. Select rules to enable, disable or
-delete them together. The editor opens in a centered dialog with Match, Route, Description and tester sections.
+delete them together. The editor opens in a centered dialog with **Rule**, **Test** (pattern tester) and **Notes** tabs.
 
 Rules have one global numeric priority. The first enabled, compatible, non-expired match wins.
 Rules are evaluated strictly in their displayed global order. Categories and hidden specificity

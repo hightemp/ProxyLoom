@@ -6,12 +6,14 @@ import {
   FlaskConical,
   GripVertical,
   Info,
+  NotebookText,
   Pencil,
   Play,
   Plus,
   Route,
   Search,
   SlidersHorizontal,
+  SquarePen,
   TimerOff,
   TimerReset,
   Trash2,
@@ -46,6 +48,7 @@ import { confirmController } from '../confirm/confirm-controller'
 import { createRegexWorker } from '../runtime/regex-worker-factory'
 import IconButton from '../components/IconButton.vue'
 import Modal from '../components/Modal.vue'
+import Tabs from '../components/Tabs.vue'
 import OverflowMenu from '../components/OverflowMenu.vue'
 import ProfileChip from '../components/ProfileChip.vue'
 
@@ -199,6 +202,12 @@ const temporaryDisableText = (rule: Rule): string | null => {
         new Date(until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       )
 }
+
+const ruleTabs = [
+  { icon: SquarePen, id: 'rule', label: t('tabRule') },
+  { icon: FlaskConical, id: 'test', label: t('tabTest') },
+  { icon: NotebookText, id: 'notes', label: t('tabNotes') },
+] as const
 
 const moreFiltersOpen = shallowRef(false)
 const expandedPatterns = shallowRef<ReadonlySet<string>>(new Set())
@@ -697,164 +706,171 @@ watch(() => props.busy, restoreFocus)
       :open="formOpen"
       :title="editingId === null ? t('addRule') : t('editRule')"
       size="large"
+      fixed-height
       @close="closeEditor"
     >
-      <form id="rule-form" class="rule-editor" @submit.prevent="void save()">
-        <section class="editor-section">
-          <div class="name-row">
-            <label>
-              {{ t('name') }}
-              <input ref="editorNameInput" v-model="draft.name" maxlength="256" required />
-            </label>
-            <label class="switch">
-              <input v-model="draft.enabled" type="checkbox" role="switch" />
-              {{ t('enabled') }}
-            </label>
-          </div>
-        </section>
+      <form id="rule-form" @submit.prevent="void save()">
+        <Tabs :label="t('ruleEditorTabs')" :tabs="ruleTabs">
+          <template #rule>
+            <div class="rule-editor">
+              <section class="editor-section">
+                <div class="name-row">
+                  <label>
+                    {{ t('name') }}
+                    <input ref="editorNameInput" v-model="draft.name" maxlength="256" required />
+                  </label>
+                  <label class="switch">
+                    <input v-model="draft.enabled" type="checkbox" role="switch" />
+                    {{ t('enabled') }}
+                  </label>
+                </div>
+              </section>
 
-        <section class="editor-section">
-          <h3>{{ t('editorMatch') }}</h3>
-          <div class="match-row">
-            <label>
-              {{ t('matcherTarget') }}
-              <select v-model="draft.matcherType">
-                <option value="ORIGIN">{{ t('originPortable') }}</option>
-                <option value="FULL_URL">{{ t('fullUrlFirefoxOnly') }}</option>
-              </select>
-            </label>
-            <label>
-              {{ t('flags') }}
-              <input v-model="draft.flags" maxlength="2" pattern="[im]*" />
-            </label>
-          </div>
-          <label>
-            {{ t('regularExpression') }}
-            <textarea
-              v-model="draft.pattern"
-              class="pattern-input"
-              rows="3"
-              maxlength="2048"
-              spellcheck="false"
-              required
-            />
-          </label>
-          <p class="notice">
-            <Info :size="16" aria-hidden="true" />
-            {{ t('regexGuidance') }}
-          </p>
-          <div class="template-box">
-            <label>
-              {{ t('template') }}
-              <select v-model="templateId" :aria-label="t('template')">
-                <option value="EXACT_HOSTNAME">{{ t('exactHostname') }}</option>
-                <option value="DOMAIN_AND_SUBDOMAINS">{{ t('domainSubdomains') }}</option>
-                <option value="DOMAIN_SUFFIXES">{{ t('domainSuffixes') }}</option>
-                <option value="RUSSIAN_DOMAINS">{{ t('russianSitesExample') }}</option>
-                <option value="SOCIAL_NETWORKS">{{ t('socialNetworksExample') }}</option>
-                <option value="EXACT_ORIGIN">{{ t('exactOrigin') }}</option>
-                <option value="HTTP_ONLY">{{ t('httpOnly') }}</option>
-                <option value="HTTPS_ONLY">{{ t('httpsOnly') }}</option>
-                <option value="CUSTOM_PORT">{{ t('customPort') }}</option>
-                <option value="LOCALHOST">{{ t('localhost') }}</option>
-                <option value="PRIVATE_IPV4">{{ t('privateIpv4') }}</option>
-                <option value="FIREFOX_URL_PATH">{{ t('firefoxUrlPath') }}</option>
-                <option value="FIREFOX_QUERY_PARAMETER">{{ t('firefoxQueryParameter') }}</option>
-              </select>
-            </label>
-            <label
-              v-if="
-                templateId !== 'DOMAIN_SUFFIXES' &&
-                templateId !== 'RUSSIAN_DOMAINS' &&
-                templateId !== 'SOCIAL_NETWORKS'
-              "
-            >
-              {{ t('templateHostname') }}
-              <input v-model="templateHost" />
-            </label>
-            <label v-else-if="templateId === 'DOMAIN_SUFFIXES'">
-              {{ t('domainSuffixes') }}
-              <textarea
-                v-model="templateDomainSuffixes"
-                rows="2"
-                :placeholder="t('domainSuffixesPlaceholder')"
-              />
-            </label>
-            <button type="button" @click="applyTemplate">
-              <WandSparkles :size="16" aria-hidden="true" />
-              {{ t('generateEditablePattern') }}
-            </button>
-          </div>
-        </section>
+              <section class="editor-section">
+                <h3>{{ t('editorMatch') }}</h3>
+                <div class="match-row">
+                  <label>
+                    {{ t('matcherTarget') }}
+                    <select v-model="draft.matcherType">
+                      <option value="ORIGIN">{{ t('originPortable') }}</option>
+                      <option value="FULL_URL">{{ t('fullUrlFirefoxOnly') }}</option>
+                    </select>
+                  </label>
+                  <label>
+                    {{ t('flags') }}
+                    <input v-model="draft.flags" maxlength="2" pattern="[im]*" />
+                  </label>
+                </div>
+                <label>
+                  {{ t('regularExpression') }}
+                  <textarea
+                    v-model="draft.pattern"
+                    class="pattern-input"
+                    rows="3"
+                    maxlength="2048"
+                    spellcheck="false"
+                    required
+                  />
+                </label>
+                <p class="notice">
+                  <Info :size="16" aria-hidden="true" />
+                  {{ t('regexGuidance') }}
+                </p>
+                <div class="template-box">
+                  <label>
+                    {{ t('template') }}
+                    <select v-model="templateId" :aria-label="t('template')">
+                      <option value="EXACT_HOSTNAME">{{ t('exactHostname') }}</option>
+                      <option value="DOMAIN_AND_SUBDOMAINS">{{ t('domainSubdomains') }}</option>
+                      <option value="DOMAIN_SUFFIXES">{{ t('domainSuffixes') }}</option>
+                      <option value="RUSSIAN_DOMAINS">{{ t('russianSitesExample') }}</option>
+                      <option value="SOCIAL_NETWORKS">{{ t('socialNetworksExample') }}</option>
+                      <option value="EXACT_ORIGIN">{{ t('exactOrigin') }}</option>
+                      <option value="HTTP_ONLY">{{ t('httpOnly') }}</option>
+                      <option value="HTTPS_ONLY">{{ t('httpsOnly') }}</option>
+                      <option value="CUSTOM_PORT">{{ t('customPort') }}</option>
+                      <option value="LOCALHOST">{{ t('localhost') }}</option>
+                      <option value="PRIVATE_IPV4">{{ t('privateIpv4') }}</option>
+                      <option value="FIREFOX_URL_PATH">{{ t('firefoxUrlPath') }}</option>
+                      <option value="FIREFOX_QUERY_PARAMETER">
+                        {{ t('firefoxQueryParameter') }}
+                      </option>
+                    </select>
+                  </label>
+                  <label
+                    v-if="
+                      templateId !== 'DOMAIN_SUFFIXES' &&
+                      templateId !== 'RUSSIAN_DOMAINS' &&
+                      templateId !== 'SOCIAL_NETWORKS'
+                    "
+                  >
+                    {{ t('templateHostname') }}
+                    <input v-model="templateHost" />
+                  </label>
+                  <label v-else-if="templateId === 'DOMAIN_SUFFIXES'">
+                    {{ t('domainSuffixes') }}
+                    <textarea
+                      v-model="templateDomainSuffixes"
+                      rows="2"
+                      :placeholder="t('domainSuffixesPlaceholder')"
+                    />
+                  </label>
+                  <button type="button" @click="applyTemplate">
+                    <WandSparkles :size="16" aria-hidden="true" />
+                    {{ t('generateEditablePattern') }}
+                  </button>
+                </div>
+              </section>
 
-        <section class="editor-section">
-          <h3>{{ t('editorRoute') }}</h3>
-          <label>
-            {{ t('routeVia') }}
-            <select v-model="draft.routeTarget" required>
-              <option value="" disabled>{{ t('selectRoute') }}</option>
-              <option value="DIRECT">{{ t('directConnection') }}</option>
-              <option v-if="routeSelectionMissing" :value="draft.routeTarget" disabled>
-                {{ t('missingProxyRoute') }}
-              </option>
-              <option
-                v-for="profile in state.config.profiles"
-                :key="profile.id"
-                :value="profileRouteTarget(profile.id)"
-              >
-                {{ t('proxyRouteOption', profile.name) }}
-              </option>
-            </select>
-          </label>
-          <p v-if="routeSelectionMissing" class="notice danger" role="alert">
-            {{ t('chooseAvailableRoute') }}
-          </p>
-        </section>
-
-        <details class="editor-section advanced">
-          <summary>{{ t('description') }}</summary>
-          <label>
-            <span class="sr-only">{{ t('description') }}</span>
-            <textarea v-model="draft.description" rows="2" maxlength="4096" />
-          </label>
-        </details>
-
-        <details class="tester-panel">
-          <summary>{{ t('singleMultipleTester') }}</summary>
-          <p class="muted">
-            {{ t('testerPrivacyDescription') }}
-          </p>
-          <label>
-            {{ t('urlsOnePerLine') }}
-            <textarea v-model="testLines" rows="4" />
-          </label>
-          <div class="button-row">
-            <button type="button" @click="runRegexTest">
-              <FlaskConical :size="16" aria-hidden="true" />
-              {{ t('testPattern') }}
-            </button>
-            <button type="button" class="ghost" @click="tester.cancel()">
-              {{ t('cancel') }}
-            </button>
-            <span class="muted" aria-live="polite">
-              {{ testerStatus }}
-            </span>
-          </div>
-          <ul class="test-results">
-            <li v-for="row in testRows" :key="row.input">
-              <strong>
-                {{
-                  row.errorCode === null
-                    ? row.matched
-                      ? t('match')
-                      : t('noMatch')
-                    : errorText({ code: row.errorCode })
-                }}
-              </strong>
-              <code>{{ row.normalizedTarget ?? row.input }}</code>
-            </li>
-          </ul>
-        </details>
+              <section class="editor-section">
+                <h3>{{ t('editorRoute') }}</h3>
+                <label>
+                  {{ t('routeVia') }}
+                  <select v-model="draft.routeTarget" required>
+                    <option value="" disabled>{{ t('selectRoute') }}</option>
+                    <option value="DIRECT">{{ t('directConnection') }}</option>
+                    <option v-if="routeSelectionMissing" :value="draft.routeTarget" disabled>
+                      {{ t('missingProxyRoute') }}
+                    </option>
+                    <option
+                      v-for="profile in state.config.profiles"
+                      :key="profile.id"
+                      :value="profileRouteTarget(profile.id)"
+                    >
+                      {{ t('proxyRouteOption', profile.name) }}
+                    </option>
+                  </select>
+                </label>
+                <p v-if="routeSelectionMissing" class="notice danger" role="alert">
+                  {{ t('chooseAvailableRoute') }}
+                </p>
+              </section>
+            </div>
+          </template>
+          <template #test>
+            <div class="stack">
+              <p class="muted">
+                {{ t('testerPrivacyDescription') }}
+              </p>
+              <label>
+                {{ t('urlsOnePerLine') }}
+                <textarea v-model="testLines" rows="4" />
+              </label>
+              <div class="button-row">
+                <button type="button" @click="runRegexTest">
+                  <FlaskConical :size="16" aria-hidden="true" />
+                  {{ t('testPattern') }}
+                </button>
+                <button type="button" class="ghost" @click="tester.cancel()">
+                  {{ t('cancel') }}
+                </button>
+                <span class="muted" aria-live="polite">
+                  {{ testerStatus }}
+                </span>
+              </div>
+              <ul class="test-results">
+                <li v-for="row in testRows" :key="row.input">
+                  <strong>
+                    {{
+                      row.errorCode === null
+                        ? row.matched
+                          ? t('match')
+                          : t('noMatch')
+                        : errorText({ code: row.errorCode })
+                    }}
+                  </strong>
+                  <code>{{ row.normalizedTarget ?? row.input }}</code>
+                </li>
+              </ul>
+            </div>
+          </template>
+          <template #notes>
+            <label>
+              {{ t('description') }}
+              <textarea v-model="draft.description" rows="6" maxlength="4096" />
+            </label>
+          </template>
+        </Tabs>
       </form>
       <template #footer>
         <button type="button" @click="closeEditor">

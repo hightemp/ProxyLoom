@@ -12,6 +12,7 @@ import type { ProxyTransport } from '../../domain/types/entities'
 import { t } from '../../i18n/messages'
 import { errorText, importStatusLabel, proxyStringErrorLabel } from '../labels'
 import { runtimeClient } from '../runtime/client'
+import Disclosure from '../components/Disclosure.vue'
 import FileInput from '../components/FileInput.vue'
 
 const props = defineProps<{
@@ -219,14 +220,13 @@ const runImport = async (): Promise<void> => {
       </button>
     </div>
 
-    <details>
-      <summary>{{ t('supportedFormats') }}</summary>
+    <Disclosure :title="t('supportedFormats')">
       <ul class="format-list">
         <li v-for="example in FORMAT_EXAMPLES" :key="example">
           <code>{{ example }}</code>
         </li>
       </ul>
-    </details>
+    </Disclosure>
   </section>
 </template>
 
@@ -248,7 +248,7 @@ textarea {
 .format-list {
   display: grid;
   gap: 4px;
-  margin: 8px 0 0;
+  margin: 0;
   padding-left: 18px;
 }
 </style>

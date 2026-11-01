@@ -134,7 +134,7 @@ test('runs local pattern and global routing testers and supports duplicate, disa
   await extensionPage.getByLabel('Regular expression').fill('^https://example\\.com/$')
   await extensionPage.getByLabel('Route via').selectOption('DIRECT')
 
-  await extensionPage.getByText('Single and multiple URL tester').click()
+  await extensionPage.getByRole('tab', { name: 'Test' }).click()
   await extensionPage
     .getByLabel('URLs, one per line')
     .fill('https://example.com/\nhttps://other.example/')
