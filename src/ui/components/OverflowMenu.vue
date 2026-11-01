@@ -1,8 +1,6 @@
 <script setup lang="ts">
+import { MoreHorizontal } from '@lucide/vue'
 import { nextTick, onBeforeUnmount, shallowRef } from 'vue'
-
-/** Decorative glyph; the button is named by aria-label. */
-const MENU_GLYPH = '⋯'
 
 defineProps<{ label: string }>()
 
@@ -69,14 +67,14 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onDocumentPoin
   <span class="overflow-menu">
     <button
       ref="trigger"
-      class="overflow-trigger"
+      class="overflow-trigger ghost icon-button"
       type="button"
       aria-haspopup="menu"
       :aria-expanded="open ? 'true' : 'false'"
       :aria-label="label"
       @click="void toggle()"
     >
-      <span aria-hidden="true">{{ MENU_GLYPH }}</span>
+      <MoreHorizontal :size="16" aria-hidden="true" />
     </button>
     <div
       v-if="open"
@@ -96,12 +94,6 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onDocumentPoin
 .overflow-menu {
   position: relative;
   display: inline-block;
-}
-
-.overflow-trigger {
-  min-width: 36px;
-  font-size: 18px;
-  line-height: 1;
 }
 
 .overflow-items {

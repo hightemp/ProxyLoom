@@ -51,7 +51,7 @@ test('persists explicit dark theme across options, popup, and error surfaces', a
         getComputedStyle(document.documentElement).getPropertyValue('--color-bg').trim(),
       ),
     )
-    .toBe('#111522')
+    .toBe('#0f1218')
   await extensionPage.emulateMedia({ colorScheme: 'light' })
   await expect
     .poll(() =>
@@ -59,7 +59,7 @@ test('persists explicit dark theme across options, popup, and error surfaces', a
         getComputedStyle(document.documentElement).getPropertyValue('--color-bg').trim(),
       ),
     )
-    .toBe('#f5f7fb')
+    .toBe('#f5f6f8')
 })
 
 test('shows honest browser-owned Chromium incognito status and help', async ({ extensionPage }) => {

@@ -1907,5 +1907,17 @@
         "content": "$1"
       }
     }
+  },
+  "chooseFile": {
+    "message": "Choose file"
+  },
+  "dropFileHint": {
+    "message": "Drop a file here or choose one"
+  },
+  "showPassword": {
+    "message": "Show password"
+  },
+  "hidePassword": {
+    "message": "Hide password"
   }
 }

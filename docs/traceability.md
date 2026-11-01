@@ -68,6 +68,8 @@ complete acceptance evidence exists.
 | PL-150        | A      | Rule bulk unit tests, rule row/filter/drawer component tests and Chromium E2E incl. drag/keyboard order and bulk disable          | None beyond aggregate release gates                                |
 | PL-151        | A      | about:blank completion regression unit test and repeated full Chromium E2E runs without proxy-check failures                      | None beyond aggregate release gates                                |
 | PL-152        | A      | Disable service/overlay unit tests, resolver/PAC skip and expiry parity, rule-row UI tests and Chromium disable/re-enable E2E     | Firefox behaviour in PL-122 matrix                                 |
+| PL-153        | A      | Design-token contrast E2E in both themes and IconButton/Modal/FileInput/PasswordInput component tests                             | None beyond aggregate release gates                                |
+| PL-154…PL-157 | P      | Planned UI rework; no implementation evidence yet                                                                                 | Full task acceptance                                               |
 
 ## Product requirement evidence
 

@@ -1,9 +1,7 @@
 <script setup lang="ts">
+import { X } from '@lucide/vue'
 import { t } from '../../i18n/messages'
 import { toastController, type ToastController } from '../toast/toast-controller'
-
-/** Decorative glyph; the button is named by aria-label. */
-const CLOSE_GLYPH = '×'
 
 withDefaults(defineProps<{ controller?: ToastController }>(), {
   controller: () => toastController,
@@ -26,7 +24,7 @@ withDefaults(defineProps<{ controller?: ToastController }>(), {
         :aria-label="t('dismissMessage')"
         @click="controller.dismiss()"
       >
-        <span aria-hidden="true">{{ CLOSE_GLYPH }}</span>
+        <X :size="14" aria-hidden="true" />
       </button>
     </div>
   </div>

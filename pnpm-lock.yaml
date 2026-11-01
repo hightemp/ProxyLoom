@@ -16,6 +16,9 @@ importers:
 
   .:
     dependencies:
+      '@lucide/vue':
+        specifier: 1.57.0
+        version: 1.57.0(vue@3.5.40(typescript@5.9.3))
       idb:
         specifier: 8.0.3
         version: 8.0.3
@@ -730,6 +733,11 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@lucide/vue@1.57.0':
+    resolution: {integrity: sha512-l/D9mr+8Wb8uHl2vzHfcGVRkunJnq0NDmv8HFwXAL3UiYYxuNpDSd1uaCVqeR8+I1XY70dWA+R5W/pSpXWilMw==}
+    peerDependencies:
+      vue: '>=3.0.1'
 
   '@mdn/browser-compat-data@8.0.4':
     resolution: {integrity: sha512-up6DsNsaPt3jq5d2TGx4UOXIqBKU0D86dxWwcVmmOOEYqP1rFaV1XcAcwHxMvb6bbtMfY5JpjUCszzy/aVc4yA==}
@@ -3892,6 +3900,10 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@lucide/vue@1.57.0(vue@3.5.40(typescript@5.9.3))':
+    dependencies:
+      vue: 3.5.40(typescript@5.9.3)
 
   '@mdn/browser-compat-data@8.0.4': {}
 
