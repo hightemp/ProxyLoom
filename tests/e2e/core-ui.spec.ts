@@ -153,7 +153,7 @@ test('runs local pattern and global routing testers and supports duplicate, disa
   await extensionPage.getByRole('button', { name: /Rules/ }).click()
   await extensionPage.getByLabel('URL', { exact: true }).fill('https://example.com/')
   await extensionPage.getByRole('button', { name: 'Resolve route' }).click()
-  await expect(extensionPage.locator('.route-result')).toContainText('DIRECT · RULE')
+  await expect(extensionPage.locator('.route-result')).toContainText('Direct · Rule')
 
   const copy = extensionPage.getByRole('listitem').filter({ hasText: 'Tester route copy' }).first()
   await copy.getByRole('button', { name: 'Delete' }).click()
@@ -203,7 +203,7 @@ test('duplicates a profile and safely invalidates referring routes when deleting
   await extensionPage.getByRole('button', { name: /Rules/ }).click()
   await expect(
     extensionPage.getByRole('listitem').filter({ hasText: 'Referring route' }),
-  ).toContainText('INVALID REFERENCE')
+  ).toContainText('Invalid proxy reference')
   await extensionPage
     .getByRole('listitem')
     .filter({ hasText: 'Referring route' })
@@ -265,10 +265,10 @@ test('assigns domain suffix rules to different proxy profiles and persists the r
   await extensionPage.getByRole('button', { name: /Rules/ }).click()
   await extensionPage.getByLabel('URL', { exact: true }).fill('https://example.ru/')
   await extensionPage.getByRole('button', { name: 'Resolve route' }).click()
-  await expect(extensionPage.locator('.route-result')).toContainText('PROXY · RULE · Proxy 1')
+  await expect(extensionPage.locator('.route-result')).toContainText('Proxy · Rule · Proxy 1')
   await extensionPage.getByLabel('URL', { exact: true }).fill('https://example.de/')
   await extensionPage.getByRole('button', { name: 'Resolve route' }).click()
-  await expect(extensionPage.locator('.route-result')).toContainText('PROXY · RULE · Proxy 2')
+  await expect(extensionPage.locator('.route-result')).toContainText('Proxy · Rule · Proxy 2')
 
   await extensionPage.reload()
   await extensionPage.getByRole('button', { name: /Rules/ }).click()
@@ -367,7 +367,7 @@ test('creates Once and Always routes from the real action popup and opens the ma
   await popup.getByRole('button', { name: 'RULES' }).click()
   await popup.getByRole('button', { name: 'Once' }).click()
   await acceptConfirm(popup)
-  await expect(popup.locator('.current-site small')).toContainText('DIRECT · OVERRIDE')
+  await expect(popup.locator('.current-site small')).toContainText('Direct · Once override')
 
   const sessionState = await extensionPage.evaluate(async () => {
     const extensionApi = (
@@ -403,7 +403,7 @@ test('creates Once and Always routes from the real action popup and opens the ma
   popup = await openPopup()
   await popup.getByRole('button', { name: 'Always (create rule)' }).click()
   await acceptConfirm(popup)
-  await expect(popup.locator('.current-site small')).toContainText('DIRECT · RULE')
+  await expect(popup.locator('.current-site small')).toContainText('Direct · Rule')
   await expect(popup.getByRole('button', { name: 'Edit matched rule' })).toBeVisible()
 
   const settingsPromise = extensionContext.waitForEvent('page')

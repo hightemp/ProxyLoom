@@ -6,6 +6,7 @@ import type { AppRuntimeState, RuntimeRequest } from '../../src/application/runt
 import type { LogQuery } from '../../src/application/logging/log-types'
 import { t } from '../../src/i18n/messages'
 import ConfirmDialog from '../../src/ui/components/ConfirmDialog.vue'
+import { errorText, modeLabel } from '../../src/ui/labels'
 import AppearanceSection from '../../src/ui/options/AppearanceSection.vue'
 import DiagnosticsSection from '../../src/ui/options/DiagnosticsSection.vue'
 import GeneralSection from '../../src/ui/options/GeneralSection.vue'
@@ -63,7 +64,7 @@ const load = async (logQuery?: LogQuery): Promise<void> => {
   const result = await runtimeClient.getState(logQuery)
   loading.value = false
   if (!result.ok) {
-    setStatus(`${result.error.code}: ${result.error.message}`, true)
+    setStatus(errorText(result.error), true)
     return
   }
   state.value = result.value
@@ -76,7 +77,7 @@ const execute = async (request: RuntimeRequest): Promise<void> => {
   const result = await runtimeClient.command<unknown>(request)
   busy.value = false
   if (!result.ok) {
-    setStatus(`${result.error.code}: ${result.error.message}`, true)
+    setStatus(errorText(result.error), true)
     return
   }
   if (
@@ -155,7 +156,7 @@ onBeforeUnmount(() => {
           }}
         </span>
         <span>
-          <strong>{{ state.config.general.mode }}</strong>
+          <strong>{{ modeLabel(state.config.general.mode) }}</strong>
           <small>{{ t('revision') }} {{ state.config.revision }}</small>
         </span>
       </div>

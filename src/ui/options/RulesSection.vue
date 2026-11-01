@@ -15,6 +15,13 @@ import {
 } from '../../domain/rules/templates'
 import type { MatcherType, Rule } from '../../domain/types/entities'
 import { t } from '../../i18n/messages'
+import {
+  decisionActionLabel,
+  decisionSourceLabel,
+  errorText,
+  ruleTraceStatusLabel,
+  ruleValidityLabel,
+} from '../labels'
 import { confirmController } from '../confirm/confirm-controller'
 import { createRegexWorker } from '../runtime/regex-worker-factory'
 
@@ -249,13 +256,9 @@ const applyTemplate = (): void => {
       testLines.value = preset.testUrls.join('\n')
     }
     testerStatus.value = t('templateApplied')
-  } catch (error) {
+  } catch {
     testerStatus.value =
-      templateId.value === 'DOMAIN_SUFFIXES'
-        ? t('invalidDomainSuffixes')
-        : error instanceof Error
-          ? error.message
-          : String(error)
+      templateId.value === 'DOMAIN_SUFFIXES' ? t('invalidDomainSuffixes') : t('templateInvalid')
   }
 }
 
@@ -268,7 +271,7 @@ const runRegexTest = async (): Promise<void> => {
     pattern: draft.pattern,
   })
   if (!result.ok) {
-    testerStatus.value = result.error.code.replaceAll('_', ' ')
+    testerStatus.value = errorText(result.error)
     testRows.value = []
     return
   }
@@ -410,7 +413,7 @@ watch(() => props.busy, restoreFocus)
               {{ t('firefoxOnly') }}
             </span>
             <span v-if="rule.validity !== 'VALID'" class="status-pill danger">
-              {{ rule.validity.replaceAll('_', ' ') }}
+              {{ ruleValidityLabel(rule.validity) }}
             </span>
           </div>
           <code>{{ rule.pattern }}</code>
@@ -593,7 +596,13 @@ watch(() => props.busy, restoreFocus)
         <ul class="test-results">
           <li v-for="row in testRows" :key="row.input">
             <strong>
-              {{ row.errorCode ?? (row.matched ? t('match') : t('noMatch')) }}
+              {{
+                row.errorCode === null
+                  ? row.matched
+                    ? t('match')
+                    : t('noMatch')
+                  : errorText({ code: row.errorCode })
+              }}
             </strong>
             <code>{{ row.normalizedTarget ?? row.input }}</code>
           </li>
@@ -628,13 +637,14 @@ watch(() => props.busy, restoreFocus)
       </div>
       <div v-if="routingResult" class="route-result">
         <strong>
-          {{ routingResult.action }} · {{ routingResult.source }}
+          {{ decisionActionLabel(routingResult.action) }} ·
+          {{ decisionSourceLabel(routingResult.source) }}
           {{ routingResult.profileName ? `· ${routingResult.profileName}` : '' }}
         </strong>
         <code>{{ routingResult.normalizedTarget }}</code>
         <ol>
           <li v-for="row in routingResult.trace" :key="row.ruleId">
-            {{ row.ruleName }} — {{ row.status.replaceAll('_', ' ') }}
+            {{ row.ruleName }} — {{ ruleTraceStatusLabel(row.status) }}
           </li>
         </ol>
       </div>

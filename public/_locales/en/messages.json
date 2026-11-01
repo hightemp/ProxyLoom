@@ -1105,5 +1105,223 @@
   },
   "create": {
     "message": "Create"
+  },
+  "decisionDirect": {
+    "message": "Direct"
+  },
+  "decisionProxy": {
+    "message": "Proxy"
+  },
+  "decisionConfigError": {
+    "message": "Configuration error"
+  },
+  "sourceMode": {
+    "message": "Global mode"
+  },
+  "sourceOverride": {
+    "message": "Once override"
+  },
+  "sourceRule": {
+    "message": "Rule"
+  },
+  "sourceFallback": {
+    "message": "No rule matched"
+  },
+  "reasonNoActiveTab": {
+    "message": "No active tab"
+  },
+  "reasonUnsupportedUrl": {
+    "message": "This page cannot be routed by extensions"
+  },
+  "controlThisExtension": {
+    "message": "Controlled by this extension"
+  },
+  "controlControllable": {
+    "message": "Available to this extension"
+  },
+  "controlOtherExtension": {
+    "message": "Controlled by another extension"
+  },
+  "controlPolicy": {
+    "message": "Controlled by browser policy"
+  },
+  "controlNotControllable": {
+    "message": "Proxy settings cannot be changed"
+  },
+  "validityValid": {
+    "message": "Valid"
+  },
+  "validityInvalidReference": {
+    "message": "Invalid proxy reference"
+  },
+  "validityInvalidPattern": {
+    "message": "Invalid pattern"
+  },
+  "traceMatched": {
+    "message": "Matched"
+  },
+  "traceNoMatch": {
+    "message": "No match"
+  },
+  "traceDisabled": {
+    "message": "Disabled"
+  },
+  "traceTemporarilyDisabled": {
+    "message": "Temporarily disabled"
+  },
+  "traceIncompatible": {
+    "message": "Not supported in this browser"
+  },
+  "traceInvalidPattern": {
+    "message": "Invalid pattern"
+  },
+  "requestMainFrame": {
+    "message": "Page"
+  },
+  "requestSubFrame": {
+    "message": "Frame"
+  },
+  "requestXhr": {
+    "message": "Fetch/XHR"
+  },
+  "requestWebSocket": {
+    "message": "WebSocket"
+  },
+  "requestDownload": {
+    "message": "Download"
+  },
+  "requestOther": {
+    "message": "Other"
+  },
+  "proxyInfoDirect": {
+    "message": "Direct"
+  },
+  "proxyInfoHttp": {
+    "message": "HTTP"
+  },
+  "proxyInfoHttps": {
+    "message": "HTTPS"
+  },
+  "proxyInfoSocks": {
+    "message": "SOCKS"
+  },
+  "proxyInfoUnknown": {
+    "message": "Unknown"
+  },
+  "skipMalformedEntry": {
+    "message": "Malformed entry"
+  },
+  "skipUnsupportedSocks": {
+    "message": "SOCKS is not supported"
+  },
+  "skipUnsupportedPac": {
+    "message": "PAC is not supported"
+  },
+  "skipDirectEntry": {
+    "message": "Direct entry"
+  },
+  "skipInvalidHost": {
+    "message": "Invalid host"
+  },
+  "skipInvalidPort": {
+    "message": "Invalid port"
+  },
+  "skipOther": {
+    "message": "Not supported"
+  },
+  "errorActiveProfileRequired": {
+    "message": "Choose a global proxy profile before switching to PROXY."
+  },
+  "errorProfileNotFound": {
+    "message": "The proxy profile no longer exists."
+  },
+  "errorRuleNotFound": {
+    "message": "The rule no longer exists."
+  },
+  "errorInvalidUrl": {
+    "message": "Enter a valid http, https, ws, or wss URL."
+  },
+  "errorNoActiveTab": {
+    "message": "There is no active tab to act on."
+  },
+  "errorDomainScopeUnavailable": {
+    "message": "Domain and subdomains is not available for this host. Use the exact hostname."
+  },
+  "errorPatternInvalid": {
+    "message": "The pattern is not a valid supported regular expression."
+  },
+  "errorProfileInvalid": {
+    "message": "The proxy profile has invalid fields."
+  },
+  "errorRuleInvalid": {
+    "message": "The rule has invalid fields."
+  },
+  "errorNotControllable": {
+    "message": "Another extension or a browser policy controls proxy settings."
+  },
+  "errorCheckAlreadyRunning": {
+    "message": "A proxy check is already running."
+  },
+  "errorInputTooLarge": {
+    "message": "The input is too large."
+  },
+  "errorUnsupportedFormat": {
+    "message": "The file format is not supported."
+  },
+  "errorInvalidConfig": {
+    "message": "The configuration is invalid."
+  },
+  "errorFilteredReorder": {
+    "message": "Clear filters to reorder rules."
+  },
+  "errorTimeBudgetExceeded": {
+    "message": "The test took too long and was stopped."
+  },
+  "errorGeneric": {
+    "message": "The action could not be completed (code $CODE$).",
+    "placeholders": {
+      "code": {
+        "content": "$1"
+      }
+    }
+  },
+  "templateInvalid": {
+    "message": "The template could not be generated from these values."
+  },
+  "errorAlreadyRunning": {
+    "message": "A test is already running."
+  },
+  "errorCancelled": {
+    "message": "Cancelled."
+  },
+  "errorWorkerFailed": {
+    "message": "The background tester stopped unexpectedly. Try again."
+  },
+  "checkInvalidEndpoint": {
+    "message": "Invalid check URL"
+  },
+  "checkTimeout": {
+    "message": "Timed out"
+  },
+  "checkNetworkError": {
+    "message": "Network error"
+  },
+  "checkHttpError": {
+    "message": "HTTP error"
+  },
+  "checkResponseTooLarge": {
+    "message": "Response too large"
+  },
+  "checkMalformedResponse": {
+    "message": "Unreadable response"
+  },
+  "checkInvalidIp": {
+    "message": "Invalid IP in response"
+  },
+  "checkInvalidCountry": {
+    "message": "Invalid country in response"
+  },
+  "checkFailed": {
+    "message": "Check failed"
   }
 }

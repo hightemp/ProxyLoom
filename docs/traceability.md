@@ -50,7 +50,8 @@ complete acceptance evidence exists.
 | PL-131        | B      | Lifecycle/frame filter unit matrix plus existing Chromium active-navigation fail-closed Retry regression                          | Yandex 26 Google-search prerender manual regression                |
 | PL-132        | A      | Safe-origin context and disabled-coordinator unit coverage plus Chromium options/error-page E2E                                   | None beyond aggregate release gates                                |
 | PL-133        | A      | ConfirmDialog/controller and call-site component tests, lint ban on browser dialogs, full Chromium E2E with in-page confirms      | None beyond aggregate release gates                                |
-| PL-134…PL-145 | P      | Planned in `docs/IMPROVEMENT_PLAN.md`; no implementation evidence yet                                                             | Full task acceptance                                               |
+| PL-134        | A      | Exhaustive typed label maps, catalog-backed unit tests, source scan for raw enums/errors and full Chromium E2E                    | None beyond aggregate release gates                                |
+| PL-135…PL-145 | P      | Planned in `docs/IMPROVEMENT_PLAN.md`; no implementation evidence yet                                                             | Full task acceptance                                               |
 | PL-146        | A      | Brand asset unit test, Chromium-rendered icons, dual build manifest validation and accessibility/foundation E2E                   | Visual toolbar check on signed packages in release matrices        |
 | PL-147…PL-150 | P      | Planned in `docs/IMPROVEMENT_PLAN.md`; no implementation evidence yet                                                             | Full task acceptance                                               |
 

@@ -7,6 +7,7 @@ import type {
   NativeImportPreviewView,
 } from '../../application/runtime/contracts'
 import { t } from '../../i18n/messages'
+import { errorText, foxyProxySkipLabel } from '../labels'
 import { confirmController } from '../confirm/confirm-controller'
 import { runtimeClient } from '../runtime/client'
 
@@ -56,7 +57,7 @@ const downloadExport = async (): Promise<void> => {
   const result = await runtimeClient.exportNative(includeCredentials.value)
   working.value = false
   if (!result.ok) {
-    emit('status', result.error.message, true)
+    emit('status', errorText(result.error), true)
     return
   }
   const blob = new Blob([result.value.text], { type: 'application/json' })
@@ -75,7 +76,7 @@ const previewNative = async (): Promise<void> => {
   working.value = false
   if (!result.ok) {
     nativePreview.value = null
-    emit('status', `${result.error.code}: ${result.error.message}`, true)
+    emit('status', errorText(result.error), true)
     return
   }
   nativePreview.value = result.value
@@ -101,7 +102,7 @@ const applyNative = async (): Promise<void> => {
   )
   working.value = false
   if (!result.ok) {
-    emit('status', `${result.error.code}: ${result.error.message}`, true)
+    emit('status', errorText(result.error), true)
     return
   }
   emit('status', t('nativeImportCommitted'))
@@ -114,7 +115,7 @@ const previewFoxy = async (): Promise<void> => {
   working.value = false
   if (!result.ok) {
     foxyPreview.value = null
-    emit('status', `${result.error.code}: ${result.error.message}`, true)
+    emit('status', errorText(result.error), true)
     return
   }
   foxyPreview.value = result.value
@@ -133,7 +134,7 @@ const applyFoxy = async (): Promise<void> => {
   const result = await runtimeClient.applyFoxyProxyImport(foxyText.value, [...selectedFoxy.value])
   working.value = false
   if (!result.ok) {
-    emit('status', `${result.error.code}: ${result.error.message}`, true)
+    emit('status', errorText(result.error), true)
     return
   }
   emit('status', t('foxyProxyProfilesImported'))
@@ -253,7 +254,7 @@ const applyFoxy = async (): Promise<void> => {
         <ul v-if="foxyPreview.skipped.length > 0">
           <li v-for="entry in foxyPreview.skipped" :key="entry.sourceIndex">
             {{ t('skipped') }} {{ entry.title || `${t('entry')} ${entry.sourceIndex + 1}` }}:
-            {{ entry.reason.replaceAll('_', ' ') }}
+            {{ foxyProxySkipLabel(entry.reason) }}
           </li>
         </ul>
         <button

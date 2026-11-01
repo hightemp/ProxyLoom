@@ -4,6 +4,7 @@ import { shallowRef } from 'vue'
 import type { AppRuntimeState, RuntimeRequest } from '../../application/runtime/contracts'
 import type { LogQuery } from '../../application/logging/log-types'
 import { t } from '../../i18n/messages'
+import { decisionActionLabel, proxyInfoTypeLabel, requestTypeLabel } from '../labels'
 import { confirmController } from '../confirm/confirm-controller'
 
 const props = defineProps<{
@@ -125,12 +126,12 @@ const clear = async (): Promise<void> => {
         <tbody>
           <tr v-for="entry in state.logs" :key="`${entry.id ?? 0}-${entry.timestamp}`">
             <td>{{ new Date(entry.timestamp).toLocaleString() }}</td>
-            <td>{{ entry.requestType.replaceAll('_', ' ') }}</td>
+            <td>{{ requestTypeLabel(entry.requestType) }}</td>
             <td>
               <code>{{ entry.scheme }}://{{ entry.hostname }}</code>
             </td>
             <td>
-              {{ entry.plannedAction }}
+              {{ decisionActionLabel(entry.plannedAction) }}
               <button
                 v-if="entry.plannedProxyProfileId"
                 class="link-button"
@@ -144,7 +145,7 @@ const clear = async (): Promise<void> => {
                 }}
               </button>
               <small v-if="entry.actualProxyInfo">
-                {{ t('actual') }} {{ entry.actualProxyInfo.type }}
+                {{ t('actual') }} {{ proxyInfoTypeLabel(entry.actualProxyInfo.type) }}
               </small>
             </td>
             <td>

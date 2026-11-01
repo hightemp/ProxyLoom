@@ -5,6 +5,7 @@ import type { AppRuntimeState } from '../../application/runtime/contracts'
 import { PRODUCT } from '../../config/product'
 import { productResourceLinks } from '../../config/product-resources'
 import { t } from '../../i18n/messages'
+import { controlStatusLabel, platformLabel } from '../labels'
 
 const props = defineProps<{
   state: AppRuntimeState
@@ -48,11 +49,11 @@ const copy = async (): Promise<void> => {
         </div>
         <div>
           <dt>{{ t('platform') }}</dt>
-          <dd>{{ state.diagnostics.platform }}</dd>
+          <dd>{{ platformLabel(state.diagnostics.platform) }}</dd>
         </div>
         <div>
           <dt>{{ t('control') }}</dt>
-          <dd>{{ state.diagnostics.controlStatus.replaceAll('_', ' ') }}</dd>
+          <dd>{{ controlStatusLabel(state.diagnostics.controlStatus) }}</dd>
         </div>
         <div>
           <dt>{{ t('schema') }}</dt>

@@ -8,6 +8,13 @@ import { t } from '../../src/i18n/messages'
 import type { OverridePreview } from '../../src/application/overrides/override-service'
 import ConfirmDialog from '../../src/ui/components/ConfirmDialog.vue'
 import { confirmController } from '../../src/ui/confirm/confirm-controller'
+import {
+  decisionActionLabel,
+  decisionSourceLabel,
+  errorText,
+  inspectionReasonLabel,
+  modeLabel,
+} from '../../src/ui/labels'
 import { runtimeClient } from '../../src/ui/runtime/client'
 
 const state = shallowRef<AppRuntimeState | null>(null)
@@ -55,7 +62,7 @@ const action = (): RuleAction => ({
 const load = async (): Promise<void> => {
   const result = await runtimeClient.getState(undefined, requestedTabId)
   if (!result.ok) {
-    error.value = result.error.message
+    error.value = errorText(result.error)
     return
   }
   state.value = result.value
@@ -71,7 +78,7 @@ const execute = async (request: RuntimeRequest): Promise<void> => {
   const result = await runtimeClient.command<unknown>(request)
   busy.value = false
   if (!result.ok) {
-    error.value = `${result.error.code}: ${result.error.message}`
+    error.value = errorText(result.error)
     return
   }
   await load()
@@ -88,7 +95,7 @@ const siteAction = async (persistent: boolean): Promise<void> => {
     type: 'PREVIEW_SITE_ACTION',
   })
   if (!previewResult.ok) {
-    error.value = previewResult.error.message
+    error.value = errorText(previewResult.error)
     return
   }
   const preview = previewResult.value
@@ -96,7 +103,7 @@ const siteAction = async (persistent: boolean): Promise<void> => {
     code: preview.generatedPattern,
     confirmLabel: t('create'),
     details: [
-      `${t('action')}: ${actionType.value}`,
+      `${t('action')}: ${decisionActionLabel(actionType.value)}`,
       ...(preview.chromiumScopeWarning && !persistent ? [t('temporaryOverrideWarning')] : []),
     ],
     message: t('siteActionMessage'),
@@ -130,7 +137,7 @@ onMounted(() => {
           danger: state.diagnostics.lastApplyError !== null,
         }"
       >
-        {{ state.config.general.mode }}
+        {{ modeLabel(state.config.general.mode) }}
       </span>
     </header>
 
@@ -149,7 +156,7 @@ onMounted(() => {
           :aria-pressed="state.config.general.mode === mode"
           @click="execute({ mode, type: 'SET_MODE' })"
         >
-          {{ mode }}
+          {{ modeLabel(mode) }}
         </button>
       </fieldset>
 
@@ -177,7 +184,8 @@ onMounted(() => {
         <template v-if="inspection?.supported">
           <strong>{{ inspection.hostname }}</strong>
           <small>
-            {{ inspection.decision.action }} · {{ inspection.decision.source }}
+            {{ decisionActionLabel(inspection.decision.action) }} ·
+            {{ decisionSourceLabel(inspection.decision.source) }}
             {{ matchedRuleName === null ? '' : `· ${matchedRuleName}` }}
           </small>
           <p v-if="inspection.scopeWarning" class="notice">
@@ -187,7 +195,7 @@ onMounted(() => {
         <template v-else>
           <strong>{{ t('unsupportedPage') }}</strong>
           <small>
-            {{ inspection?.reason.replaceAll('_', ' ') ?? t('noActiveTab') }}
+            {{ inspection ? inspectionReasonLabel(inspection.reason) : t('noActiveTab') }}
           </small>
         </template>
       </section>

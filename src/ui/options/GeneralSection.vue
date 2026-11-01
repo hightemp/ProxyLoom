@@ -4,6 +4,7 @@ import { reactive } from 'vue'
 import type { AppRuntimeState, RuntimeRequest } from '../../application/runtime/contracts'
 import type { GeneralSettings } from '../../domain/types/entities'
 import { t } from '../../i18n/messages'
+import { controlStatusLabel, modeLabel } from '../labels'
 
 const props = defineProps<{
   state: AppRuntimeState
@@ -37,7 +38,7 @@ const save = (): void => {
           <p>{{ t('globalRoutingDescription') }}</p>
         </div>
         <span class="status-pill" :class="{ danger: state.diagnostics.lastApplyError !== null }">
-          {{ state.diagnostics.controlStatus.replaceAll('_', ' ') }}
+          {{ controlStatusLabel(state.diagnostics.controlStatus) }}
         </span>
       </div>
 
@@ -52,7 +53,7 @@ const save = (): void => {
           :aria-pressed="state.config.general.mode === mode"
           @click="emit('command', { mode, type: 'SET_MODE' })"
         >
-          {{ mode }}
+          {{ modeLabel(mode) }}
         </button>
       </fieldset>
 

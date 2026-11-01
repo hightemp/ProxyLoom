@@ -1486,7 +1486,7 @@
     удаления профиля/правила.
   - **Готово, когда:** lint/typecheck/unit/E2E/dual builds зелёные, version 0.1.6/docs обновлены.
 
-- [ ] **PL-134 — Локализовать enum-значения и ошибки в popup/options**
+- [x] **PL-134 — Локализовать enum-значения и ошибки в popup/options**
   - **Цель:** убрать сырые `DIRECT/PROXY/RULES`, `decision.action/source`, `reason` и
     `${code}: ${message}` из UI.
   - **Требования:** FR-012, FR-027, FR-054.

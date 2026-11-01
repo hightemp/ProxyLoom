@@ -5,6 +5,7 @@ import type { AppRuntimeState, RuntimeRequest } from '../../application/runtime/
 import type { ProxyEndpoint, ProxyProfile, ProxyTransport } from '../../domain/types/entities'
 import { t } from '../../i18n/messages'
 import { confirmController } from '../confirm/confirm-controller'
+import { checkErrorLabel } from '../labels'
 
 const props = defineProps<{
   state: AppRuntimeState
@@ -258,7 +259,12 @@ watch(() => props.busy, restoreFocus)
           </strong>
           <span>
             {{ Math.round(profile.lastCheck.totalDurationMs) }} {{ t('millisecondsShort') }} ·
-            {{ profile.lastCheck.externalIp ?? profile.lastCheck.errorCode ?? t('noIp') }}
+            {{
+              profile.lastCheck.externalIp ??
+              (profile.lastCheck.errorCode === null
+                ? t('noIp')
+                : checkErrorLabel(profile.lastCheck.errorCode))
+            }}
           </span>
           <small>
             {{ t('connectDuration') }}

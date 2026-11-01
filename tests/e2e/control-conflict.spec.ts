@@ -41,7 +41,7 @@ test('reports another proxy extension without fighting it and Retry recovers aft
   )
 
   await extensionPage.reload()
-  await expect(extensionPage.getByText('CONTROLLED BY OTHER EXTENSION')).toBeVisible()
+  await expect(extensionPage.getByText('Controlled by another extension')).toBeVisible()
   await extensionPage.getByRole('button', { name: 'DIRECT' }).click()
   await expect(extensionPage.getByRole('alert')).toContainText(
     'NOT_CONTROLLABLE: CONTROLLED_BY_OTHER_EXTENSION',

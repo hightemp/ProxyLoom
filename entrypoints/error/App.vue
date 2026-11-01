@@ -3,6 +3,7 @@ import { onMounted, shallowRef } from 'vue'
 
 import type { ErrorPageContext } from '../../src/application/errors/error-correlation-store'
 import { t } from '../../src/i18n/messages'
+import { errorText } from '../../src/ui/labels'
 import { runtimeClient } from '../../src/ui/runtime/client'
 
 const context = shallowRef<ErrorPageContext | null>(null)
@@ -40,7 +41,7 @@ const recover = async (directOnce: boolean): Promise<void> => {
     type: directOnce ? 'DIRECT_ONCE_FROM_ERROR' : 'RETRY_ERROR',
   })
   busy.value = false
-  if (!result.ok) error.value = `${result.error.code}: ${result.error.message}`
+  if (!result.ok) error.value = errorText(result.error)
 }
 
 const openSettings = async (section?: string): Promise<void> => {
