@@ -1,6 +1,6 @@
 {
   "name": "proxy-routing-extension",
-  "version": "0.1.32",
+  "version": "0.1.33",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.32.1",
@@ -33,6 +33,7 @@
     "validate:traceability": "node scripts/validate-traceability.mjs",
     "publish:github-release": "node scripts/publish-github-release.mjs",
     "capture:store-assets": "node scripts/capture-store-assets.mjs",
+    "capture:readme-screenshots": "node scripts/capture-readme-screenshots.mjs",
     "render:icons": "node scripts/render-icons.mjs",
     "scan:artifacts": "node scripts/scan-artifacts.mjs",
     "scan:test-artifacts": "node scripts/scan-artifacts.mjs --inspect-archives test-results playwright-report",

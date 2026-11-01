@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 
 const workspace = resolve(fileURLToPath(new URL('..', import.meta.url)))
 const packageJson = JSON.parse(await readFile(join(workspace, 'package.json'), 'utf8'))
-const roots = ['README.md', 'docs', 'store']
+const roots = ['README.md', 'README.ru.md', 'docs', 'store']
 const markdownFiles = []
 
 const visit = async (relativePath) => {

@@ -1,9 +1,30 @@
-# ProxyLoom
+<p align="center">
+  <img src="public/icon.svg" alt="ProxyLoom icon" width="112" height="112">
+</p>
 
-[![CI](https://github.com/hightemp/ProxyLoom/actions/workflows/ci.yml/badge.svg)](https://github.com/hightemp/ProxyLoom/actions/workflows/ci.yml)
-[![Latest release](https://img.shields.io/github/v/release/hightemp/ProxyLoom?display_name=tag&sort=semver)](https://github.com/hightemp/ProxyLoom/releases/latest)
-[![Release downloads](https://img.shields.io/github/downloads/hightemp/ProxyLoom/total)](https://github.com/hightemp/ProxyLoom/releases)
-[![](https://asdertasd.site/counter/ProxyLoom)](https://asdertasd.site/counter/ProxyLoom)
+<h1 align="center">ProxyLoom</h1>
+
+<p align="center">Explicit, deterministic HTTP and HTTPS proxy routing for Chromium browsers and Firefox.</p>
+
+<p align="center">
+  <a href="https://github.com/hightemp/ProxyLoom/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/hightemp/ProxyLoom/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/hightemp/ProxyLoom/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/hightemp/ProxyLoom?display_name=tag&sort=semver"></a>
+  <a href="https://github.com/hightemp/ProxyLoom/releases"><img alt="Release downloads" src="https://img.shields.io/github/downloads/hightemp/ProxyLoom/total"></a>
+  <a href="https://github.com/hightemp/ProxyLoom/commits/main"><img alt="Last commit" src="https://img.shields.io/github/last-commit/hightemp/ProxyLoom"></a>
+  <a href="https://asdertasd.site/counter/ProxyLoom"><img alt="Visitors" src="https://asdertasd.site/counter/ProxyLoom"></a>
+</p>
+<p align="center">
+  <img alt="Manifest V3" src="https://img.shields.io/badge/Manifest-V3-3a52e0">
+  <img alt="Chrome, Edge, Yandex Browser" src="https://img.shields.io/badge/Chromium-Chrome%20%7C%20Edge%20%7C%20Yandex-4285F4?logo=googlechrome&logoColor=white">
+  <img alt="Firefox" src="https://img.shields.io/badge/Firefox-MV3-FF7139?logo=firefoxbrowser&logoColor=white">
+  <img alt="Vue 3" src="https://img.shields.io/badge/Vue-3-42b883?logo=vuedotjs&logoColor=white">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white">
+  <img alt="WXT" src="https://img.shields.io/badge/built%20with-WXT-67D55E">
+  <img alt="UI languages" src="https://img.shields.io/badge/UI-English%20%7C%20%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9-0f766e">
+  <img alt="No telemetry" src="https://img.shields.io/badge/telemetry-none-2ea44f">
+</p>
+
+<p align="center"><b>English</b> · <a href="README.ru.md">Русский</a></p>
 
 ProxyLoom is a Manifest V3 browser extension for explicit, deterministic HTTP and HTTPS proxy
 routing. One WXT/Vue/TypeScript codebase produces a Chromium package for Chrome, Chromium, Edge,
@@ -42,14 +63,28 @@ the HTTPS endpoint.
 - inactive-profile checks through the selected proxy, only after an explicit click;
 - native JSON merge/replace/export (credentials included by default, opt-out available) and
   profiles-only FoxyProxy 6–9 import;
-- system/light/dark themes and localized English UI;
+- one-click proxy check with external IP and country flag, plus an explicit download speed test
+  (Mbit/s);
+- system/light/dark themes with six accent colors, an in-app Help guide and contextual tips;
+- English and Russian UI, chosen by the browser language;
 - local-only storage, no analytics, telemetry, accounts, ads, remote config, or remote code.
 
 ## Screenshots
 
-![ProxyLoom global routing settings](screenshots/2026-08-01_16-16_1.png)
-![ProxyLoom proxy profiles](screenshots/2026-08-01_16-16_2.png)
-![ProxyLoom ordered routing rules](screenshots/2026-08-01_16-16_3.png)
+Light theme with synthetic demo data. Regenerate them with `pnpm capture:readme-screenshots`
+after `pnpm build`.
+
+| Proxies                                                                            | Rules                                              |
+| ---------------------------------------------------------------------------------- | -------------------------------------------------- |
+| ![Proxy profiles with check result, speed and country](screenshots/en/proxies.png) | ![Ordered routing rules](screenshots/en/rules.png) |
+| **Rule editor**                                                                    | **Global routing**                                 |
+| ![Rule editor with regex help and flags](screenshots/en/rule-editor.png)           | ![General settings](screenshots/en/general.png)    |
+| **Appearance**                                                                     | **Help**                                           |
+| ![Themes and accent colors](screenshots/en/appearance.png)                         | ![In-app help](screenshots/en/help.png)            |
+
+<p align="center">
+  <img src="screenshots/en/popup.png" alt="Toolbar popup" width="300">
+</p>
 
 ## Development
 
