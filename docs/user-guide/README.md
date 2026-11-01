@@ -64,6 +64,22 @@ before confirmation.
 
 Both actions open an in-page preview with the generated pattern before anything is created.
 
+### Managing Once overrides
+
+Settings → **Temporary overrides** lists every active Once override of the current session with its
+site, scope, route, the tabs it applies to, the source tab and when it was created. For each one
+you can:
+
+- **Edit** the scope (exact hostname or domain + subdomains, in both directions) and the route,
+  with a live preview of the generated pattern;
+- **Make permanent**, which adds an equivalent Origin Rule at the top of the rule list and then
+  removes the override;
+- **Remove** it.
+
+**Clear all** removes every override of the session. Overrides created in a private window are not
+shown on the normal settings page; manage them from the popup of a private window. When a proxy
+profile is deleted, Once overrides that used it are removed and counted in About / Diagnostics.
+
 ## Confirmations
 
 Deleting a profile or rule, clearing logs, and replacing the configuration ask for confirmation in

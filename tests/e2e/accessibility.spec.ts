@@ -132,6 +132,7 @@ test('keyboard-only tab order traverses every options section', async ({ extensi
     /^General/,
     /^Proxies/,
     /^Rules/,
+    /^Temporary overrides/,
     /^Logs/,
     /^Import & Export/,
     /^Appearance/,

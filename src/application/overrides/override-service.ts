@@ -48,6 +48,33 @@ const domainPattern = (domain: string): string => {
   return `^(?:https?|wss?)://(?:[^./]+\\.)*${escaped}(?::\\d+)?/$`
 }
 
+/** The single generator of Once patterns; the service and the UI preview both use it. */
+export const previewOverrideForHostname = (
+  hostname: string,
+  scope: OverrideScope,
+  platform: BrowserPlatform,
+): Result<OverridePreview, OverrideCommandError> => {
+  let originKey: string
+  let generatedPattern: string
+  if (scope === 'EXACT_HOSTNAME') {
+    originKey = hostname
+    generatedPattern = hostnamePattern(hostname)
+  } else {
+    const domain = registrableDomain(hostname)
+    if (!domain.ok) {
+      return err({ code: 'DOMAIN_SCOPE_UNAVAILABLE' })
+    }
+    originKey = domain.value
+    generatedPattern = domainPattern(domain.value)
+  }
+  return ok({
+    chromiumScopeWarning: platform === 'CHROMIUM',
+    generatedPattern,
+    originKey,
+    platformScope: platform === 'FIREFOX' ? 'TAB' : 'ORIGIN',
+  })
+}
+
 export class OverrideApplicationService {
   constructor(
     private readonly session: SessionStatePort,
@@ -64,33 +91,7 @@ export class OverrideApplicationService {
     if (!normalized.ok) {
       return err({ code: 'INVALID_URL' })
     }
-    return this.previewHostname(normalized.value.hostname, scope, platform)
-  }
-
-  private previewHostname(
-    hostname: string,
-    scope: OverrideScope,
-    platform: BrowserPlatform,
-  ): Result<OverridePreview, OverrideCommandError> {
-    let originKey: string
-    let generatedPattern: string
-    if (scope === 'EXACT_HOSTNAME') {
-      originKey = hostname
-      generatedPattern = hostnamePattern(hostname)
-    } else {
-      const domain = registrableDomain(hostname)
-      if (!domain.ok) {
-        return err({ code: 'DOMAIN_SCOPE_UNAVAILABLE' })
-      }
-      originKey = domain.value
-      generatedPattern = domainPattern(domain.value)
-    }
-    return ok({
-      chromiumScopeWarning: platform === 'CHROMIUM',
-      generatedPattern,
-      originKey,
-      platformScope: platform === 'FIREFOX' ? 'TAB' : 'ORIGIN',
-    })
+    return previewOverrideForHostname(normalized.value.hostname, scope, platform)
   }
 
   async create(
@@ -118,7 +119,11 @@ export class OverrideApplicationService {
     if (!normalized.ok) {
       return err({ code: 'INVALID_URL' })
     }
-    const preview = this.previewHostname(normalized.value.hostname, input.scope, input.platform)
+    const preview = previewOverrideForHostname(
+      normalized.value.hostname,
+      input.scope,
+      input.platform,
+    )
     if (!preview.ok) {
       return preview
     }
@@ -188,7 +193,7 @@ export class OverrideApplicationService {
       return err({ code: 'PROFILE_NOT_FOUND' })
     }
     const scope = input.scope ?? existing.scope
-    const preview = this.previewHostname(existing.sourceHostname, scope, input.platform)
+    const preview = previewOverrideForHostname(existing.sourceHostname, scope, input.platform)
     if (!preview.ok) {
       return preview
     }

@@ -1,4 +1,4 @@
-import { expect, test } from './fixtures/extension'
+import { acceptConfirm, expect, test } from './fixtures/extension'
 
 interface ExtensionApi {
   readonly runtime: { sendMessage(message: unknown): Promise<unknown> }
@@ -91,4 +91,83 @@ test('manages Once overrides through the background and hides private ones from 
     storedIds: ['private-once'],
     widened: 'example.co.uk',
   })
+})
+
+test('lists, edits, promotes and clears Once overrides in the options page', async ({
+  extensionPage,
+}) => {
+  await extensionPage.evaluate(async () => {
+    const api = (globalThis as unknown as { chrome: ExtensionApi }).chrome
+    await api.storage.session.clear()
+    await api.storage.local.clear()
+  })
+  await extensionPage.reload()
+  await expect(extensionPage.getByRole('heading', { name: 'General' })).toBeVisible()
+
+  await extensionPage.getByRole('button', { name: /Proxies/ }).click()
+  await extensionPage.getByRole('button', { name: 'Add profile' }).click()
+  await extensionPage.getByLabel('Name', { exact: true }).fill('Office')
+  await extensionPage.getByLabel('Host', { exact: true }).fill('127.0.0.1')
+  await extensionPage.getByLabel('Port', { exact: true }).fill('3128')
+  await extensionPage.getByRole('button', { name: 'Save profile' }).click()
+  await expect(extensionPage.getByRole('heading', { name: 'Office' })).toBeVisible()
+
+  await extensionPage.evaluate(async () => {
+    const api = (globalThis as unknown as { chrome: ExtensionApi }).chrome
+    const tabId = (await api.tabs.getCurrent())?.id ?? 0
+    const once = (id: string, hostname: string) => ({
+      action: { targetProxyProfileId: null, type: 'DIRECT' },
+      createdAt: '2026-11-01T00:00:00.000Z',
+      expiresOnTabClose: true,
+      generatedPattern: `^(?:https?|wss?)://${hostname.replaceAll('.', '\\.')}(?::\\d+)?/$`,
+      id,
+      incognito: false,
+      originKey: hostname,
+      platformScope: 'ORIGIN',
+      scope: 'EXACT_HOSTNAME',
+      sourceHostname: hostname,
+      sourceTabId: tabId,
+    })
+    await api.storage.session.set({
+      'session.overrides': {
+        overrides: [once('first', 'www.example.co.uk'), once('second', 'docs.example.org')],
+        schemaVersion: 2,
+      },
+    })
+  })
+  await extensionPage.reload()
+
+  await extensionPage.getByRole('button', { name: /Temporary overrides/ }).click()
+  const rows = extensionPage.locator('tbody tr')
+  await expect(rows).toHaveCount(2)
+  const first = rows.filter({ hasText: 'www.example.co.uk' })
+  await expect(first).toContainText('Direct')
+  await expect(first).toContainText('All tabs on this site')
+
+  await first.getByRole('button', { name: 'Edit override for www.example.co.uk' }).click()
+  await expect(extensionPage.locator('select[name="override-scope"]')).toBeFocused()
+  await extensionPage.locator('select[name="override-scope"]').selectOption('REGISTRABLE_DOMAIN')
+  await extensionPage
+    .locator('select[name="override-route"]')
+    .selectOption({ label: 'Office (OFF)' })
+  await expect(extensionPage.locator('.override-preview code')).toHaveText(
+    '^(?:https?|wss?)://(?:[^./]+\\.)*example\\.co\\.uk(?::\\d+)?/$',
+  )
+  await extensionPage.getByRole('button', { name: 'Save override' }).click()
+  const edited = rows.filter({ hasText: 'example.co.uk' })
+  await expect(edited).toContainText('Office')
+  await expect(edited).toContainText('Domain + subdomains')
+
+  await edited.getByRole('button', { name: 'Make permanent' }).click()
+  await acceptConfirm(extensionPage)
+  await expect(rows).toHaveCount(1)
+  await extensionPage.getByRole('button', { name: /Rules/ }).first().click()
+  await expect(extensionPage.locator('.rule-row').first()).toContainText(
+    '^(?:https?|wss?)://(?:[^./]+\\.)*example\\.co\\.uk(?::\\d+)?/$',
+  )
+
+  await extensionPage.getByRole('button', { name: /Temporary overrides/ }).click()
+  await extensionPage.getByRole('button', { name: 'Clear all' }).click()
+  await acceptConfirm(extensionPage)
+  await expect(extensionPage.getByText(/No Once overrides are active/)).toBeVisible()
 })

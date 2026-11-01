@@ -12,11 +12,13 @@ import DiagnosticsSection from '../../src/ui/options/DiagnosticsSection.vue'
 import GeneralSection from '../../src/ui/options/GeneralSection.vue'
 import ImportExportSection from '../../src/ui/options/ImportExportSection.vue'
 import LogsSection from '../../src/ui/options/LogsSection.vue'
+import OverridesSection from '../../src/ui/options/OverridesSection.vue'
 import ProfilesSection from '../../src/ui/options/ProfilesSection.vue'
 import RulesSection from '../../src/ui/options/RulesSection.vue'
 import { runtimeClient } from '../../src/ui/runtime/client'
 
-type SectionId = 'general' | 'proxies' | 'rules' | 'logs' | 'import-export' | 'appearance' | 'about'
+type SectionId =
+  'general' | 'proxies' | 'rules' | 'overrides' | 'logs' | 'import-export' | 'appearance' | 'about'
 
 const sections: readonly {
   readonly id: SectionId
@@ -26,6 +28,7 @@ const sections: readonly {
   { eyebrow: t('sectionGeneralEyebrow'), id: 'general', label: t('sectionGeneral') },
   { eyebrow: t('sectionProxiesEyebrow'), id: 'proxies', label: t('sectionProxies') },
   { eyebrow: t('sectionRulesEyebrow'), id: 'rules', label: t('sectionRules') },
+  { eyebrow: t('sectionOverridesEyebrow'), id: 'overrides', label: t('sectionOverrides') },
   { eyebrow: t('sectionLogsEyebrow'), id: 'logs', label: t('sectionLogs') },
   {
     eyebrow: t('sectionImportExportEyebrow'),
@@ -208,6 +211,12 @@ onBeforeUnmount(() => {
         />
         <RulesSection
           v-else-if="selected === 'rules'"
+          :state="state"
+          :busy="busy"
+          @command="execute"
+        />
+        <OverridesSection
+          v-else-if="selected === 'overrides'"
           :state="state"
           :busy="busy"
           @command="execute"

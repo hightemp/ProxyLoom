@@ -1326,5 +1326,87 @@
   },
   "invalidOverridesRemoved": {
     "message": "Once overrides removed after profile deletion"
+  },
+  "sectionOverrides": {
+    "message": "Temporary overrides"
+  },
+  "sectionOverridesEyebrow": {
+    "message": "Once"
+  },
+  "overridesTitle": {
+    "message": "Active Once overrides"
+  },
+  "overridesDescription": {
+    "message": "Session-only routes created with Once in the popup. They take priority over all rules and end when the source tab closes or the browser restarts."
+  },
+  "noOverrides": {
+    "message": "No Once overrides are active. Use Once in the popup to route the current site for this session only."
+  },
+  "privateOverridesNote": {
+    "message": "Overrides created in private windows are shown only in the popup of a private window."
+  },
+  "overrideSite": {
+    "message": "Site"
+  },
+  "overrideAppliesTo": {
+    "message": "Applies to"
+  },
+  "overrideSourceTab": {
+    "message": "Source tab"
+  },
+  "overrideCreated": {
+    "message": "Created"
+  },
+  "overrideActions": {
+    "message": "Actions"
+  },
+  "overrideThisTab": {
+    "message": "This tab"
+  },
+  "overrideAllTabsOnSite": {
+    "message": "All tabs on this site"
+  },
+  "remove": {
+    "message": "Remove"
+  },
+  "makePermanent": {
+    "message": "Make permanent"
+  },
+  "makePermanentTitle": {
+    "message": "Make this override permanent?"
+  },
+  "makePermanentMessage": {
+    "message": "A permanent Origin Rule with this pattern is added at the top of the rule list, and the Once override is removed."
+  },
+  "clearAllOverrides": {
+    "message": "Clear all"
+  },
+  "clearOverridesTitle": {
+    "message": "Clear all Once overrides?"
+  },
+  "clearOverridesMessage": {
+    "message": "Remove every Once override of this session? Affected sites return to normal routing."
+  },
+  "saveOverride": {
+    "message": "Save override"
+  },
+  "generatedPattern": {
+    "message": "Generated pattern"
+  },
+  "tabNumber": {
+    "message": "Tab $ID$",
+    "placeholders": {
+      "id": {
+        "content": "$1"
+      }
+    }
+  },
+  "editOverrideFor": {
+    "message": "Edit override for $SITE$",
+    "placeholders": {
+      "site": {
+        "content": "$1"
+      }
+    }
   }
 }

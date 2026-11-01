@@ -1521,7 +1521,7 @@
   - **Готово, когда:** unit/integration/typecheck/lint/dual builds зелёные, version 0.1.7/docs
     обновлены.
 
-- [ ] **PL-136 — Раздел Temporary overrides в options**
+- [x] **PL-136 — Раздел Temporary overrides в options**
   - **Цель:** видимый список Once-оверрайдов с редактированием.
   - **Требования:** FR-005, FR-026, FR-053–FR-054, COMPAT-009, NFR-007–NFR-010.
   - **Действия:** секция `#overrides`: таблица origin/scope/route/platform scope/source tab/created;
