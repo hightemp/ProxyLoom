@@ -1464,6 +1464,271 @@
     не меняются; exact URL остаётся bounded one-time `storage.session` state.
   - **Готово, когда:** automated acceptance зелёный, version 0.1.4/docs обновлены, checkbox отмечен.
 
+## Фаза 33. Улучшения UX, импорт строк, копирование и SOCKS5
+
+План и обоснование: `docs/IMPROVEMENT_PLAN.md`.
+
+**Все задачи фазы выполняются через TDD:** сначала падающий тест (для бага — regression,
+воспроизводящий его), затем минимальная реализация, затем refactor при зелёных тестах. Handoff
+называет тест, который был красным до изменения.
+
+- [ ] **PL-133 — Заменить `window.confirm` встроенными диалогами**
+  - **Цель:** единый доступный confirm/preview flow в popup и options.
+  - **Требования:** FR-026, FR-054, NFR-008, NFR-009.
+  - **Действия:** `ConfirmDialog.vue` на `<dialog>` и composable `useConfirm()`; inline preview
+    Once/Always в popup; учёт `confirmDangerousActions` в одном месте; заменить все
+    `window.confirm`; lint-запрет `confirm/alert/prompt` в `entrypoints/` и `src/ui/`.
+  - **Модули:** `src/ui`, popup/options entrypoints, locale, eslint config.
+  - **Зависимости:** нет.
+  - **Критерии приёмки:** в UI нет системных диалогов; фокус ловится и возвращается на инициатор;
+    `Escape` отменяет; preview показывает pattern, route и Chromium warning.
+  - **Тесты:** component tests диалога (focus/escape/aria), обновлённые Chromium E2E Once/Always и
+    удаления профиля/правила.
+  - **Готово, когда:** lint/typecheck/unit/E2E/dual builds зелёные, version 0.1.6/docs обновлены.
+
+- [ ] **PL-134 — Локализовать enum-значения и ошибки в popup/options**
+  - **Цель:** убрать сырые `DIRECT/PROXY/RULES`, `decision.action/source`, `reason` и
+    `${code}: ${message}` из UI.
+  - **Требования:** FR-012, FR-027, FR-054.
+  - **Действия:** typed label maps в i18n для mode/action/source/unsupported reason/error code;
+    UI использует только их; stable internal enum не меняется.
+  - **Модули:** `src/i18n`, `locales/en`, popup, options sections.
+  - **Зависимости:** нет.
+  - **Критерии приёмки:** каждый enum имеет locale label (exhaustive typecheck); E2E не видит
+    `_`-кодов в popup.
+  - **Тесты:** unit exhaustive label map, popup component snapshot, E2E smoke.
+  - **Готово, когда:** lint/typecheck/unit/E2E/dual builds зелёные, version 0.1.6/docs обновлены.
+
+- [ ] **PL-135 — Управление Once-оверрайдами в application и изоляция private**
+  - **Цель:** list/update/promote/clear для session overrides; не отдавать private overrides
+    обычному контексту.
+  - **Требования:** FR-005, FR-026, FR-057–FR-059, FR-074, SEC-003, PRIV-010.
+  - **Действия:** поле `sourceHostname` и versioned envelope `session.overrides` v2 с fail-safe
+    очисткой malformed/future; команды `LIST_OVERRIDES`, `UPDATE_OVERRIDE`, `PROMOTE_OVERRIDE`,
+    `CLEAR_OVERRIDES`; pattern пересчитывается только через `OverrideApplicationService.preview`;
+    фильтр по incognito caller context в `GET_STATE`/`LIST_OVERRIDES`; redacted diagnostic при
+    cleanup invalid overrides; monotonic reapply.
+  - **Модули:** override service, session repository, runtime contracts/controller, adapters.
+  - **Зависимости:** PL-133.
+  - **Критерии приёмки:** update меняет scope/action атомарно и маршрутизация следует новому
+    оверрайду без reload; promote создаёт правило на top и удаляет оверрайд одной операцией, при
+    ошибке оверрайд сохраняется; обычная options page не получает private overrides; `DIRECT`
+    по-прежнему игнорирует оверрайды.
+  - **Тесты:** unit update/promote/clear/legacy envelope/malformed; parity resolver после update;
+    Chromium+Firefox integration normal/private isolation.
+  - **Миграции/permissions/privacy:** session schema v2 (transient); config schema не меняется;
+    permissions не меняются.
+  - **Готово, когда:** unit/integration/typecheck/lint/dual builds зелёные, version 0.1.7/docs
+    обновлены.
+
+- [ ] **PL-136 — Раздел Temporary overrides в options**
+  - **Цель:** видимый список Once-оверрайдов с редактированием.
+  - **Требования:** FR-005, FR-026, FR-053–FR-054, COMPAT-009, NFR-007–NFR-010.
+  - **Действия:** секция `#overrides`: таблица origin/scope/route/platform scope/source tab/created;
+    Edit (scope+route с live preview), Make permanent, Remove, Clear all, empty state, подсказка про
+    private-window overrides.
+  - **Модули:** `src/ui/options`, options entrypoint, locale, user guide.
+  - **Зависимости:** PL-135.
+  - **Критерии приёмки:** все действия доступны с клавиатуры; фокус не теряется после удаления;
+    profile обозначен именем/short name, не только цветом.
+  - **Тесты:** component tests, Chromium E2E create Once → edit → promote → remove.
+  - **Готово, когда:** E2E/typecheck/lint/dual builds зелёные, version 0.1.8/docs обновлены.
+
+- [ ] **PL-137 — Оверрайды текущего сайта в popup**
+  - **Цель:** видеть и менять Once прямо из popup.
+  - **Требования:** FR-004, FR-005, FR-050–FR-052, COMPAT-009, NFR-012.
+  - **Действия:** блок «Active for this site» (вкл. Chromium оверрайды из других вкладок того же
+    origin с пометкой), смена route, Remove, Make permanent, `Manage all`; `Once` → `Update Once`
+    при существующем оверрайде.
+  - **Модули:** popup entrypoint, locale.
+  - **Зависимости:** PL-135.
+  - **Критерии приёмки:** popup usable на 200% zoom; изменения сразу отражаются в inspection.
+  - **Тесты:** popup component test, Chromium E2E, Firefox smoke tab-scoped.
+  - **Готово, когда:** E2E/typecheck/lint/dual builds зелёные, version 0.1.8/docs обновлены.
+
+- [ ] **PL-138 — Pure parser строк прокси**
+  - **Цель:** разбор строк форматов `proxy_switcher_vpn` в `ProxyLoom` профиль.
+  - **Требования:** FR-002, FR-041, SEC-003.
+  - **Действия:** `src/domain/profiles/proxy-string.ts`: URI, `host:port`, `user:pass@host:port`,
+    четыре поля с ambiguity, protocol-токены, whitespace-токены, CSV/TSV/`;`, IPv6 в скобках;
+    host validation общая с `validateProxyProfile`; лимит 8 KiB; ошибки typed без эха ввода.
+  - **Модули:** `src/domain/profiles`, unit tests.
+  - **Зависимости:** нет.
+  - **Критерии приёмки:** покрыты все кейсы `ProxyStringParserTest.kt` (кроме network detection),
+    socks → typed failure до PL-145.
+  - **Тесты:** table tests, IPv6/IDN/injection corpus, property round-trip с formatter PL-141.
+  - **Готово, когда:** unit/typecheck/lint зелёные, version 0.1.9.
+
+- [ ] **PL-139 — Bulk import прокси из текста с preview**
+  - **Цель:** создать/обновить много профилей из многострочного текста или `.txt/.csv`.
+  - **Требования:** FR-002, FR-041, FR-069–FR-070, FR-078, NFR-008, SEC-003.
+  - **Действия:** application preview/apply (лимиты 1000 строк, 1 MiB), статусы NEW/UPDATE/
+    UNCHANGED/DUPLICATE/ERROR, ambiguity order, default transport, имя `host:port` с разрешением
+    коллизий; атомарный apply; UI панель в Proxies и пункт в Import & Export; help форматов.
+  - **Модули:** `src/application/profiles`, Proxies/Import&Export UI, locale, user guide.
+  - **Зависимости:** PL-133, PL-138.
+  - **Критерии приёмки:** пароли не показываются в preview; при ошибке commit конфигурация не
+    меняется; update сохраняет name/color/note/references.
+  - **Тесты:** application unit (dedup/update/limits/atomicity), Chromium E2E paste → preview →
+    import, Firefox smoke.
+  - **Готово, когда:** unit/E2E/typecheck/lint/dual builds зелёные, version 0.1.10/docs обновлены.
+
+- [ ] **PL-140 — Вставка строки прокси в редактор профиля**
+  - **Цель:** заполнить форму профиля из одной строки.
+  - **Требования:** FR-041, FR-054, NFR-009.
+  - **Действия:** поле `Paste proxy string` + `Fill`, выбор при ambiguity, inline-ошибка без эха.
+  - **Модули:** `ProfilesSection.vue`, locale.
+  - **Зависимости:** PL-138.
+  - **Критерии приёмки:** заполняются transport/host/port/credentials и `useSameProxy`; пустое имя
+    получает `host:port`.
+  - **Тесты:** component test, E2E.
+  - **Готово, когда:** E2E/typecheck/lint/dual builds зелёные, version 0.1.10/docs обновлены.
+
+- [ ] **PL-141 — Экспорт с паролями, копирование в URL/curl и `.txt`**
+  - **Цель:** скопировать профиль(и) в `scheme://user:pass@host:port`, curl-команду и
+    `host:port:user:pass`, сохранить список в `.txt` и экспортировать native JSON с паролями по
+    умолчанию — credentials не скрываются.
+  - **Требования:** FR-041, FR-067, PRIV-010, SEC-003.
+  - **Действия:** сначала PRD: переформулировать FR-067 (`Include proxy credentials` включён по
+    умолчанию, видимое предупреждение вместо confirm) и новый FR о copy/text export; privacy-док и
+    store disclosure; pure formatter (percent-encoding userinfo, shell quoting curl, раздельные
+    HTTP/HTTPS endpoints); меню `Copy as` в карточке, `Copy all as URLs`, `Copy URL` в popup;
+    `Export proxies as text` (URL или `host:port:user:pass`, Blob/anchor, без новых permissions);
+    toast в live region.
+  - **Модули:** `src/domain/profiles`, Proxies UI, popup, locale, PRD/privacy/user guide.
+  - **Зависимости:** PL-138.
+  - **Критерии приёмки:** native export по умолчанию содержит credentials и показывает
+    предупреждение, снятие чекбокса их исключает; `.txt` импортируется обратно PL-139 без потерь;
+    вывод formatter парсится обратно PL-138 в эквивалентный профиль; curl
+    команда исполнима в bash с паролем, содержащим `'`, `@`, `:`, `%`; скопированное не попадает в
+    logs/diagnostics.
+  - **Тесты:** formatter table/property tests, curl quoting test через локальный proxy в
+    integration, canary-скан E2E traces.
+  - **Миграции/permissions/privacy:** schema/permissions не меняются; privacy promise расширяется
+    явным clipboard copy, `.txt` export и credentials в native export по умолчанию.
+  - **Готово, когда:** unit/integration/E2E/typecheck/lint/dual builds зелёные, version 0.1.11/docs
+    обновлены.
+
+- [ ] **PL-142 — Поиск, фильтр и групповые действия профилей**
+  - **Цель:** управлять сотнями профилей после bulk import.
+  - **Требования:** FR-002, FR-035, FR-045, NFR-007.
+  - **Действия:** поиск name/host, фильтр transport/last check, multi-select `Delete selected` с
+    impact preview, `Check selected` последовательно с отменой.
+  - **Модули:** Proxies UI, profile application service, locale.
+  - **Зависимости:** PL-133, PL-139.
+  - **Критерии приёмки:** delete selected атомарен, rules на удалённые профили видимо invalid.
+  - **Тесты:** application unit, E2E 500 profiles.
+  - **Готово, когда:** unit/E2E/typecheck/lint/dual builds зелёные, version 0.1.12/docs обновлены.
+
+- [ ] **PL-143 — Обновить user guide, store тексты и скриншоты**
+  - **Цель:** документация соответствует PL-133…PL-142 и PL-146…PL-150.
+  - **Требования:** FR-012, FR-054.
+  - **Действия:** user guide (Once management, Import from text, Copy as), store listing,
+    скриншоты без реальных credentials, traceability.
+  - **Модули:** `docs/user-guide`, `store`, `docs/traceability.md`.
+  - **Зависимости:** PL-136, PL-137, PL-139–PL-142, PL-147–PL-150.
+  - **Критерии приёмки:** `validate:docs`, `spellcheck`, `validate:store-assets` зелёные.
+  - **Тесты:** doc validators.
+  - **Готово, когда:** validators зелёные, version 0.1.17.
+
+- [ ] **PL-144 — Spike: SOCKS5 в Chromium и Firefox MV3**
+  - **Цель:** проверить SOCKS5 routing, auth, DNS и fail-closed в target browsers.
+  - **Требования:** FR-006, FR-010, FR-075, COMPAT-001, SEC-003.
+  - **Действия:** prototype Chromium PAC `SOCKS5` и Firefox `proxy.onRequest type: 'socks'` с
+    local SOCKS5 server (с/без auth); HTTP/HTTPS/WS/WSS/download; недоступный endpoint; incognito.
+  - **Прототип/модули:** `spikes/socks5/`, без переноса prototype code в production.
+  - **Зависимости:** нет.
+  - **Критерии приёмки:** ADR-016 с таблицей поведения по browser/version, capability
+    `socks5Auth`, рекомендация.
+  - **Тесты:** ручные/integration сценарии с sanitized traces.
+  - **Готово, когда:** ADR-016 принят, зависимые задачи обновлены.
+
+- [ ] **PL-145 — Поддержка SOCKS5 transport**
+  - **Цель:** SOCKS5 профили в рамках ADR-016.
+  - **Требования:** FR-006, FR-010, FR-015–FR-016, FR-075, FR-076–FR-078, COMPAT-001, SEC-003.
+  - **Действия:** PRD (non-goals, FR, limitations); `ProxyTransport` + `SOCKS5`, config schema v4
+    migration, native import/export v4; PAC directive `SOCKS5` с injection/golden/parity; Firefox
+    adapter `socks` + `proxyDNS`; UI transport; в Chromium SOCKS5-профиль с credentials
+    сохраняется с видимым статусом `Authentication unsupported in this browser`, routing не
+    меняется (fail-closed); parser/formatter `socks5`/`socks5h`.
+  - **Модули:** domain, storage migrations, PAC compiler, Chromium/Firefox adapters, Proxies UI.
+  - **Зависимости:** PL-144 с положительным ADR-016, PL-138, PL-141.
+  - **Критерии приёмки:** fail-closed без fallback; Chromium хранит SOCKS5 credentials без потерь
+    и явно показывает, что auth не поддержан, без skip/`DIRECT`; Firefox SOCKS5 auth работает.
+  - **Тесты:** migration fixture/interruption, PAC golden/parity/injection, local SOCKS5 integration
+    обоих семейств, E2E.
+  - **Миграции/permissions/privacy:** config schema v4; permissions не меняются.
+  - **Готово, когда:** все test suites/dual builds зелёные, version 0.2.0/docs обновлены.
+
+- [x] **PL-146 — Новая иконка расширения**
+  - **Цель:** узнаваемый знак «нити → узел → маршруты» вместо буквы «P» и текстового «PL».
+  - **Требования:** FR-011, NFR-010, REL-001.
+  - **Действия:** `public/icon.svg` (полный знак) и `store/assets/icon-small.svg` (16 px);
+    `pnpm render:icons` растеризует icons/store logo/promo через Chromium; options sidebar использует
+    `/icon.svg`; удалён неиспользуемый message `extensionAbbreviation`; промо-плитка и store
+    screenshot обновлены.
+  - **Модули:** `public/`, `store/assets/`, `scripts/render-icons.mjs`, options entrypoint, locale.
+  - **Зависимости:** нет.
+  - **Критерии приёмки:** PNG 16/32/48/128 RGBA точных размеров, manifest/action icons без
+    изменений путей; знак различим на светлом и тёмном toolbar.
+  - **Тесты:** `tests/unit/scripts/brand-assets.test.ts` (красный до изменения), `pnpm check`,
+    `validate:build`, E2E `accessibility.spec.ts` и `foundation.spec.ts`, dual builds.
+  - **Миграции/permissions/privacy:** нет.
+  - **Готово, когда:** тесты/builds зелёные, version 0.1.5/docs обновлены.
+
+- [ ] **PL-147 — Оболочка options: toasts, заголовки, статус, общие компоненты**
+  - **Цель:** аккуратнее и плотнее при текущем стиле.
+  - **Требования:** FR-012, FR-054, NFR-008–NFR-011.
+  - **Действия:** toasts вместо постоянного баннера; один уровень заголовков; сайдбар с
+    локализованным mode и `Applied`/`Applying…`/`Apply failed` (revision → About); tokens
+    отступов/типографики; компоненты `Badge`, `ProfileChip`, `OverflowMenu`, `Drawer`, `EmptyState`;
+    empty/loading/error states во всех разделах.
+  - **Модули:** `src/ui`, options entrypoint, `base.css`, locale.
+  - **Зависимости:** PL-133, PL-134.
+  - **Критерии приёмки:** success toast исчезает, error остаётся до закрытия, оба озвучиваются live
+    region; профиль нигде не обозначен только цветом.
+  - **Тесты:** component tests компонентов (role/aria/keyboard), E2E accessibility regression.
+  - **Готово, когда:** unit/E2E/typecheck/lint/dual builds зелёные, version 0.1.13/docs обновлены.
+
+- [ ] **PL-148 — Редизайн popup**
+  - **Цель:** popup сразу отвечает «куда идёт этот сайт» и даёт действия в один клик.
+  - **Требования:** FR-004, FR-005, FR-050–FR-052, NFR-007, NFR-012.
+  - **Действия:** блок текущего сайта с итоговым маршрутом и источником; mode с подписями и
+    пояснением; profile list с `ProfileChip` и статусом check; Once/Always с inline preview; блок
+    оверрайдов сайта; `Copy URL`; футер Options/Logs.
+  - **Модули:** popup entrypoint, `src/ui`, locale.
+  - **Зависимости:** PL-133, PL-134, PL-137, PL-141, PL-147.
+  - **Критерии приёмки:** 200% zoom без горизонтального скролла; всё доступно с клавиатуры.
+  - **Тесты:** popup component tests, E2E core-ui/accessibility.
+  - **Готово, когда:** unit/E2E/typecheck/lint/dual builds зелёные, version 0.1.14/docs обновлены.
+
+- [ ] **PL-149 — Редизайн раздела Proxies**
+  - **Цель:** компактные карточки профилей и редактор в drawer.
+  - **Требования:** FR-002, FR-041–FR-045, NFR-007–NFR-010.
+  - **Действия:** `ProfileChip`, transport badge, выровненные endpoints без пароля, `Used by N
+rules`, compact check pill; `Use globally`/`Check` + «⋯» (Edit, Duplicate, Copy as…, Delete);
+    drawer-редактор; toolbar поиска/импорта/экспорта.
+  - **Модули:** `ProfilesSection.vue`, `src/ui`, locale.
+  - **Зависимости:** PL-139–PL-142, PL-147.
+  - **Критерии приёмки:** 500 профилей прокручиваются без подвисаний; фокус возвращается после
+    закрытия drawer.
+  - **Тесты:** component tests, E2E CRUD/check/copy, performance smoke.
+  - **Готово, когда:** unit/E2E/typecheck/lint/dual builds зелёные, version 0.1.15/docs обновлены.
+
+- [ ] **PL-150 — Редизайн раздела Rules**
+  - **Цель:** читаемый плотный список правил и удобный редактор.
+  - **Требования:** FR-003, FR-030–FR-040, NFR-003, NFR-005, NFR-007.
+  - **Действия:** подписанный switch `Enabled`, обрезка pattern с раскрытием, action как
+    `ProfileChip`/`Direct`, badges (Firefox only, temp-disabled, invalid); ↑/↓ + «⋯»; фильтры в одну
+    строку с `More filters` и `Showing N of M`; drawer-редактор с live tester; групповые действия с
+    impact preview.
+  - **Модули:** `RulesSection.vue`, `src/ui`, locale.
+  - **Зависимости:** PL-133, PL-134, PL-147.
+  - **Критерии приёмки:** 1000 правил остаются editable/testable в threshold NFR-003; порядок и
+    first-match semantics не меняются.
+  - **Тесты:** component tests, E2E CRUD/reorder/filter/tester, performance E2E.
+  - **Готово, когда:** unit/E2E/typecheck/lint/dual builds зелёные, version 0.1.16/docs обновлены.
+
 ---
 
 # Release checklist

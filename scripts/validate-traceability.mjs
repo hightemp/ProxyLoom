@@ -29,7 +29,7 @@ if (missing.length > 0) {
 
 const taskDisposition = new Map()
 const dispositionRows = traceability.matchAll(
-  /^\|\s*(PL-\d{3}(?:…PL-\d{3})?)\s*\|\s*([ABM])\s*\|/gmu,
+  /^\|\s*(PL-\d{3}(?:…PL-\d{3})?)\s*\|\s*([ABMP])\s*\|/gmu,
 )
 for (const match of dispositionRows) {
   const specification = match[1]

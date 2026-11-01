@@ -6,7 +6,8 @@ This document distinguishes implementation evidence from acceptance evidence. `A
 implementation and its repository-local automated acceptance evidence are present. `B` means the
 implementation and available automation are present, but the task explicitly requires an
 external browser, hosted service, portal or human check that has not been signed. `M` is a manual
-release gate. `A` tasks are checked in `TASKS.md`; `B` and `M` tasks remain unchecked until their
+release gate. `P` is a planned task from `docs/IMPROVEMENT_PLAN.md` whose implementation has not
+started. `A` tasks are checked in `TASKS.md`; `B` and `M` tasks remain unchecked until their
 complete acceptance evidence exists.
 
 ## Task disposition
@@ -48,6 +49,9 @@ complete acceptance evidence exists.
 | PL-130        | B      | Parallel cold-auth readiness, candidate-only routing reconciliation and Chromium HTTPS worker-restart regression                  | Yandex 26 discarded-tab manual regression                          |
 | PL-131        | B      | Lifecycle/frame filter unit matrix plus existing Chromium active-navigation fail-closed Retry regression                          | Yandex 26 Google-search prerender manual regression                |
 | PL-132        | A      | Safe-origin context and disabled-coordinator unit coverage plus Chromium options/error-page E2E                                   | None beyond aggregate release gates                                |
+| PL-133…PL-145 | P      | Planned in `docs/IMPROVEMENT_PLAN.md`; no implementation evidence yet                                                             | Full task acceptance                                               |
+| PL-146        | A      | Brand asset unit test, Chromium-rendered icons, dual build manifest validation and accessibility/foundation E2E                   | Visual toolbar check on signed packages in release matrices        |
+| PL-147…PL-150 | P      | Planned in `docs/IMPROVEMENT_PLAN.md`; no implementation evidence yet                                                             | Full task acceptance                                               |
 
 ## Product requirement evidence
 

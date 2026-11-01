@@ -235,6 +235,8 @@ Proxy/host/webRequest/tabs/notifications permissions чувствительны.
 
 ## 14. Tests и verification
 
+Разработка ведётся через TDD: сначала падающий тест на нужном уровне (для бага — regression-тест, воспроизводящий его), затем минимальная реализация до зелёного, затем refactor при зелёных тестах. Handoff называет тест, который был красным до изменения.
+
 Каждое поведение тестируется на наиболее низком достаточном уровне, но browser API promise нельзя закрыть только mock:
 
 - domain — unit/property/table tests;
