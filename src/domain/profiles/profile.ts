@@ -3,6 +3,9 @@ import { err, ok, type Result } from '../types/result'
 
 const HOST_PATTERN =
   /^(?:\[[0-9a-f:.]+\]|(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)*[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)$/i
+/** The one host validation shared by profile validation and proxy-string parsing. */
+export const isValidProxyHost = (host: string): boolean => HOST_PATTERN.test(host)
+
 const COLOR_PATTERN = /^#[0-9a-f]{6}$/i
 const SHORT_NAME_PATTERN = /^[a-z0-9]{1,3}$/i
 

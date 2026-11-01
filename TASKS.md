@@ -1546,7 +1546,7 @@
   - **Тесты:** popup component test, Chromium E2E, Firefox smoke tab-scoped.
   - **Готово, когда:** E2E/typecheck/lint/dual builds зелёные, version 0.1.8/docs обновлены.
 
-- [ ] **PL-138 — Pure parser строк прокси**
+- [x] **PL-138 — Pure parser строк прокси**
   - **Цель:** разбор строк форматов `proxy_switcher_vpn` в `ProxyLoom` профиль.
   - **Требования:** FR-002, FR-041, SEC-003.
   - **Действия:** `src/domain/profiles/proxy-string.ts`: URI, `host:port`, `user:pass@host:port`,
