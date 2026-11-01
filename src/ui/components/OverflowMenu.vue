@@ -5,6 +5,30 @@ import { nextTick, onBeforeUnmount, shallowRef } from 'vue'
 defineProps<{ label: string }>()
 
 const open = shallowRef(false)
+const placement = shallowRef<Record<string, string>>({})
+const VIEWPORT_MARGIN = 8
+const GAP = 4
+
+// Fixed to the viewport so lists with overflow clipping cannot cut the menu off; it opens
+// upwards when the space below the trigger is too small.
+const place = (): void => {
+  const anchor = trigger.value?.getBoundingClientRect()
+  const size = menu.value?.getBoundingClientRect()
+  if (anchor === undefined || size === undefined) return
+  const below = anchor.bottom + GAP
+  const above = anchor.top - GAP - size.height
+  const top =
+    below + size.height > window.innerHeight - VIEWPORT_MARGIN && above >= VIEWPORT_MARGIN
+      ? above
+      : below
+  placement.value = {
+    position: 'fixed',
+    right: `${Math.max(VIEWPORT_MARGIN, window.innerWidth - anchor.right)}px`,
+    top: `${top}px`,
+  }
+}
+
+const closeOnViewportChange = (): void => close(false)
 const trigger = shallowRef<HTMLButtonElement | null>(null)
 const menu = shallowRef<HTMLElement | null>(null)
 
@@ -24,6 +48,8 @@ const close = (restoreFocus = true): void => {
   if (!open.value) return
   open.value = false
   document.removeEventListener('pointerdown', onDocumentPointer)
+  window.removeEventListener('scroll', closeOnViewportChange, true)
+  window.removeEventListener('resize', closeOnViewportChange)
   if (restoreFocus) trigger.value?.focus()
 }
 
@@ -33,8 +59,12 @@ const toggle = async (): Promise<void> => {
     return
   }
   open.value = true
+  placement.value = { position: 'fixed', visibility: 'hidden' }
   document.addEventListener('pointerdown', onDocumentPointer)
+  window.addEventListener('scroll', closeOnViewportChange, true)
+  window.addEventListener('resize', closeOnViewportChange)
   await nextTick()
+  place()
   items()[0]?.focus()
 }
 
@@ -60,7 +90,11 @@ const onClick = (event: MouseEvent): void => {
   if ((event.target as HTMLElement).closest('[role="menuitem"]') !== null) close()
 }
 
-onBeforeUnmount(() => document.removeEventListener('pointerdown', onDocumentPointer))
+onBeforeUnmount(() => {
+  document.removeEventListener('pointerdown', onDocumentPointer)
+  window.removeEventListener('scroll', closeOnViewportChange, true)
+  window.removeEventListener('resize', closeOnViewportChange)
+})
 </script>
 
 <template>
@@ -81,6 +115,7 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onDocumentPoin
       ref="menu"
       class="overflow-items"
       role="menu"
+      :style="placement"
       :aria-label="label"
       @keydown="onKeydown"
       @click="onClick"
@@ -97,10 +132,7 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onDocumentPoin
 }
 
 .overflow-items {
-  position: absolute;
-  top: calc(100% + 4px);
-  right: 0;
-  z-index: 10;
+  z-index: 30;
   display: grid;
   min-width: 240px;
   padding: 6px;
@@ -111,10 +143,16 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onDocumentPoin
 }
 
 .overflow-items :slotted([role='menuitem']) {
+  justify-content: flex-start;
+  gap: 10px;
   width: 100%;
-  min-height: 32px;
+  min-height: 34px;
+  padding: 0 10px;
   border: 0;
+  border-radius: var(--radius-sm);
   background: transparent;
+  box-shadow: none;
+  font-weight: 450;
   text-align: left;
 }
 

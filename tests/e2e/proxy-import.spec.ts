@@ -183,3 +183,30 @@ test('handles 500 profiles with search, select all shown and bulk delete', async
   await extensionPage.getByLabel('Search name or host').fill('')
   await expect(extensionPage.getByText('Showing 400 of 400')).toBeVisible()
 })
+
+test('row menus are never clipped by the list, even on the last row', async ({ extensionPage }) => {
+  await extensionPage.evaluate(async () => {
+    const api = (globalThis as unknown as { chrome: ExtensionApi }).chrome
+    await api.storage.session.clear()
+    await api.storage.local.clear()
+  })
+  await extensionPage.reload()
+  await extensionPage.getByRole('button', { name: /^Proxies/ }).click()
+  await extensionPage.getByRole('button', { name: 'Import from text' }).click()
+  await extensionPage.getByLabel('Proxy lines').fill('192.0.2.41:8080\n192.0.2.42:8080')
+  await extensionPage.getByRole('button', { name: 'Import (2)' }).click()
+
+  const lastRow = extensionPage.locator('.proxy-row').last()
+  await lastRow.getByRole('button', { name: /^More actions for/ }).click()
+  for (const name of ['Duplicate', 'Copy URL', 'Copy curl command', 'Delete']) {
+    const item = lastRow.getByRole('menuitem', { name })
+    await expect(item).toBeInViewport()
+    const hitsItem = await item.evaluate((element) => {
+      const box = element.getBoundingClientRect()
+      return element.contains(
+        document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2),
+      )
+    })
+    expect(hitsItem, name).toBe(true)
+  }
+})

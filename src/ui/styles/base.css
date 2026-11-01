@@ -637,6 +637,12 @@ form > button {
   background: var(--color-surface-2);
 }
 
+/* Hovered rows use surface-2 too; keep neutral badges distinguishable there. */
+:is(.proxy-row, .rule-row, tbody tr):hover .badge.neutral {
+  background: var(--color-surface);
+  box-shadow: inset 0 0 0 1px var(--color-border);
+}
+
 .notice {
   display: flex;
   gap: var(--space-2);

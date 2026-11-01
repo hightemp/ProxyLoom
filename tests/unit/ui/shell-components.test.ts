@@ -76,6 +76,59 @@ describe('ProfileChip', () => {
   })
 })
 
+describe('OverflowMenu placement', () => {
+  const prototype = HTMLElement.prototype as { getBoundingClientRect: unknown }
+  const originalRect = prototype.getBoundingClientRect
+  afterEach(() => {
+    prototype.getBoundingClientRect = originalRect
+  })
+
+  const rect = (top: number, bottom: number, right: number) =>
+    ({
+      bottom,
+      height: bottom - top,
+      left: right - 36,
+      right,
+      top,
+      width: 36,
+      x: 0,
+      y: top,
+      toJSON: () => ({}),
+    }) as DOMRect
+
+  const openAt = async (triggerRect: DOMRect) => {
+    const wrapper = mount(OverflowMenu, {
+      attachTo: document.body,
+      props: { label: 'More' },
+      slots: { default: () => [h('button', { role: 'menuitem', type: 'button' }, 'Edit')] },
+    })
+    const trigger = wrapper.get('button[aria-haspopup="menu"]')
+    trigger.element.getBoundingClientRect = () => triggerRect
+    HTMLElement.prototype.getBoundingClientRect = function () {
+      return this.getAttribute('role') === 'menu' ? rect(0, 200, 240) : triggerRect
+    }
+    await trigger.trigger('click')
+    await nextTick()
+    return wrapper.get('[role="menu"]').element as HTMLElement
+  }
+
+  it('is fixed to the viewport so scrolling containers cannot clip it', async () => {
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 800 })
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1200 })
+    const menu = await openAt(rect(100, 136, 1000))
+    expect(menu.style.position).toBe('fixed')
+    expect(menu.style.top).toBe('140px')
+    expect(menu.style.right).toBe('200px')
+  })
+
+  it('opens upwards when there is no room below the trigger', async () => {
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 800 })
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1200 })
+    const menu = await openAt(rect(700, 736, 1000))
+    expect(menu.style.top).toBe('496px')
+  })
+})
+
 describe('OverflowMenu', () => {
   const mountMenu = () =>
     mount(OverflowMenu, {
