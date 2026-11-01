@@ -12,10 +12,13 @@ import type { ProxyTransport } from '../../domain/types/entities'
 import { t } from '../../i18n/messages'
 import { errorText, importStatusLabel, proxyStringErrorLabel } from '../labels'
 import { runtimeClient } from '../runtime/client'
+import FileInput from '../components/FileInput.vue'
 
 const props = defineProps<{
   state: AppRuntimeState
   busy: boolean
+  /** Inside a modal the dialog provides the title and frame. */
+  embedded?: boolean
 }>()
 const emit = defineEmits<{
   status: [message: string, error?: boolean]
@@ -71,18 +74,13 @@ const note = (line: ProxyImportLineView): string => {
   return parts.join(' · ')
 }
 
-const loadFile = async (event: Event): Promise<void> => {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
+const loadFile = async (file: File): Promise<void> => {
   fileError.value = ''
-  if (file === undefined) return
   if (file.size > MAX_IMPORT_TEXT_LENGTH) {
     fileError.value = errorText({ code: 'INPUT_TOO_LARGE' })
-    input.value = ''
     return
   }
   text.value = await file.text()
-  input.value = ''
 }
 
 const runImport = async (): Promise<void> => {
@@ -104,16 +102,33 @@ const runImport = async (): Promise<void> => {
 </script>
 
 <template>
-  <section class="surface card stack proxy-import" :aria-label="t('importFromText')">
-    <div>
-      <h3>{{ t('importFromText') }}</h3>
+  <section
+    class="stack proxy-import"
+    :class="{ 'surface card': !embedded }"
+    :aria-label="t('importFromText')"
+  >
+    <div class="panel-intro">
+      <h3 v-if="!embedded">
+        {{ t('importFromText') }}
+      </h3>
       <p>{{ t('importFromTextDescription') }}</p>
     </div>
 
     <label>
       {{ t('proxyLines') }}
-      <textarea v-model="text" rows="6" spellcheck="false" autocomplete="off" />
+      <textarea
+        v-model="text"
+        rows="7"
+        spellcheck="false"
+        autocomplete="off"
+        :placeholder="FORMAT_EXAMPLES.slice(0, 3).join('\n')"
+      />
     </label>
+    <FileInput
+      accept=".txt,.csv,text/plain,text/csv"
+      :label="t('loadFile')"
+      @file="(file) => void loadFile(file)"
+    />
 
     <div class="form-grid">
       <label>
@@ -129,10 +144,6 @@ const runImport = async (): Promise<void> => {
           <option value="HOST_FIRST">{{ t('hostFirstOrder') }}</option>
           <option value="CREDENTIALS_FIRST">{{ t('credentialsFirstOrder') }}</option>
         </select>
-      </label>
-      <label>
-        {{ t('loadFile') }}
-        <input type="file" accept=".txt,.csv,text/plain,text/csv" @change="void loadFile($event)" />
       </label>
     </div>
     <p v-if="fileError" class="notice danger" role="alert">
@@ -221,7 +232,17 @@ const runImport = async (): Promise<void> => {
 
 <style scoped>
 textarea {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.panel-intro {
+  display: grid;
+  gap: 4px;
+}
+
+.panel-intro p {
+  color: var(--color-muted);
 }
 
 .format-list {

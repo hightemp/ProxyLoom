@@ -47,7 +47,7 @@ afterEach(() => {
 })
 
 const menuItem = async (wrapper: VueWrapper, cardIndex: number, text: string) => {
-  const card = wrapper.findAll('article.profile-card')[cardIndex]!
+  const card = wrapper.findAll('li.proxy-row')[cardIndex]!
   await card.get('button[aria-haspopup="menu"]').trigger('click')
   await nextTick()
   const item = card.findAll('[role="menuitem"]').find((candidate) => candidate.text() === text)

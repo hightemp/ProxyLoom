@@ -37,11 +37,12 @@ test('checks an inactive profile through that proxy, excludes the check from log
     await extensionPage.getByLabel('Name', { exact: true }).fill('Check proxy')
     await extensionPage.getByLabel('Host', { exact: true }).fill(proxy.host)
     await extensionPage.getByLabel('Port', { exact: true }).fill(String(proxy.port))
+    await extensionPage.locator('summary', { hasText: 'Advanced' }).click()
     await extensionPage.getByLabel('Check URL').fill(`${targetOrigin}/ip`)
     await extensionPage.getByRole('button', { name: 'Save profile' }).click()
 
-    const profileCard = extensionPage.locator('.profile-card').filter({ hasText: 'Check proxy' })
-    await profileCard.getByRole('button', { name: 'Check', exact: true }).click()
+    const profileCard = extensionPage.locator('.proxy-row').filter({ hasText: 'Check proxy' })
+    await profileCard.getByRole('button', { name: /^Check / }).click()
     await acceptConfirm(extensionPage)
 
     await expect
@@ -53,8 +54,8 @@ test('checks an inactive profile through that proxy, excludes the check from log
         origin: expect.arrayContaining(['/ip']),
         proxy: expect.arrayContaining([expect.stringContaining('/ip')]),
       })
-    await expect(profileCard.locator('.check-pill')).toContainText('Available')
-    await expect(profileCard.locator('.check-pill')).toContainText('192.0.2.10')
+    await expect(profileCard.locator('.proxy-status')).toContainText('Available')
+    await expect(profileCard.locator('.proxy-status')).toContainText('192.0.2.10')
     expect(proxy.requests.some((request) => request.target.startsWith(`${targetOrigin}/ip`))).toBe(
       true,
     )
@@ -127,16 +128,17 @@ test('cancels a hanging inactive-profile check and restores direct routing', asy
     await extensionPage.getByLabel('Name', { exact: true }).fill('Hanging proxy')
     await extensionPage.getByLabel('Host', { exact: true }).fill(proxy.host)
     await extensionPage.getByLabel('Port', { exact: true }).fill(String(proxy.port))
+    await extensionPage.locator('summary', { hasText: 'Advanced' }).click()
     await extensionPage.getByLabel('Check URL').fill(`${targetOrigin}/ip`)
     await extensionPage.getByRole('button', { name: 'Save profile' }).click()
 
-    const profileCard = extensionPage.locator('.profile-card').filter({ hasText: 'Hanging proxy' })
-    await profileCard.getByRole('button', { name: 'Check', exact: true }).click()
+    const profileCard = extensionPage.locator('.proxy-row').filter({ hasText: 'Hanging proxy' })
+    await profileCard.getByRole('button', { name: /^Check / }).click()
     await acceptConfirm(extensionPage)
     await expect(profileCard.getByRole('button', { name: 'Cancel check' })).toBeVisible()
     await expect.poll(() => proxy.requests.length).toBeGreaterThan(0)
     await profileCard.getByRole('button', { name: 'Cancel check' }).click()
-    await expect(profileCard.getByRole('button', { name: 'Check', exact: true })).toBeVisible()
+    await expect(profileCard.getByRole('button', { name: /^Check / })).toBeVisible()
 
     proxy.setFailureMode('NONE')
     proxy.reset()
@@ -166,13 +168,12 @@ test('recovers the committed route after the worker is interrupted during a chec
     await extensionPage.getByLabel('Name', { exact: true }).fill('Interrupted check')
     await extensionPage.getByLabel('Host', { exact: true }).fill(proxy.host)
     await extensionPage.getByLabel('Port', { exact: true }).fill(String(proxy.port))
+    await extensionPage.locator('summary', { hasText: 'Advanced' }).click()
     await extensionPage.getByLabel('Check URL').fill(`${targetOrigin}/ip`)
     await extensionPage.getByRole('button', { name: 'Save profile' }).click()
 
-    const profileCard = extensionPage
-      .locator('.profile-card')
-      .filter({ hasText: 'Interrupted check' })
-    await profileCard.getByRole('button', { name: 'Check', exact: true }).click()
+    const profileCard = extensionPage.locator('.proxy-row').filter({ hasText: 'Interrupted check' })
+    await profileCard.getByRole('button', { name: /^Check / }).click()
     await acceptConfirm(extensionPage)
     await expect.poll(() => proxy.requests.length).toBeGreaterThan(0)
 

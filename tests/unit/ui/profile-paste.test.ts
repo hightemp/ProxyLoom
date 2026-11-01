@@ -30,7 +30,7 @@ describe('profile editor proxy string paste', () => {
   it('fills transport, endpoint, credentials, one-endpoint mode and an empty name', async () => {
     const wrapper = await open()
     await fill(wrapper, 'https://alice:s3cret@192.0.2.10:8443')
-    const endpoint = wrapper.get('fieldset.endpoint-fieldset')
+    const endpoint = wrapper.get('fieldset.endpoint-block')
     const inputs = endpoint.findAll('input')
     expect((endpoint.get('select').element as HTMLSelectElement).value).toBe('HTTPS')
     expect(inputs.map((input) => (input.element as HTMLInputElement).value)).toEqual([
@@ -61,7 +61,7 @@ describe('profile editor proxy string paste', () => {
     await choices[1]!.setValue(true)
     const use = wrapper.findAll('button').find((button) => button.text() === message('useReading'))
     await use!.trigger('click')
-    const inputs = wrapper.get('fieldset.endpoint-fieldset').findAll('input')
+    const inputs = wrapper.get('fieldset.endpoint-block').findAll('input')
     expect((inputs[0]!.element as HTMLInputElement).value).toBe('john.doe')
     expect((inputs[1]!.element as HTMLInputElement).value).toBe('12345')
   })

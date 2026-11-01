@@ -70,7 +70,8 @@ complete acceptance evidence exists.
 | PL-152        | A      | Disable service/overlay unit tests, resolver/PAC skip and expiry parity, rule-row UI tests and Chromium disable/re-enable E2E     | Firefox behaviour in PL-122 matrix                                 |
 | PL-153        | A      | Design-token contrast E2E in both themes and IconButton/Modal/FileInput/PasswordInput component tests                             | None beyond aggregate release gates                                |
 | PL-154        | A      | Options shell component test (icon nav names, header subtitle, apply status) and full Chromium E2E incl. keyboard order and zoom  | None beyond aggregate release gates                                |
-| PL-155…PL-157 | P      | Planned UI rework; no implementation evidence yet                                                                                 | Full task acceptance                                               |
+| PL-155        | A      | Proxy row/modal/paste/copy/bulk component tests incl. long-value truncation and full Chromium E2E                                 | None beyond aggregate release gates                                |
+| PL-156…PL-157 | P      | Planned UI rework; no implementation evidence yet                                                                                 | Full task acceptance                                               |
 
 ## Product requirement evidence
 

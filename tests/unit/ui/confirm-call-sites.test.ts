@@ -22,18 +22,12 @@ const sourceFiles = (directory: string): string[] =>
   })
 
 const profileMenuItem = async (wrapper: VueWrapper, text: string) => {
-  const card = wrapper.get('article.profile-card')
+  const card = wrapper.get('li.proxy-row')
   await card.get('button[aria-haspopup="menu"]').trigger('click')
   await nextTick()
   const item = card.findAll('[role="menuitem"]').find((candidate) => candidate.text() === text)
   if (item === undefined) throw new Error(`Menu item not found: ${text}`)
   return item
-}
-
-const buttonByText = (wrapper: VueWrapper, text: string) => {
-  const button = wrapper.findAll('button').find((candidate) => candidate.text() === text)
-  if (button === undefined) throw new Error(`Button not found: ${text}`)
-  return button
 }
 
 afterEach(() => {
@@ -114,7 +108,9 @@ describe('confirmation call sites', () => {
       },
     })
 
-    await buttonByText(wrapper, message('check')).trigger('click')
+    await wrapper
+      .get(`button[aria-label="${message('checkProfileNamed', checked.name)}"]`)
+      .trigger('click')
     expect(confirmController.pending.value?.message).toContain(checked.checkUrl)
     confirmController.answer(false)
     await flushPromises()

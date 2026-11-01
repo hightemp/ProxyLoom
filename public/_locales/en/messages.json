@@ -1919,5 +1919,70 @@
   },
   "hidePassword": {
     "message": "Hide password"
+  },
+  "editProfileNamed": {
+    "message": "Edit $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "checkProfileNamed": {
+    "message": "Check $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "useProfileGloballyNamed": {
+    "message": "Use $NAME$ globally",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "allProtocols": {
+    "message": "All protocols"
+  },
+  "anyCheckResult": {
+    "message": "Any check result"
+  },
+  "noAuth": {
+    "message": "No authentication"
+  },
+  "editorGeneral": {
+    "message": "General"
+  },
+  "editorEndpoint": {
+    "message": "Endpoint"
+  },
+  "editorAdvanced": {
+    "message": "Advanced"
+  },
+  "shortNameLabel": {
+    "message": "Short name"
+  },
+  "shortNamePlaceholder": {
+    "message": "Auto"
+  },
+  "colorSwatch": {
+    "message": "Color $HEX$",
+    "placeholders": {
+      "hex": {
+        "content": "$1"
+      }
+    }
+  },
+  "customColor": {
+    "message": "Custom color"
+  },
+  "useHttpForAllShort": {
+    "message": "One endpoint for all traffic"
+  },
+  "pasteProxyStringPlaceholder": {
+    "message": "http://user:pass@host:port"
   }
 }

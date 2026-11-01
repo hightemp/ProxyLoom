@@ -84,7 +84,6 @@ test('imports proxies from pasted lines with a preview and updates on repeat', a
   ])
 
   await extensionPage.getByRole('button', { name: 'Import from text' }).click()
-  await extensionPage.getByRole('button', { name: 'Import from text' }).click()
   const again = extensionPage.getByRole('region', { name: 'Import from text' })
   await again.getByLabel('Proxy lines').fill('192.0.2.11:3128:bob:changed')
   await expect(again.locator('tbody tr')).toContainText('Updates 192.0.2.11:3128')
@@ -137,7 +136,7 @@ test('copies a profile as URL and curl to the clipboard', async ({ extensionPage
   })
   const copied = () =>
     extensionPage.evaluate(() => (globalThis as unknown as { copied: string[] }).copied)
-  const card = extensionPage.locator('.profile-card').filter({ hasText: '192.0.2.30:3128' })
+  const card = extensionPage.locator('.proxy-row').filter({ hasText: '192.0.2.30:3128' })
   const menu = card.getByRole('button', { name: /^More actions for/ })
   await menu.click()
   await card.getByRole('menuitem', { name: 'Copy URL' }).click()

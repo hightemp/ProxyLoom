@@ -31,7 +31,7 @@ test('creates and persists a profile, global route, and ordered rule through the
   await extensionPage.getByRole('button', { name: /Proxies/ }).click()
   await extensionPage.getByRole('button', { name: 'Add profile' }).click()
   await extensionPage.getByLabel('Name', { exact: true }).fill('Office proxy')
-  await extensionPage.getByLabel('Short name (optional, 1–3 ASCII letters or numbers)').fill('OFF')
+  await extensionPage.getByLabel('Short name', { exact: true }).fill('OFF')
   await extensionPage.getByLabel('Host', { exact: true }).fill('127.0.0.1')
   await extensionPage.getByLabel('Port', { exact: true }).fill('9')
   await extensionPage.getByRole('button', { name: 'Save profile' }).click()
@@ -190,10 +190,7 @@ test('duplicates a profile and safely invalidates referring routes when deleting
   await extensionPage.getByRole('button', { name: 'Save rule' }).click()
 
   await extensionPage.getByRole('button', { name: /Proxies/ }).click()
-  const original = extensionPage
-    .locator('.profile-card')
-    .filter({ hasText: 'Impact proxy' })
-    .first()
+  const original = extensionPage.locator('.proxy-row').filter({ hasText: 'Impact proxy' }).first()
   await original.getByRole('button', { name: 'More actions for Impact proxy' }).click()
   await original.getByRole('menuitem', { name: 'Duplicate' }).click()
   await expect(extensionPage.getByRole('heading', { name: 'Impact proxy copy' })).toBeVisible()
