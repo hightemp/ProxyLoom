@@ -353,9 +353,6 @@ watch(() => props.busy, restoreFocus)
   <div class="stack">
     <div class="section-heading">
       <div>
-        <p class="eyebrow">
-          {{ t('endpoints') }}
-        </p>
         <h2>{{ t('proxyProfiles') }}</h2>
         <p>{{ t('proxyProfilesDescription') }}</p>
       </div>

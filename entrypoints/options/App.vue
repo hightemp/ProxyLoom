@@ -6,7 +6,9 @@ import type { AppRuntimeState, RuntimeRequest } from '../../src/application/runt
 import type { LogQuery } from '../../src/application/logging/log-types'
 import { t } from '../../src/i18n/messages'
 import ConfirmDialog from '../../src/ui/components/ConfirmDialog.vue'
-import { errorText, modeLabel } from '../../src/ui/labels'
+import ToastHost from '../../src/ui/components/ToastHost.vue'
+import { toastController } from '../../src/ui/toast/toast-controller'
+import { applyStateLabel, errorText, modeLabel } from '../../src/ui/labels'
 import AppearanceSection from '../../src/ui/options/AppearanceSection.vue'
 import DiagnosticsSection from '../../src/ui/options/DiagnosticsSection.vue'
 import GeneralSection from '../../src/ui/options/GeneralSection.vue'
@@ -61,6 +63,7 @@ const applyTheme = (next: AppRuntimeState): void => {
 const setStatus = (value: string, error = false): void => {
   message.value = value
   messageIsError.value = error
+  toastController.show(value, error)
 }
 
 const load = async (logQuery?: LogQuery): Promise<void> => {
@@ -77,6 +80,7 @@ const load = async (logQuery?: LogQuery): Promise<void> => {
 const execute = async (request: RuntimeRequest): Promise<void> => {
   busy.value = true
   message.value = ''
+  toastController.dismiss()
   const result = await runtimeClient.command<unknown>(request)
   busy.value = false
   if (!result.ok) {
@@ -160,30 +164,16 @@ onBeforeUnmount(() => {
         </span>
         <span>
           <strong>{{ modeLabel(state.config.general.mode) }}</strong>
-          <small>{{ t('revision') }} {{ state.config.revision }}</small>
+          <small>{{ applyStateLabel(busy, state.diagnostics.lastApplyError) }}</small>
         </span>
       </div>
     </aside>
 
     <main id="settings-content" class="content" tabindex="-1">
       <header class="page-header">
-        <div>
-          <p class="eyebrow">
-            {{ selectedMeta.eyebrow }}
-          </p>
-          <h1>{{ selectedMeta.label }}</h1>
-        </div>
+        <h1>{{ selectedMeta.label }}</h1>
         <span v-if="busy" class="status-pill" role="status"> {{ t('applying') }} </span>
       </header>
-
-      <p
-        v-if="message"
-        class="toast"
-        :class="{ danger: messageIsError }"
-        :role="messageIsError ? 'alert' : 'status'"
-      >
-        {{ message }}
-      </p>
 
       <div v-if="loading" class="surface empty-state" role="status">
         <strong>{{ t('loadingSettings') }}</strong>
@@ -247,6 +237,7 @@ onBeforeUnmount(() => {
       </template>
     </main>
     <ConfirmDialog />
+    <ToastHost />
   </div>
 </template>
 
@@ -349,24 +340,6 @@ nav button[aria-current='page'] {
   margin: 2px 0 0;
   font-size: clamp(28px, 4vw, 38px);
   letter-spacing: -0.035em;
-}
-
-.toast {
-  position: sticky;
-  z-index: 5;
-  top: 12px;
-  margin: 0;
-  padding: 11px 14px;
-  border: 1px solid var(--color-success);
-  border-radius: 10px;
-  color: var(--color-success-strong);
-  background: var(--color-success-soft);
-}
-
-.toast.danger {
-  border-color: var(--color-danger);
-  color: var(--color-danger);
-  background: var(--color-danger-soft);
 }
 
 @media (max-width: 760px) {

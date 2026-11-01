@@ -180,3 +180,7 @@ export const errorText = (error: Pick<RuntimeCommandError, 'code'>): string => {
   const key = errorKeys[error.code]
   return key === undefined ? t('errorGeneric', error.code) : t(key)
 }
+
+/** Sidebar/popup summary of whether the persisted configuration is active in the browser. */
+export const applyStateLabel = (busy: boolean, lastApplyError: string | null): string =>
+  lastApplyError !== null ? t('applyStateFailed') : busy ? t('applying') : t('applyStateApplied')

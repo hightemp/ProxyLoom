@@ -61,7 +61,8 @@ complete acceptance evidence exists.
 | PL-142        | A      | deleteMany/filter unit tests, bulk UI component tests and Chromium 500-profile import/search/bulk-delete E2E                      | None beyond aggregate release gates                                |
 | PL-143…PL-145 | P      | Planned in `docs/IMPROVEMENT_PLAN.md`; no implementation evidence yet                                                             | Full task acceptance                                               |
 | PL-146        | A      | Brand asset unit test, Chromium-rendered icons, dual build manifest validation and accessibility/foundation E2E                   | Visual toolbar check on signed packages in release matrices        |
-| PL-147…PL-150 | P      | Planned in `docs/IMPROVEMENT_PLAN.md`; no implementation evidence yet                                                             | Full task acceptance                                               |
+| PL-147        | A      | Toast/ProfileChip/OverflowMenu/Drawer/apply-state component tests and full Chromium E2E incl. accessibility contrast and zoom     | None beyond aggregate release gates                                |
+| PL-148…PL-150 | P      | Planned in `docs/IMPROVEMENT_PLAN.md`; no implementation evidence yet                                                             | Full task acceptance                                               |
 | PL-151        | A      | about:blank completion regression unit test and repeated full Chromium E2E runs without proxy-check failures                      | None beyond aggregate release gates                                |
 
 ## Product requirement evidence

@@ -1731,5 +1731,14 @@
   },
   "noMatchingProfiles": {
     "message": "No profiles match the search and filters."
+  },
+  "dismissMessage": {
+    "message": "Dismiss message"
+  },
+  "applyStateApplied": {
+    "message": "Applied"
+  },
+  "applyStateFailed": {
+    "message": "Apply failed"
   }
 }

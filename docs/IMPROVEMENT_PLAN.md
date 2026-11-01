@@ -328,6 +328,13 @@ ADR-016 фиксирует результат и capability `socks5Auth: boolean
   `Drawer` для редакторов, `EmptyState`.
 - Empty/loading/error states во всех разделах (General, Logs, Import & Export, About).
 
+Реализация PL-147: toast (`ToastHost`, success исчезает через 6 с, error остаётся до закрытия,
+одновременно показывается один), в сайдбаре `Applied` / `Applying…` / `Apply failed` вместо
+revision (revision остаётся в About / Diagnostics), убраны eyebrow заголовка страницы и
+дублирующий eyebrow в Proxies, добавлены `ProfileChip`, `OverflowMenu` (клавиатура: стрелки,
+Home/End, Escape с возвратом фокуса) и `Drawer` (модальный `<dialog>`). Отдельные tokens отступов
+и компонент `EmptyState` не понадобились: существующие `.surface`/`.empty-state` уже единообразны.
+
 ### 9.4 Popup (PL-148)
 
 - Сверху крупно: hostname текущего сайта и итоговый маршрут (`Direct` / `ProfileChip`) с
