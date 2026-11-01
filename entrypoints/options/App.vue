@@ -1,4 +1,18 @@
 <script setup lang="ts">
+import {
+  AlertTriangle,
+  ArrowLeftRight,
+  CheckCircle2,
+  Clock,
+  Info,
+  ListOrdered,
+  LoaderCircle,
+  Palette,
+  ScrollText,
+  Server,
+  SlidersHorizontal,
+} from '@lucide/vue'
+import type { Component } from 'vue'
 import { browser } from 'wxt/browser'
 import { computed, onBeforeUnmount, onMounted, shallowRef } from 'vue'
 
@@ -26,23 +40,36 @@ const sections: readonly {
   readonly id: SectionId
   readonly label: string
   readonly eyebrow: string
+  readonly icon: Component
 }[] = [
-  { eyebrow: t('sectionGeneralEyebrow'), id: 'general', label: t('sectionGeneral') },
-  { eyebrow: t('sectionProxiesEyebrow'), id: 'proxies', label: t('sectionProxies') },
-  { eyebrow: t('sectionRulesEyebrow'), id: 'rules', label: t('sectionRules') },
-  { eyebrow: t('sectionOverridesEyebrow'), id: 'overrides', label: t('sectionOverrides') },
-  { eyebrow: t('sectionLogsEyebrow'), id: 'logs', label: t('sectionLogs') },
+  {
+    eyebrow: t('sectionGeneralEyebrow'),
+    id: 'general',
+    icon: SlidersHorizontal,
+    label: t('sectionGeneral'),
+  },
+  { eyebrow: t('sectionProxiesEyebrow'), id: 'proxies', icon: Server, label: t('sectionProxies') },
+  { eyebrow: t('sectionRulesEyebrow'), id: 'rules', icon: ListOrdered, label: t('sectionRules') },
+  {
+    eyebrow: t('sectionOverridesEyebrow'),
+    id: 'overrides',
+    icon: Clock,
+    label: t('sectionOverrides'),
+  },
+  { eyebrow: t('sectionLogsEyebrow'), id: 'logs', icon: ScrollText, label: t('sectionLogs') },
   {
     eyebrow: t('sectionImportExportEyebrow'),
     id: 'import-export',
+    icon: ArrowLeftRight,
     label: t('sectionImportExport'),
   },
   {
     eyebrow: t('sectionAppearanceEyebrow'),
     id: 'appearance',
+    icon: Palette,
     label: t('appearanceTitle'),
   },
-  { eyebrow: t('sectionAboutEyebrow'), id: 'about', label: t('diagnosticsTitle') },
+  { eyebrow: t('sectionAboutEyebrow'), id: 'about', icon: Info, label: t('diagnosticsTitle') },
 ]
 
 const selected = shallowRef<SectionId>('general')
@@ -149,19 +176,18 @@ onBeforeUnmount(() => {
           :aria-current="selected === section.id ? 'page' : undefined"
           @click="select(section.id)"
         >
+          <component :is="section.icon" :size="17" aria-hidden="true" />
           <span>{{ section.label }}</span>
-          <small>{{ section.eyebrow }}</small>
         </button>
       </nav>
-      <div v-if="state" class="sidebar-status">
-        <span class="status-dot" :class="{ danger: state.diagnostics.lastApplyError !== null }" />
-        <span class="sr-only">
-          {{
-            state.diagnostics.lastApplyError === null
-              ? t('applyStatusHealthy')
-              : t('applyStatusFailed')
-          }}
-        </span>
+      <div
+        v-if="state"
+        class="sidebar-status"
+        :class="{ danger: state.diagnostics.lastApplyError }"
+      >
+        <AlertTriangle v-if="state.diagnostics.lastApplyError" :size="16" aria-hidden="true" />
+        <LoaderCircle v-else-if="busy" :size="16" aria-hidden="true" class="spin" />
+        <CheckCircle2 v-else :size="16" aria-hidden="true" />
         <span>
           <strong>{{ modeLabel(state.config.general.mode) }}</strong>
           <small>{{ applyStateLabel(busy, state.diagnostics.lastApplyError) }}</small>
@@ -171,7 +197,10 @@ onBeforeUnmount(() => {
 
     <main id="settings-content" class="content" tabindex="-1">
       <header class="page-header">
-        <h1>{{ selectedMeta.label }}</h1>
+        <div>
+          <h1>{{ selectedMeta.label }}</h1>
+          <p>{{ selectedMeta.eyebrow }}</p>
+        </div>
         <span v-if="busy" class="status-pill" role="status"> {{ t('applying') }} </span>
       </header>
 
@@ -244,7 +273,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .settings-shell {
   display: grid;
-  grid-template-columns: 260px minmax(0, 980px);
+  grid-template-columns: 232px minmax(0, 1fr);
   min-height: 100vh;
 }
 
@@ -253,93 +282,128 @@ onBeforeUnmount(() => {
   top: 0;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  gap: 28px;
+  gap: var(--space-6);
   height: 100vh;
-  padding: 24px 18px;
+  padding: var(--space-5) var(--space-3);
   border-right: 1px solid var(--color-border);
   background: var(--color-surface);
 }
 
-.brand,
-.sidebar-status {
+.brand {
   display: flex;
-  gap: 11px;
+  gap: 10px;
   align-items: center;
+  padding: 0 var(--space-2);
 }
 
 .brand-mark {
   display: block;
-  width: 38px;
-  height: 38px;
+  width: 32px;
+  height: 32px;
   flex: none;
 }
 
-.brand div,
-.sidebar-status span:last-child {
+.brand div {
   display: grid;
-  gap: 2px;
 }
 
-.brand small,
-.sidebar-status small {
-  color: var(--color-muted);
+.brand small {
+  font-size: 12px;
 }
 
 nav {
   display: grid;
   align-content: start;
-  gap: 4px;
+  gap: 2px;
 }
 
 nav button {
-  display: grid;
-  gap: 2px;
-  padding: 10px 12px;
+  justify-content: flex-start;
+  gap: 10px;
+  min-height: 36px;
+  padding: 0 10px;
   border: 0;
-  border-radius: 10px;
   color: var(--color-muted);
   background: transparent;
-  text-align: left;
-  cursor: pointer;
+  box-shadow: none;
+  font-weight: 500;
 }
 
-nav button small {
-  opacity: 0.75;
+nav button:hover:not(:disabled) {
+  border: 0;
+  color: var(--color-text);
+  background: var(--color-surface-2);
 }
 
 nav button[aria-current='page'] {
   color: var(--color-primary);
   background: var(--color-primary-soft);
+  font-weight: 600;
 }
 
-.status-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--color-success);
+.sidebar-status {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-success);
+  background: var(--color-surface-2);
 }
 
-.status-dot.danger {
-  background: var(--color-danger);
+.sidebar-status.danger {
+  color: var(--color-danger);
+}
+
+.sidebar-status span {
+  display: grid;
+  color: var(--color-text);
+}
+
+.sidebar-status small {
+  font-size: 12px;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+  }
 }
 
 .content {
   display: grid;
   align-content: start;
-  gap: 20px;
-  padding: 38px 44px 80px;
+  gap: var(--space-5);
+  width: 100%;
+  max-width: 1080px;
+  padding: var(--space-8) var(--space-8) 80px;
 }
 
 .page-header {
   display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
   justify-content: space-between;
-  min-height: 68px;
 }
 
-.page-header h1 {
-  margin: 2px 0 0;
-  font-size: clamp(28px, 4vw, 38px);
-  letter-spacing: -0.035em;
+.page-header div {
+  display: grid;
+  gap: 4px;
+}
+
+.page-header p {
+  color: var(--color-muted);
 }
 
 @media (max-width: 760px) {
@@ -349,7 +413,6 @@ nav button[aria-current='page'] {
 
   .sidebar {
     position: static;
-    z-index: 10;
     grid-template-rows: auto auto;
     height: auto;
     border-right: 0;
@@ -370,7 +433,7 @@ nav button[aria-current='page'] {
   }
 
   .content {
-    padding: 24px 16px 56px;
+    padding: var(--space-6) var(--space-4) 56px;
   }
 }
 </style>
