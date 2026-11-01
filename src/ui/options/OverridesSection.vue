@@ -11,6 +11,7 @@ import { confirmController } from '../confirm/confirm-controller'
 import IconButton from '../components/IconButton.vue'
 import Modal from '../components/Modal.vue'
 import { decisionActionLabel, errorText } from '../labels'
+import HelpTip from '../components/HelpTip.vue'
 
 const props = defineProps<{
   state: AppRuntimeState
@@ -130,7 +131,10 @@ const clearAll = async (): Promise<void> => {
   <div class="stack">
     <div class="section-heading">
       <div>
-        <h2>{{ t('overridesTitle') }}</h2>
+        <h2 class="title-with-tip">
+          {{ t('overridesTitle') }}
+          <HelpTip :text="t('tipOnce')" article="once" />
+        </h2>
         <p>{{ t('overridesDescription') }}</p>
       </div>
       <button

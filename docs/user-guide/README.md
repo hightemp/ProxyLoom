@@ -198,3 +198,12 @@ Settings → **Appearance** offers the System, Light and Dark themes with previe
 colors (Indigo, Teal, Violet, Rose, Amber, Slate) for buttons, links, selection and focus. Every
 combination keeps text at WCAG AA contrast. The choice applies to settings, the popup and the
 error page and is part of the native backup; older backups import with the Indigo accent.
+
+## Help and tips
+
+Settings → **Help** contains short guides to modes, proxy profiles, importing and copying proxies,
+checks, rules and regular expressions, Once and Always, logs and privacy, browser differences,
+troubleshooting and appearance, with a search box. Fields that often raise questions show a **?**
+button: it opens a short explanation that closes with Escape and links to the matching guide
+(`options.html#help/<article>`). The help is bundled with the extension and makes no network
+requests.

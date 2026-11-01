@@ -137,6 +137,7 @@ test('keyboard-only tab order traverses every options section', async ({ extensi
     /^Import & Export/,
     /^Appearance/,
     /^About \/ Diagnostics/,
+    /^Help/,
   ]
   for (const name of sectionNames) {
     await extensionPage.keyboard.press('Tab')

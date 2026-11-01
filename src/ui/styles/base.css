@@ -390,6 +390,31 @@ label > textarea {
   font-weight: 400;
 }
 
+.title-with-tip {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field-label {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  color: var(--color-muted);
+  font-size: 12.5px;
+  font-weight: 550;
+}
+
+.field-label label {
+  display: inline;
+}
+
 .check-row {
   display: flex;
   gap: var(--space-3);

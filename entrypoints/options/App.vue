@@ -5,6 +5,7 @@ import {
   CheckCircle2,
   Clock,
   Info,
+  LifeBuoy,
   ListOrdered,
   LoaderCircle,
   Palette,
@@ -20,6 +21,8 @@ import type { AppRuntimeState, RuntimeRequest } from '../../src/application/runt
 import type { LogQuery } from '../../src/application/logging/log-types'
 import { t } from '../../src/i18n/messages'
 import ConfirmDialog from '../../src/ui/components/ConfirmDialog.vue'
+import { isHelpArticleId, type HelpArticleId } from '../../src/ui/help/articles'
+import HelpSection from '../../src/ui/options/HelpSection.vue'
 import { applyAppearance } from '../../src/ui/theme/accents'
 import ToastHost from '../../src/ui/components/ToastHost.vue'
 import { toastController } from '../../src/ui/toast/toast-controller'
@@ -35,7 +38,15 @@ import RulesSection from '../../src/ui/options/RulesSection.vue'
 import { runtimeClient } from '../../src/ui/runtime/client'
 
 type SectionId =
-  'general' | 'proxies' | 'rules' | 'overrides' | 'logs' | 'import-export' | 'appearance' | 'about'
+  | 'general'
+  | 'proxies'
+  | 'rules'
+  | 'overrides'
+  | 'logs'
+  | 'import-export'
+  | 'appearance'
+  | 'about'
+  | 'help'
 
 const sections: readonly {
   readonly id: SectionId
@@ -71,6 +82,7 @@ const sections: readonly {
     label: t('appearanceTitle'),
   },
   { eyebrow: t('sectionAboutEyebrow'), id: 'about', icon: Info, label: t('diagnosticsTitle') },
+  { eyebrow: t('sectionHelpEyebrow'), icon: LifeBuoy, id: 'help', label: t('sectionHelp') },
 ]
 
 const selected = shallowRef<SectionId>('general')
@@ -135,11 +147,15 @@ const select = (section: SectionId): void => {
   document.querySelector<HTMLElement>('#settings-content')?.focus()
 }
 
+const helpArticle = shallowRef<HelpArticleId | null>(null)
+
+/** `#section` or `#help/<article>`; links from help tips and the popup use the latter. */
 const syncHash = (): void => {
-  const candidate = location.hash.slice(1)
+  const [candidate = '', detail = ''] = decodeURIComponent(location.hash.slice(1)).split('/')
   if (sections.some(({ id }) => id === candidate)) {
     selected.value = candidate as SectionId
   }
+  helpArticle.value = candidate === 'help' && isHelpArticleId(detail) ? detail : null
 }
 
 const storageChanged = (): void => {
@@ -263,6 +279,7 @@ onBeforeUnmount(() => {
           :busy="busy"
           @command="execute"
         />
+        <HelpSection v-else-if="selected === 'help'" :article="helpArticle" />
         <DiagnosticsSection v-else :state="state" />
       </template>
     </main>

@@ -6,6 +6,7 @@ import type { AppRuntimeState, RuntimeRequest } from '../../application/runtime/
 import type { GeneralSettings } from '../../domain/types/entities'
 import { t } from '../../i18n/messages'
 import { controlStatusLabel, modeLabel } from '../labels'
+import HelpTip from '../components/HelpTip.vue'
 
 const props = defineProps<{
   state: AppRuntimeState
@@ -33,7 +34,10 @@ const save = (): void => {
       <div class="card-heading">
         <Route :size="20" aria-hidden="true" />
         <div>
-          <h2>{{ t('globalRouting') }}</h2>
+          <h2 class="title-with-tip">
+            {{ t('globalRouting') }}
+            <HelpTip :text="t('tipModes')" article="modes" />
+          </h2>
           <p>{{ t('globalRoutingDescription') }}</p>
         </div>
         <span class="status-pill" :class="{ danger: state.diagnostics.lastApplyError !== null }">
@@ -129,16 +133,20 @@ const save = (): void => {
       </label>
 
       <div class="form-grid">
-        <label>
-          {{ t('manualCheckEndpoint') }}
+        <div class="field">
+          <span class="field-label">
+            <label for="check-endpoint">{{ t('manualCheckEndpoint') }}</label>
+            <HelpTip :text="t('tipCheckEndpoint')" article="check" />
+          </span>
           <input
+            id="check-endpoint"
             v-model="settings.ipGeoProviderEndpoint"
             type="url"
             maxlength="2048"
             autocomplete="off"
             required
           />
-        </label>
+        </div>
         <label>
           {{ t('timeoutMilliseconds') }}
           <input

@@ -23,6 +23,7 @@ import {
   modeLabel,
 } from '../../src/ui/labels'
 import SiteOverrides from '../../src/ui/popup/SiteOverrides.vue'
+import HelpTip from '../../src/ui/components/HelpTip.vue'
 import { runtimeClient } from '../../src/ui/runtime/client'
 
 const PROFILE_PREFIX = 'PROFILE:'
@@ -263,6 +264,10 @@ onMounted(() => {
             </select>
           </label>
         </div>
+        <p class="hint with-tip">
+          {{ t('tipOnce') }}
+          <HelpTip :text="t('helpOnceBody2')" article="once" external />
+        </p>
         <p v-if="inspection.scopeWarning" class="hint">
           {{ t('temporaryOverrideWarning') }}
         </p>
@@ -411,6 +416,12 @@ onMounted(() => {
 .global {
   display: grid;
   gap: 10px;
+}
+
+.with-tip {
+  display: flex;
+  gap: 4px;
+  align-items: flex-start;
 }
 
 .hint {

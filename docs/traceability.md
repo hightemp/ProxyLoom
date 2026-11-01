@@ -76,7 +76,7 @@ complete acceptance evidence exists.
 | PL-158        | A      | Logs debounce/switch, global marker and checking spinner component tests plus Chromium logs E2E                                   | None beyond aggregate release gates                                |
 | PL-159        | A      | Tabs (roles, keyboard, invalid-field reveal)/Disclosure tests, no-<details> source scan and Chromium editor E2E                   | None beyond aggregate release gates                                |
 | PL-160        | A      | v3→v4 migration/idempotence/import/storage-recovery tests, per-accent AA contrast unit test, Appearance component and accent E2E  | None beyond aggregate release gates                                |
-| PL-161        | P      | Planned UI follow-up; no implementation evidence yet                                                                              | Full task acceptance                                               |
+| PL-161        | A      | Help articles/tip/search unit tests, help E2E (tip, Escape focus, deep link, search), keyboard navigation E2E                     | None beyond aggregate release gates                                |
 
 ## Product requirement evidence
 

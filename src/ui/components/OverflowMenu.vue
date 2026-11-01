@@ -2,30 +2,18 @@
 import { MoreHorizontal } from '@lucide/vue'
 import { nextTick, onBeforeUnmount, shallowRef } from 'vue'
 
+import { placeFloating } from './floating'
+
 defineProps<{ label: string }>()
 
 const open = shallowRef(false)
 const placement = shallowRef<Record<string, string>>({})
-const VIEWPORT_MARGIN = 8
-const GAP = 4
-
-// Fixed to the viewport so lists with overflow clipping cannot cut the menu off; it opens
-// upwards when the space below the trigger is too small.
+// Fixed to the viewport so lists with overflow clipping cannot cut the menu off.
 const place = (): void => {
   const anchor = trigger.value?.getBoundingClientRect()
   const size = menu.value?.getBoundingClientRect()
   if (anchor === undefined || size === undefined) return
-  const below = anchor.bottom + GAP
-  const above = anchor.top - GAP - size.height
-  const top =
-    below + size.height > window.innerHeight - VIEWPORT_MARGIN && above >= VIEWPORT_MARGIN
-      ? above
-      : below
-  placement.value = {
-    position: 'fixed',
-    right: `${Math.max(VIEWPORT_MARGIN, window.innerWidth - anchor.right)}px`,
-    top: `${top}px`,
-  }
+  placement.value = placeFloating(anchor, size)
 }
 
 const closeOnViewportChange = (): void => close(false)

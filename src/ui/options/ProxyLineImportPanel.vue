@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, shallowRef } from 'vue'
+import { computed, shallowRef, useId } from 'vue'
 
 import {
   MAX_IMPORT_TEXT_LENGTH,
@@ -14,6 +14,7 @@ import { errorText, importStatusLabel, proxyStringErrorLabel } from '../labels'
 import { runtimeClient } from '../runtime/client'
 import Disclosure from '../components/Disclosure.vue'
 import FileInput from '../components/FileInput.vue'
+import HelpTip from '../components/HelpTip.vue'
 
 const props = defineProps<{
   state: AppRuntimeState
@@ -40,6 +41,7 @@ const FORMAT_EXAMPLES = [
 ] as const
 
 const text = shallowRef('')
+const linesId = useId()
 const defaultTransport = shallowRef<ProxyTransport>('HTTP')
 const fieldOrder = shallowRef<ProxyFieldOrder>('HOST_FIRST')
 const fileError = shallowRef('')
@@ -115,16 +117,20 @@ const runImport = async (): Promise<void> => {
       <p>{{ t('importFromTextDescription') }}</p>
     </div>
 
-    <label>
-      {{ t('proxyLines') }}
+    <div class="field">
+      <span class="field-label">
+        <label :for="linesId">{{ t('proxyLines') }}</label>
+        <HelpTip :text="t('tipImportFormats')" article="import" />
+      </span>
       <textarea
+        :id="linesId"
         v-model="text"
         rows="7"
         spellcheck="false"
         autocomplete="off"
         :placeholder="FORMAT_EXAMPLES.slice(0, 3).join('\n')"
       />
-    </label>
+    </div>
     <FileInput
       accept=".txt,.csv,text/plain,text/csv"
       :label="t('loadFile')"

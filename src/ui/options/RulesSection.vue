@@ -51,6 +51,7 @@ import Modal from '../components/Modal.vue'
 import Tabs from '../components/Tabs.vue'
 import OverflowMenu from '../components/OverflowMenu.vue'
 import ProfileChip from '../components/ProfileChip.vue'
+import HelpTip from '../components/HelpTip.vue'
 
 const props = defineProps<{
   state: AppRuntimeState
@@ -437,7 +438,10 @@ watch(() => props.busy, restoreFocus)
   <div class="stack">
     <div class="section-heading">
       <div>
-        <h2>{{ t('orderedRules') }}</h2>
+        <h2 class="title-with-tip">
+          {{ t('orderedRules') }}
+          <HelpTip :text="t('helpRulesBody1')" article="rules" />
+        </h2>
         <p>{{ t('orderedRulesDescription') }}</p>
       </div>
       <button class="primary" type="button" :disabled="busy" @click="create($event)">
@@ -729,21 +733,32 @@ watch(() => props.busy, restoreFocus)
               <section class="editor-section">
                 <h3>{{ t('editorMatch') }}</h3>
                 <div class="match-row">
-                  <label>
-                    {{ t('matcherTarget') }}
-                    <select v-model="draft.matcherType">
-                      <option value="ORIGIN">{{ t('originPortable') }}</option>
-                      <option value="FULL_URL">{{ t('fullUrlFirefoxOnly') }}</option>
+                  <div class="field">
+                    <span class="field-label">
+                      <label for="rule-matcher">{{ t('matcherTarget') }}</label>
+                      <HelpTip :text="t('tipMatcher')" article="limits" />
+                    </span>
+                    <select id="rule-matcher" v-model="draft.matcherType">
+                      <option value="ORIGIN">
+                        {{ t('originPortable') }}
+                      </option>
+                      <option value="FULL_URL">
+                        {{ t('fullUrlFirefoxOnly') }}
+                      </option>
                     </select>
-                  </label>
+                  </div>
                   <label>
                     {{ t('flags') }}
                     <input v-model="draft.flags" maxlength="2" pattern="[im]*" />
                   </label>
                 </div>
-                <label>
-                  {{ t('regularExpression') }}
+                <div class="field">
+                  <span class="field-label">
+                    <label for="rule-pattern">{{ t('regularExpression') }}</label>
+                    <HelpTip :text="t('tipRegex')" article="rules" />
+                  </span>
                   <textarea
+                    id="rule-pattern"
                     v-model="draft.pattern"
                     class="pattern-input"
                     rows="3"
@@ -751,7 +766,7 @@ watch(() => props.busy, restoreFocus)
                     spellcheck="false"
                     required
                   />
-                </label>
+                </div>
                 <p class="notice">
                   <Info :size="16" aria-hidden="true" />
                   {{ t('regexGuidance') }}

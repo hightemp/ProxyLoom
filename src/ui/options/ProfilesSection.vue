@@ -50,6 +50,7 @@ import Modal from '../components/Modal.vue'
 import Tabs from '../components/Tabs.vue'
 import PasswordInput from '../components/PasswordInput.vue'
 import OverflowMenu from '../components/OverflowMenu.vue'
+import HelpTip from '../components/HelpTip.vue'
 
 const props = defineProps<{
   state: AppRuntimeState
@@ -731,10 +732,14 @@ watch(() => props.busy, restoreFocus)
           <template #connection>
             <div class="editor">
               <section class="paste-box">
-                <label>
-                  {{ t('pasteProxyString') }}
+                <div class="field">
+                  <span class="field-label">
+                    <label for="proxy-string">{{ t('pasteProxyString') }}</label>
+                    <HelpTip :text="t('tipPasteString')" article="import" />
+                  </span>
                   <span class="paste-row">
                     <input
+                      id="proxy-string"
                       v-model="pasteText"
                       name="proxy-string"
                       autocomplete="off"
@@ -748,7 +753,7 @@ watch(() => props.busy, restoreFocus)
                       {{ t('fillFromString') }}
                     </button>
                   </span>
-                </label>
+                </div>
                 <small id="proxy-string-help">{{ t('pasteProxyStringDescription') }}</small>
                 <p v-if="pasteError" class="notice danger" role="alert">
                   {{ pasteError }}
@@ -816,10 +821,13 @@ watch(() => props.busy, restoreFocus)
               <section class="editor-section">
                 <div class="section-title-row">
                   <h3>{{ t('editorEndpoint') }}</h3>
-                  <label class="switch">
-                    <input v-model="draft.useSameProxy" type="checkbox" role="switch" />
-                    {{ t('useHttpForAllShort') }}
-                  </label>
+                  <span class="switch-with-tip">
+                    <label class="switch">
+                      <input v-model="draft.useSameProxy" type="checkbox" role="switch" />
+                      {{ t('useHttpForAllShort') }}
+                    </label>
+                    <HelpTip :text="t('tipOneEndpoint')" article="proxies" />
+                  </span>
                 </div>
                 <fieldset class="endpoint-block">
                   <legend>{{ draft.useSameProxy ? t('allSchemes') : t('httpWsEndpoint') }}</legend>
@@ -1141,6 +1149,12 @@ watch(() => props.busy, restoreFocus)
 .editor-section {
   display: grid;
   gap: var(--space-3);
+}
+
+.switch-with-tip {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
 }
 
 .section-title-row {

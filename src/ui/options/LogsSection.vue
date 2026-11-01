@@ -7,6 +7,7 @@ import type { LogQuery } from '../../application/logging/log-types'
 import { t } from '../../i18n/messages'
 import { decisionActionLabel, proxyInfoTypeLabel, requestTypeLabel } from '../labels'
 import { confirmController } from '../confirm/confirm-controller'
+import HelpTip from '../components/HelpTip.vue'
 
 const props = defineProps<{
   state: AppRuntimeState
@@ -70,7 +71,10 @@ const clear = async (): Promise<void> => {
   <div class="stack">
     <div class="section-heading">
       <div>
-        <h2>{{ t('routingLogs') }}</h2>
+        <h2 class="title-with-tip">
+          {{ t('routingLogs') }}
+          <HelpTip :text="t('tipLogs')" article="logs" />
+        </h2>
         <p>{{ t('routingLogsDescription') }}</p>
       </div>
     </div>

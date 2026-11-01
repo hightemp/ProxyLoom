@@ -2071,5 +2071,158 @@
   },
   "accentSlate": {
     "message": "Slate"
+  },
+  "sectionHelp": {
+    "message": "Help"
+  },
+  "sectionHelpEyebrow": {
+    "message": "Guides and answers"
+  },
+  "helpMoreInfo": {
+    "message": "More information"
+  },
+  "helpLearnMore": {
+    "message": "Learn more"
+  },
+  "helpSearch": {
+    "message": "Search help"
+  },
+  "helpNoResults": {
+    "message": "No help articles match your search."
+  },
+  "helpIntro": {
+    "message": "Short guides to how routing works and answers to common questions. Nothing here is sent anywhere."
+  },
+  "helpModesTitle": {
+    "message": "Modes: DIRECT, PROXY and RULES"
+  },
+  "helpModesBody1": {
+    "message": "DIRECT sends all traffic without a proxy. Rules and Once overrides are kept but not used."
+  },
+  "helpModesBody2": {
+    "message": "PROXY applies a Once override for the site first, then the first matching rule, and sends everything else through the global proxy."
+  },
+  "helpModesBody3": {
+    "message": "RULES applies a Once override first, then the first matching rule, and sends everything else directly."
+  },
+  "helpProxiesTitle": {
+    "message": "Proxy profiles and endpoints"
+  },
+  "helpProxiesBody1": {
+    "message": "A profile is a proxy server with a name, color and short name used on the badge. Its transport (HTTP or HTTPS) is how the browser talks to the proxy, not which sites it serves."
+  },
+  "helpProxiesBody2": {
+    "message": "By default one endpoint handles all traffic. Turn off One endpoint for all traffic to send HTTPS and WSS targets to a different endpoint."
+  },
+  "helpProxiesBody3": {
+    "message": "Usernames and passwords are stored in ordinary extension storage, without a master password, and are offered only to the matching proxy."
+  },
+  "helpImportTitle": {
+    "message": "Importing and copying proxies"
+  },
+  "helpImportBody1": {
+    "message": "Import from text accepts one proxy per line: http://user:pass@host:port, host:port, user:pass@host:port, host:port:user:pass, user:pass:host:port, a protocol word before or after the record, space-separated fields and CSV rows. IPv6 hosts go in brackets."
+  },
+  "helpImportBody2": {
+    "message": "When a line like 1.2.3.4:8080:john.doe:12345 can be read both ways, choose the field order. A later line with the same host, port and username replaces an earlier one, and a matching profile only gets its password and protocol updated."
+  },
+  "helpImportBody3": {
+    "message": "Copy as URL, curl or host:port:user:pass and Export proxies as text include the password, so treat the copied text as a secret."
+  },
+  "helpCheckTitle": {
+    "message": "Checking a proxy"
+  },
+  "helpCheckBody1": {
+    "message": "Check sends one request to the profile's check URL through that profile and shows whether it worked, how long it took and the external IP and country reported by the endpoint."
+  },
+  "helpCheckBody2": {
+    "message": "The check endpoint receives your proxy's exit IP. Nothing is checked in the background; only an explicit Check sends a request."
+  },
+  "helpRulesTitle": {
+    "message": "Rules and regular expressions"
+  },
+  "helpRulesBody1": {
+    "message": "Rules are checked strictly from top to bottom and the first enabled match wins. Drag rules or use the arrows to change the order."
+  },
+  "helpRulesBody2": {
+    "message": "An Origin rule matches scheme, host and port, for example ^https://example\\.com/$, and works in every browser. A Full URL rule also sees the path and query and works only in Firefox."
+  },
+  "helpRulesBody3": {
+    "message": "Patterns are regular expressions: anchor them with ^ and $, escape dots as \\. and use (?::\\d+)? for an optional port. Templates generate a pattern you can then edit, and the Test tab checks it against sample URLs without any network request."
+  },
+  "helpOnceTitle": {
+    "message": "Once and Always for the current site"
+  },
+  "helpOnceBody1": {
+    "message": "Once routes the current site for this browser session only. It takes priority over rules and ends when its tab closes or the browser restarts. Always creates a permanent rule instead."
+  },
+  "helpOnceBody2": {
+    "message": "In Chromium a Once override applies to every tab on that site until its source tab closes, because the browser does not tell the proxy which tab made a request. Firefox keeps it to the tab."
+  },
+  "helpOnceBody3": {
+    "message": "Temporary overrides lists them all: change the scope or route, make one permanent or remove it."
+  },
+  "helpLogsTitle": {
+    "message": "Logs and privacy"
+  },
+  "helpLogsBody1": {
+    "message": "Logs keep the time, request type, scheme and hostname, the planned route and the result. Paths, queries, headers, cookies and credentials are never stored."
+  },
+  "helpLogsBody2": {
+    "message": "At most 1000 entries are kept. Entries from private windows stay in memory and are cleared when the last private window closes. Logging can be paused or turned off in General."
+  },
+  "helpLimitsTitle": {
+    "message": "Browser differences and safety"
+  },
+  "helpLimitsBody1": {
+    "message": "An assigned proxy never falls back to a direct connection or another proxy. If it is unreachable the request fails and the error page offers Retry, Switch proxy or Open directly once."
+  },
+  "helpLimitsBody2": {
+    "message": "Chromium cannot route by path, so Full URL rules are skipped there and shown as Firefox only. The error page is best effort and appears only for page loads."
+  },
+  "helpTroubleTitle": {
+    "message": "Troubleshooting"
+  },
+  "helpTroubleBody1": {
+    "message": "A site does not load: check the profile with Check, look at the route in the popup and at the log entry, or use Open directly once from the error page."
+  },
+  "helpTroubleBody2": {
+    "message": "Routing controls are disabled: another extension or a browser policy controls proxy settings. Disable the other extension or ask your administrator; ProxyLoom does not fight for control."
+  },
+  "helpTroubleBody3": {
+    "message": "Repeated authentication prompts: the proxy rejected the saved username or password. Each request is answered once, so update the credentials in the profile."
+  },
+  "helpAppearanceTitle": {
+    "message": "Appearance"
+  },
+  "helpAppearanceBody1": {
+    "message": "Choose System, Light or Dark and one of six accent colors. Every combination keeps text readable at WCAG AA contrast."
+  },
+  "tipModes": {
+    "message": "DIRECT ignores rules, PROXY uses the global proxy for unmatched traffic and RULES sends unmatched traffic directly."
+  },
+  "tipCheckEndpoint": {
+    "message": "Used only when you press Check. It receives the proxy's exit IP and must return JSON with the IP and, optionally, the country."
+  },
+  "tipPasteString": {
+    "message": "Paste http://user:pass@host:port, host:port:user:pass or any other supported line to fill the endpoint."
+  },
+  "tipOneEndpoint": {
+    "message": "On: one endpoint for HTTP, HTTPS, WS and WSS. Off: HTTPS and WSS targets use a separate endpoint."
+  },
+  "tipRegex": {
+    "message": "Examples: ^https://example\\.com/$ matches one site; ^https://([a-z0-9-]+\\.)*example\\.com(?::\\d+)?/$ also matches its subdomains and any port."
+  },
+  "tipMatcher": {
+    "message": "Origin matches scheme, host and port in every browser. Full URL also sees path and query but works only in Firefox."
+  },
+  "tipOnce": {
+    "message": "Once applies to this session only and takes priority over rules; Always creates a permanent rule."
+  },
+  "tipLogs": {
+    "message": "Only hostname and scheme are stored, never paths, queries or credentials. Up to 1000 entries are kept."
+  },
+  "tipImportFormats": {
+    "message": "One proxy per line in URL, host:port:user:pass, user:pass@host:port, CSV or space-separated form. Lines with # or // are ignored."
   }
 }

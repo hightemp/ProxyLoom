@@ -33,6 +33,7 @@ describe('options shell', () => {
       message('sectionImportExport'),
       message('appearanceTitle'),
       message('diagnosticsTitle'),
+      message('sectionHelp'),
     ])
     for (const button of buttons) {
       expect(button.get('svg').attributes('aria-hidden')).toBe('true')
