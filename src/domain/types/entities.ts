@@ -33,6 +33,10 @@ export interface ProxyCheckResult {
   readonly country: string | null
   readonly httpStatus: number | null
   readonly errorCode: string | null
+  /** Download throughput from Test speed; null for a plain check. */
+  readonly downloadMbps: number | null
+  /** Set when Test speed reached the proxy but the download failed. */
+  readonly speedErrorCode: string | null
   readonly checkedAt: IsoTimestamp
 }
 
@@ -108,6 +112,8 @@ export interface GeneralSettings {
   readonly proxyCheckTimeoutMs: number
   readonly ipGeoProviderEndpoint: string
   readonly geoIpEnabled: boolean
+  /** Download URL used by Test speed. */
+  readonly speedTestEndpoint: string
   readonly errorPageEnabled: boolean
   readonly confirmDangerousActions: boolean
 }

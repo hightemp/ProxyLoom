@@ -182,7 +182,12 @@ export type RuntimeRequest =
       readonly text: string
       readonly selectedSourceIndexes: readonly number[]
     }
-  | { readonly type: 'CHECK_PROFILE'; readonly profileId: string }
+  | {
+      readonly type: 'CHECK_PROFILE'
+      readonly profileId: string
+      /** Test speed: also download a test file through the profile. */
+      readonly measureSpeed?: boolean
+    }
   | { readonly type: 'CANCEL_PROXY_CHECK' }
   | { readonly type: 'GET_ERROR_CONTEXT'; readonly token: string }
   | { readonly type: 'RETRY_ERROR'; readonly token: string }

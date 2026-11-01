@@ -89,10 +89,11 @@ export const config = (options: Partial<AppConfig> = {}): AppConfig => ({
     loggingPaused: false,
     mode: 'RULES',
     proxyCheckTimeoutMs: 10_000,
+    speedTestEndpoint: 'https://speed.cloudflare.com/__down?bytes=5000000',
   },
   profiles: [],
   revision: 1,
   rules: [],
-  schemaVersion: 4,
+  schemaVersion: 5,
   ...options,
 })

@@ -20,14 +20,14 @@ const versionThree = () => {
 
 describe('schema v4 accent migration', () => {
   it('is the current schema and the default accent is Indigo', () => {
-    expect(CURRENT_SCHEMA_VERSION).toBe(4)
+    expect(CURRENT_SCHEMA_VERSION).toBeGreaterThanOrEqual(4)
     expect(createDefaultConfig().appearance).toEqual({ accent: 'INDIGO', theme: 'SYSTEM' })
   })
 
   it('adds the default accent to a v3 config and keeps the theme', () => {
     const result = migrateConfig(versionThree())
     if (!result.ok) throw new Error(result.error.code)
-    expect(result.value.schemaVersion).toBe(4)
+    expect(result.value.schemaVersion).toBe(CURRENT_SCHEMA_VERSION)
     expect(result.value.appearance).toEqual({ accent: 'INDIGO', theme: 'DARK' })
   })
 
@@ -59,7 +59,7 @@ describe('schema v4 accent migration', () => {
       config(),
     )
     if (!preview.ok) throw new Error(preview.error.code)
-    expect(preview.value.document.config.schemaVersion).toBe(4)
+    expect(preview.value.document.config.schemaVersion).toBe(CURRENT_SCHEMA_VERSION)
     expect(preview.value.document.config.appearance).toEqual({ accent: 'INDIGO', theme: 'LIGHT' })
   })
 })
@@ -74,7 +74,9 @@ describe('stored v3 configuration', () => {
     if (!result.ok) throw new Error(result.error.code)
     expect(result.value.appearance.accent).toBe('INDIGO')
     const values = await storage.get([CONFIG_KEY, CONFIG_BACKUP_KEY, CONFIG_MIGRATION_MARKER_KEY])
-    expect((values[CONFIG_KEY] as { schemaVersion: number }).schemaVersion).toBe(4)
+    expect((values[CONFIG_KEY] as { schemaVersion: number }).schemaVersion).toBe(
+      CURRENT_SCHEMA_VERSION,
+    )
     expect(values[CONFIG_BACKUP_KEY]).toEqual(stored)
     expect(values[CONFIG_MIGRATION_MARKER_KEY]).toBeUndefined()
   })
@@ -94,7 +96,7 @@ describe('stored v3 configuration', () => {
     expect(await repository.recover()).toEqual({ ok: true, value: null })
     const reloaded = await repository.initialize()
     if (!reloaded.ok) throw new Error(reloaded.error.code)
-    expect(reloaded.value.schemaVersion).toBe(4)
+    expect(reloaded.value.schemaVersion).toBe(CURRENT_SCHEMA_VERSION)
     expect(reloaded.value.appearance).toEqual({ accent: 'INDIGO', theme: 'DARK' })
   })
 })

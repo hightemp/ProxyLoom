@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { CircleCheck, CircleX } from '@lucide/vue'
+import { CircleCheck, CircleX, Gauge } from '@lucide/vue'
 import { computed } from 'vue'
 
 import type { ProxyCheckResult } from '../../domain/types/entities'
 import { t } from '../../i18n/messages'
 import { countryDisplay } from '../flags/country'
 import CountryFlag from './CountryFlag.vue'
-import { checkErrorLabel } from '../labels'
+import { checkErrorLabel, speedErrorLabel } from '../labels'
 
 const props = defineProps<{ result: ProxyCheckResult }>()
 
@@ -33,6 +33,14 @@ const countryTitle = computed(() =>
       <span class="check-latency"
         >{{ Math.round(result.totalDurationMs) }} {{ t('millisecondsShort') }}</span
       >
+      <span v-if="result.downloadMbps !== null" class="check-speed">
+        <Gauge :size="13" aria-hidden="true" />
+        {{ t('speedMbps', result.downloadMbps.toFixed(1)) }}
+      </span>
+      <span v-else-if="result.speedErrorCode !== null" class="check-speed failed">
+        <Gauge :size="13" aria-hidden="true" />
+        {{ t('speedTestFailed') }}: {{ speedErrorLabel(result.speedErrorCode) }}
+      </span>
     </div>
     <div v-if="result.availability" class="check-line details">
       <span v-if="country" class="check-country" :title="countryTitle">
@@ -67,6 +75,20 @@ const countryTitle = computed(() =>
   color: var(--color-text);
   font-variant-numeric: tabular-nums;
   font-weight: 550;
+}
+
+.check-speed {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  font-weight: 550;
+}
+
+.check-speed.failed {
+  color: var(--color-warning-text, var(--color-muted));
+  font-weight: 400;
 }
 
 .details {

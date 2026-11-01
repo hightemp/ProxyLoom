@@ -79,7 +79,7 @@ complete acceptance evidence exists.
 | PL-161        | A      | Help articles/tip/search unit tests, help E2E (tip, Escape focus, deep link, search), keyboard navigation E2E                     | None beyond aggregate release gates                                |
 | PL-162        | A      | Regex results/flags/cheat-sheet/tip-slot/toolbar-structure/placement unit tests; help and core-ui E2E                             | None beyond aggregate release gates                                |
 | PL-163        | A      | Country/flag and check summary unit tests, popup layout test, proxy-check E2E (Germany + flag), row column alignment E2E          | None beyond aggregate release gates                                |
-| PL-164        | P      | Planned UI follow-up; no implementation evidence yet                                                                              | Full task acceptance                                               |
+| PL-164        | A      | v4→v5 migration/import/recovery, speed service, in-page probe, targeted check, UI tests; Chromium speed E2E via local proxy       | Firefox speed path verified by build only (env limitation)         |
 
 ## Product requirement evidence
 
@@ -93,6 +93,7 @@ complete acceptance evidence exists.
 | FR-060…FR-072         | Logs, proxy check, native import/export and fixture-backed FoxyProxy import                                  |
 | FR-073…FR-080         | Incognito model, help/status, privacy, docs and release artifacts                                            |
 | FR-083                | Formatter table/round-trip/bash-quoting tests, copy/export component tests and Chromium clipboard/export E2E |
+| FR-084                | Speed migration, service, in-page download probe, targeted check and component tests; Chromium speed E2E     |
 | FR-082                | Pure parser and line-import planner tests, import panel component tests and Chromium paste/import/update E2E |
 | FR-081                | Override service update/promote/clear/cleanup, caller-session scoping and background override E2E            |
 | NFR-001…NFR-017       | Strict builds, performance budgets, accessibility, local infrastructure, diagnostics and CI                  |

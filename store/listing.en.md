@@ -16,7 +16,7 @@ supports Full URL path/query rules. Chromium clearly marks and skips those rules
 API cannot provide portable full-URL behavior.
 
 Everything stays local except normal traffic through proxies you configure and a manual IP/country
-check you explicitly start. There are no analytics, ads, accounts, remote configuration, or remote
+check or download speed test you explicitly start. There are no analytics, ads, accounts, remote configuration, or remote
 code. Credentials are stored in ordinary browser extension storage. Exports and copied proxy URLs include
 them in plaintext so they restore working profiles; you can export without them.
 
@@ -26,8 +26,9 @@ Let users define and diagnose deterministic browser proxy routing.
 
 ## Reviewer notes
 
-- The `scripting` permission is exercised only after a Check click against an inactive temporary
-  tab created by the extension; it reads a bounded JSON provider response and closes the tab.
+- The `scripting` permission is exercised only after a Check or Test speed click against an
+  inactive temporary tab created by the extension; it reads a bounded JSON provider response and,
+  for Test speed, downloads a bounded test file (15 s / 5 MB) from that tab, then closes the tab.
 - Chromium Once is origin-scoped and visibly disclosed. Firefox can use reliable tab scope.
 - The optional error page is best effort and main-frame only; it links a redacted origin and can be
   disabled to retain the browser's native error page.

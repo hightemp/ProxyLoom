@@ -31,3 +31,20 @@ cancellation.
 
 Connect duration остаётся `null`, если browser API не предоставляет честную фазу connect.
 Внешняя сеть происходит только по явному нажатию пользователя.
+
+## Дополнение (PL-164): Test speed
+
+`Test speed` переиспользует тот же workflow. Временный exact-origin override ставится и для origin
+`general.speedTestEndpoint`; этот origin так же считается internal (без user logs и error page).
+После успешного чтения JSON в ту же вкладку через `scripting.executeScript` внедряется
+самодостаточная функция `measureDownloadInPage`: она выполняет `fetch` (`no-store`, без cookies)
+и читает поток до 5 MB или 15 s, начиная отсчёт с получения заголовков. Service-worker `fetch`
+по-прежнему не используется — ровно по причине из основного решения. Ответ должен разрешать
+cross-origin чтение (Cloudflare отдаёт `Access-Control-Allow-Origin: *`). Ошибка скачивания не
+меняет availability: сохраняется `speedErrorCode`. Время фазы скачивания вычитается из
+`totalDurationMs`. Отмена закрывает вкладку и возвращает `TIMEOUT`.
+
+Evidence: unit tests probe/service/targeted check; Chromium E2E через локальный прокси и локальный
+`/__down` на втором origin подтверждает, что скачивание идёт через профиль и не попадает в logs.
+Firefox использует тот же код, но в этой среде Firefox integration не запускается (см. известное
+ограничение `-remote-allow-system-access`), поэтому Firefox-путь подтверждён только сборкой.

@@ -1,6 +1,7 @@
 import type { SupportedRequestType, ActualProxyInfo } from '../application/logging/log-types'
 import type { ProxyImportStatus } from '../application/profiles/proxy-line-import'
 import type { IpGeoProviderErrorCode } from '../application/proxy-check/ip-geo-provider'
+import type { SpeedErrorCode } from '../application/proxy-check/speed'
 import type { RuntimeCommandError } from '../application/runtime/contracts'
 import type {
   RoutingDecisionAction,
@@ -134,6 +135,17 @@ const checkErrorKeys: Record<IpGeoProviderErrorCode, MessageKey> = {
   RESPONSE_TOO_LARGE: 'checkResponseTooLarge',
   TIMEOUT: 'checkTimeout',
 }
+
+const speedErrorKeys: Record<SpeedErrorCode, MessageKey> = {
+  HTTP_ERROR: 'checkHttpError',
+  INVALID_ENDPOINT: 'checkInvalidEndpoint',
+  NETWORK_ERROR: 'checkNetworkError',
+  TIMEOUT: 'checkTimeout',
+  TOO_LITTLE_DATA: 'speedTooLittleData',
+}
+
+export const speedErrorLabel = (code: string): string =>
+  t((speedErrorKeys as Record<string, MessageKey>)[code] ?? 'checkFailed')
 
 /** Persisted check results keep the stable code; unknown or future codes get a generic label. */
 export const checkErrorLabel = (code: string): string =>

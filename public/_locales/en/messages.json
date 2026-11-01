@@ -2327,5 +2327,56 @@
   },
   "regexExampleSubdomains": {
     "message": "example.com and its subdomains, any port"
+  },
+  "speedMbps": {
+    "message": "$SPEED$ Mbit/s",
+    "placeholders": {
+      "speed": {
+        "content": "$1"
+      }
+    }
+  },
+  "speedTestFailed": {
+    "message": "Speed test failed"
+  },
+  "speedTooLittleData": {
+    "message": "too little data received"
+  },
+  "testSpeedNamed": {
+    "message": "Test speed of $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "speedTestTitle": {
+    "message": "Test proxy speed"
+  },
+  "speedTestMessage": {
+    "message": "Check $PROFILE$ and download a test file from $URL$ through it, for at most 15 seconds or 5 MB.",
+    "placeholders": {
+      "profile": {
+        "content": "$1"
+      },
+      "url": {
+        "content": "$2"
+      }
+    }
+  },
+  "speedTestDisclosure": {
+    "message": "The download server sees the proxy's exit IP address. Speed is never tested in the background; you can change the download URL in General."
+  },
+  "runSpeedTest": {
+    "message": "Test speed"
+  },
+  "testingSpeedNow": {
+    "message": "Testing speed…"
+  },
+  "speedTestEndpoint": {
+    "message": "Speed test download URL"
+  },
+  "tipSpeedEndpoint": {
+    "message": "Used only by Test speed. The file is downloaded through the proxy for at most 15 seconds or 5 MB, and the server sees the proxy's exit IP. The server must allow cross-origin requests."
   }
 }

@@ -83,3 +83,17 @@ describe('proxy rows polish', () => {
     finish({ ok: true, value: null })
   })
 })
+
+describe('speed test endpoint setting', () => {
+  it('is an editable URL field in General next to the check endpoint', async () => {
+    const { mount: mountGeneral } = await import('@vue/test-utils')
+    const GeneralSection = (await import('../../../src/ui/options/GeneralSection.vue')).default
+    const { runtimeState: state } = await import('./support')
+    const wrapper = mountGeneral(GeneralSection, { props: { busy: false, state: state() } })
+    const input = wrapper.get('input#speed-endpoint')
+    expect((input.element as HTMLInputElement).value).toBe(
+      'https://speed.cloudflare.com/__down?bytes=5000000',
+    )
+    expect(input.attributes('type')).toBe('url')
+  })
+})

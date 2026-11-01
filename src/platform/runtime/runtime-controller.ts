@@ -387,7 +387,7 @@ export class RuntimeController {
         case 'APPLY_FOXYPROXY_IMPORT':
           return this.applyFoxyProxyImport(request)
         case 'CHECK_PROFILE':
-          return this.checkProfile(request.profileId)
+          return this.checkProfile(request.profileId, request.measureSpeed === true)
         case 'CANCEL_PROXY_CHECK':
           this.#proxyCheck.cancel()
           return { ok: true, value: null }
@@ -602,14 +602,17 @@ export class RuntimeController {
     return { ok: true, value: null }
   }
 
-  private async checkProfile(profileId: string): Promise<RuntimeResponse<unknown>> {
+  private async checkProfile(
+    profileId: string,
+    measureSpeed: boolean,
+  ): Promise<RuntimeResponse<unknown>> {
     const current = await this.options.configRepository.initialize()
     if (!current.ok) return commandError(current.error)
     const profile = current.value.profiles.find((candidate) => candidate.id === profileId)
     if (profile === undefined) {
       return commandError({ code: 'PROFILE_NOT_FOUND' })
     }
-    const result = await this.#proxyCheck.check(profile, current.value.general)
+    const result = await this.#proxyCheck.check(profile, current.value.general, { measureSpeed })
     if (!result.ok) return commandError(result.error)
     const saved = await this.options.configRepository.update(current.value.revision, (config) => ({
       ...config,

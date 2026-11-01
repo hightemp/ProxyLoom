@@ -147,6 +147,20 @@ const save = (): void => {
             required
           />
         </div>
+        <div class="field">
+          <span class="field-label">
+            <label for="speed-endpoint">{{ t('speedTestEndpoint') }}</label>
+            <HelpTip :text="t('tipSpeedEndpoint')" article="check" />
+          </span>
+          <input
+            id="speed-endpoint"
+            v-model="settings.speedTestEndpoint"
+            type="url"
+            maxlength="2048"
+            autocomplete="off"
+            required
+          />
+        </div>
         <label>
           {{ t('timeoutMilliseconds') }}
           <input

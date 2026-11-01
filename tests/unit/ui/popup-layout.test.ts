@@ -15,6 +15,8 @@ const office = profile('office', {
     connectDurationMs: null,
     country: 'DE',
     errorCode: null,
+    downloadMbps: null,
+    speedErrorCode: null,
     externalIp: '192.0.2.99',
     httpStatus: 200,
     totalDurationMs: 707,

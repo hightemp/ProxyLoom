@@ -266,6 +266,7 @@ Matcher Firefox-only. Target включает scheme, hostname, explicit/non-def
 - `FR-041`: profile CRUD, duplicate, color, note, check URL, short name и impact view.
 - `FR-042`: short name 1–3 отображаемых ASCII alphanumeric characters; если отсутствует, генерируется детерминированно из name с устранением коллизии в badge display.
 - `FR-043`: manual check result сохраняется только как последний result, не как периодическая история.
+- `FR-084`: отдельное действие `Test speed` по явному нажатию выполняет обычную проверку профиля и в той же одноразовой check-вкладке через тот же профиль скачивает тестовый файл с `general.speedTestEndpoint` (default `https://speed.cloudflare.com/__down?bytes=5000000`). Скачивание ограничено 15 s и 5 MB, скорость (Mbit/s) считается от получения заголовков ответа. Ошибка скачивания не делает профиль `Unavailable`: результат хранит `speedErrorCode`. Endpoint показан в confirm и General, заменяем; origin скачивания исключён из user routing logs/error page. Config schema v5 добавляет `general.speedTestEndpoint` и `ProxyCheckResult.downloadMbps/speedErrorCode` (миграция v4 → v5 подставляет default и `null`).
 - `FR-044`: check URL валидируется как public `http/https` URL; internal/local targets требуют отдельного предупреждения.
 - `FR-045`: удалить используемый profile можно только после impact preview и explicit confirmation.
 
@@ -497,7 +498,7 @@ Provider interface отделяет request, timeout, schema validation и mappi
 
 - `FR-063`: provider получает сетевой запрос через проверяемый profile, но не сохранённые credentials как payload/header приложения; proxy auth остаётся browser-level.
 - `FR-064`: malformed/oversized response, timeout, non-2xx и invalid IP/country дают typed failure.
-- `FR-065`: Chromium inactive-profile check исследует temporary high-priority PAC override только для origins check/IP endpoints, сериализует одну проверку, сохраняет prior snapshot, восстанавливает его в `finally` и на startup recovery.
+- `FR-065`: Chromium inactive-profile check исследует temporary high-priority PAC override только для origins check/IP endpoints (и speed endpoint для `Test speed`), сериализует одну проверку, сохраняет prior snapshot, восстанавливает его в `finally` и на startup recovery.
 - `FR-066`: internal test requests не попадают в user log.
 - `PRIV-003`: endpoint и передаваемые ему данные объясняются до check; фоновых/periodic calls нет.
 
@@ -689,6 +690,8 @@ ProxyCheckResult
   country: string | null
   httpStatus: integer | null
   errorCode: string | null
+  downloadMbps: number | null      # только для Test speed (schema v5)
+  speedErrorCode: string | null    # Test speed: проверка прошла, скачивание нет
   checkedAt: timestamp
 
 LogEntry
@@ -719,7 +722,7 @@ Networks templates. Они не создают rule и не выбирают rou
 ## 29. Privacy
 
 - `PRIV-005`: analytics, telemetry, ads, accounts, remote config и crash upload отсутствуют.
-- `PRIV-006`: URL пользователя не отправляются наружу; proxy check отправляет только явный запрос к показанному endpoint.
+- `PRIV-006`: URL пользователя не отправляются наружу; proxy check отправляет только явный запрос к показанному endpoint; `Test speed` дополнительно отправляет один явный запрос скачивания к показанному speed endpoint (default Cloudflare), который видит egress IP прокси.
 - `PRIV-007`: credentials никогда не отправляются GeoIP/IP service как application data.
 - `PRIV-008`: export credentials opt-in и содержит предупреждение о plaintext JSON.
 - `PRIV-009`: logs минимизированы до hostname/scheme и перечисленных diagnostics.

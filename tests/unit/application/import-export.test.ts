@@ -170,7 +170,7 @@ describe('NativeImportService', () => {
     const preview = service.preview(JSON.stringify(legacy), config())
     expect(preview.ok).toBe(true)
     if (!preview.ok) return
-    expect(preview.value.document.config.schemaVersion).toBe(4)
+    expect(preview.value.document.config.schemaVersion).toBe(5)
     expect(preview.value.document.config).not.toHaveProperty('groups')
     expect(preview.value.document.config.rules[0]).not.toHaveProperty('groupId')
     expect(preview.value.document.config.rules[0]?.id).toBe('legacy-rule')
@@ -196,7 +196,7 @@ describe('NativeImportService', () => {
     const preview = service.preview(JSON.stringify(legacy), config())
     expect(preview.ok).toBe(true)
     if (!preview.ok) return
-    expect(preview.value.document.config.schemaVersion).toBe(4)
+    expect(preview.value.document.config.schemaVersion).toBe(5)
     expect(preview.value.document.config.rules[0]?.pattern).toContain('instagram\\.com')
   })
 

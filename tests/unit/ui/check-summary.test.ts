@@ -13,7 +13,9 @@ const result = (overrides: Partial<ProxyCheckResult> = {}): ProxyCheckResult => 
   checkedAt: asIsoTimestamp('2026-11-01T10:00:00.000Z'),
   connectDurationMs: null,
   country: 'DE',
+  downloadMbps: null,
   errorCode: null,
+  speedErrorCode: null,
   externalIp: '203.0.113.7',
   httpStatus: 200,
   totalDurationMs: 709.6,
@@ -62,5 +64,25 @@ describe('check summary', () => {
     expect(wrapper.find('.check-ip').exists()).toBe(false)
     expect(wrapper.find('img.flag').exists()).toBe(false)
     expect(wrapper.get('.check-error').text()).not.toBe('')
+  })
+})
+
+describe('speed in the check summary', () => {
+  it('shows the measured download speed', () => {
+    const wrapper = mount(CheckSummary, { props: { result: result({ downloadMbps: 48.2 }) } })
+    expect(wrapper.get('.check-speed').text()).toBe(message('speedMbps', '48.2'))
+  })
+
+  it('explains a failed download while the proxy stays available', () => {
+    const wrapper = mount(CheckSummary, {
+      props: { result: result({ speedErrorCode: 'HTTP_ERROR' }) },
+    })
+    expect(wrapper.get('.badge').text()).toBe(message('available'))
+    expect(wrapper.get('.check-speed').text()).toContain(message('speedTestFailed'))
+  })
+
+  it('shows nothing about speed after a plain check', () => {
+    const wrapper = mount(CheckSummary, { props: { result: result() } })
+    expect(wrapper.find('.check-speed').exists()).toBe(false)
   })
 })

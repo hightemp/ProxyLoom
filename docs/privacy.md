@@ -35,6 +35,13 @@ through that profile, and reveals the proxy egress IP to that endpoint. The resp
 from routing logs and error-page redirects. Users can replace the endpoint or disable country
 parsing.
 
+**Test speed** is a separate, explicit action. After the same check it downloads one test file
+through the same profile from the visible **Speed test download URL** in General (default
+`https://speed.cloudflare.com/__down?bytes=5000000`), for at most 15 seconds or 5 MB, inside the same
+temporary tab. That server sees the proxy's exit IP; the request carries no cookies, credentials or
+user URLs and is excluded from routing logs. Only the resulting Mbit/s figure is stored, as part of
+the profile's last check. Speed is never measured in the background.
+
 The default endpoint is `https://api.country.is/`. Its
 [provider documentation](https://country.is/) stated on 2026-07-26 that the service requires no
 API key and does not log requests. A live release check also confirmed HTTP 200, the documented

@@ -3,6 +3,7 @@ import { z } from 'zod'
 import type { AppConfig } from '../types/entities'
 import { err, ok, type Result } from '../types/result'
 import { addAppearanceAccentFromVersionThree } from '../config/accent-migration'
+import { addSpeedTestFromVersionFour } from '../config/speed-migration'
 import { parseAppConfig } from '../config/schema'
 import {
   removeGroupsFromVersionOne,
@@ -39,9 +40,11 @@ const exportProfileSchema = z
         checkedAt: z.string().min(20).max(64),
         connectDurationMs: z.number().nonnegative().nullable(),
         country: z.string().max(128).nullable(),
+        downloadMbps: z.number().nonnegative().max(1_000_000).nullable().optional(),
         errorCode: z.string().max(256).nullable(),
         externalIp: z.string().max(64).nullable(),
         httpStatus: z.number().int().min(100).max(599).nullable(),
+        speedErrorCode: z.string().max(256).nullable().optional(),
         totalDurationMs: z.number().nonnegative(),
       })
       .strict()
@@ -131,11 +134,13 @@ export const parseNativeExportText = (
     configCandidate.schemaVersion === 1 || configCandidate.schemaVersion === 2
       ? upgradeLegacyExamplesFromVersionTwo(versionTwoCandidate)
       : versionTwoCandidate
+  const sourceVersion =
+    typeof configCandidate.schemaVersion === 'number' ? configCandidate.schemaVersion : 0
   const versionFourCandidate =
-    typeof configCandidate.schemaVersion === 'number' && configCandidate.schemaVersion <= 3
-      ? addAppearanceAccentFromVersionThree(migratedCandidate)
-      : migratedCandidate
-  const config = parseAppConfig(versionFourCandidate)
+    sourceVersion <= 3 ? addAppearanceAccentFromVersionThree(migratedCandidate) : migratedCandidate
+  const versionFiveCandidate =
+    sourceVersion <= 4 ? addSpeedTestFromVersionFour(versionFourCandidate) : versionFourCandidate
+  const config = parseAppConfig(versionFiveCandidate)
   if (!config.ok) {
     return err({
       code: 'CONFIG_INVALID',

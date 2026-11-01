@@ -94,6 +94,18 @@ export const startHttpOrigin = async (): Promise<HttpOriginFixture> => {
       response.end('deterministic download')
       return
     }
+    if (requestUrl.pathname === '/__down') {
+      // Speed-test download: N zero bytes, readable cross-origin like the public endpoint.
+      const size = Math.min(Number(requestUrl.searchParams.get('bytes') ?? '0'), 20_000_000)
+      response.writeHead(200, {
+        'access-control-allow-origin': '*',
+        'cache-control': 'no-store',
+        'content-length': String(size),
+        'content-type': 'application/octet-stream',
+      })
+      response.end(Buffer.alloc(size))
+      return
+    }
     if (requestUrl.pathname === '/ip') {
       response.writeHead(200, { 'content-type': 'application/json' })
       response.end(JSON.stringify({ country: 'DE', ip: '192.0.2.10' }))

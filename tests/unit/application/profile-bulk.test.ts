@@ -22,6 +22,8 @@ const b = profile('b', {
     connectDurationMs: null,
     country: null,
     errorCode: null,
+    downloadMbps: null,
+    speedErrorCode: null,
     externalIp: '192.0.2.1',
     httpStatus: 200,
     totalDurationMs: 10,

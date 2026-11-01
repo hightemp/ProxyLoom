@@ -6,6 +6,7 @@ import {
   ClipboardPaste,
   Copy,
   CopyPlus,
+  Gauge,
   Globe,
   Link,
   ListChecks,
@@ -221,6 +222,7 @@ const editingId = shallowRef<string | null>(null)
 const formOpen = shallowRef(false)
 const draft = reactive<ProfileDraft>(blankProfile())
 const checkingId = shallowRef<string | null>(null)
+const speedTestingId = shallowRef<string | null>(null)
 const editorNameInput = shallowRef<HTMLInputElement | null>(null)
 let editorActivator: HTMLElement | null = null
 const restoreEditorFocus = shallowRef(false)
@@ -367,7 +369,21 @@ const check = async (profile: ProxyProfile): Promise<void> => {
   })
   if (!confirmed) return
   checkingId.value = profile.id
+  speedTestingId.value = null
   emit('command', { profileId: profile.id, type: 'CHECK_PROFILE' })
+}
+
+const testSpeed = async (profile: ProxyProfile): Promise<void> => {
+  const confirmed = await confirmController.request({
+    confirmLabel: t('runSpeedTest'),
+    details: [t('manualCheckDisclosure'), t('speedTestDisclosure')],
+    message: t('speedTestMessage', [profile.name, props.state.config.general.speedTestEndpoint]),
+    title: t('speedTestTitle'),
+  })
+  if (!confirmed) return
+  checkingId.value = profile.id
+  speedTestingId.value = profile.id
+  emit('command', { measureSpeed: true, profileId: profile.id, type: 'CHECK_PROFILE' })
 }
 
 const hasCredentials = (profile: ProxyProfile): boolean =>
@@ -617,7 +633,7 @@ watch(() => props.busy, restoreFocus)
           <div class="proxy-status">
             <span v-if="isChecking(profile)" class="badge checking" role="status">
               <LoaderCircle :size="12" aria-hidden="true" class="spin" />
-              {{ t('checkingNow') }}
+              {{ speedTestingId === profile.id ? t('testingSpeedNow') : t('checkingNow') }}
             </span>
             <CheckSummary v-else-if="profile.lastCheck" :result="profile.lastCheck" />
             <span v-else class="muted">{{ t('neverChecked') }}</span>
@@ -648,6 +664,12 @@ watch(() => props.busy, restoreFocus)
               :label="t('checkProfileNamed', profile.name)"
               :disabled="busy"
               @click="void check(profile)"
+            />
+            <IconButton
+              :icon="Gauge"
+              :label="t('testSpeedNamed', profile.name)"
+              :disabled="busy"
+              @click="void testSpeed(profile)"
             />
             <OverflowMenu :label="t('moreActionsFor', profile.name)">
               <button
@@ -923,7 +945,7 @@ watch(() => props.busy, restoreFocus)
 
 .proxy-row {
   /* Fixed so rows without the Use-globally button keep every column aligned. */
-  --row-actions-width: calc(4 * var(--control-height) + 3 * var(--space-1));
+  --row-actions-width: calc(5 * var(--control-height) + 4 * var(--space-1));
 
   display: grid;
   grid-template-columns:

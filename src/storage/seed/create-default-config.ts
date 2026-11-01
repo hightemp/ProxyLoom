@@ -1,3 +1,4 @@
+import { DEFAULT_SPEED_TEST_ENDPOINT } from '../../config/defaults'
 import type { AppConfig } from '../../domain/types/entities'
 
 export const createDefaultConfig = (): AppConfig => ({
@@ -14,9 +15,10 @@ export const createDefaultConfig = (): AppConfig => ({
     loggingPaused: false,
     mode: 'DIRECT',
     proxyCheckTimeoutMs: 10_000,
+    speedTestEndpoint: DEFAULT_SPEED_TEST_ENDPOINT,
   },
   profiles: [],
   revision: 0,
   rules: [],
-  schemaVersion: 4,
+  schemaVersion: 5,
 })

@@ -3,21 +3,21 @@ import { browser } from 'wxt/browser'
 import {
   parseIpGeoPayload,
   type IpGeoProviderError,
-  type IpGeoResult,
 } from '../../application/proxy-check/ip-geo-provider'
-import type { ProxyCheckRequestPort } from '../../application/proxy-check/proxy-check-service'
+import type {
+  CheckSettings,
+  ProxyCheckRequestPort,
+  ProxyLookupResult,
+} from '../../application/proxy-check/proxy-check-service'
+import type { SpeedSample, SpeedTestRequest } from '../../application/proxy-check/speed'
 import type { ProxyPlatformAdapter } from '../../application/ports/proxy-platform'
 import { buildRoutingSnapshot, type RoutingSnapshot } from '../../domain/routing/snapshot'
 import { asIsoTimestamp, asTemporaryOverrideId } from '../../domain/types/brand'
-import type {
-  AppConfig,
-  GeneralSettings,
-  ProxyProfile,
-  TemporaryOverride,
-} from '../../domain/types/entities'
+import type { AppConfig, ProxyProfile, TemporaryOverride } from '../../domain/types/entities'
 import { err, type Result } from '../../domain/types/result'
 import { normalizeUrl } from '../../domain/url/normalize'
 import type { SessionRepository } from '../../storage/session/session-repository'
+import { measureDownloadInPage } from './speed-probe'
 
 interface TargetedProxyCheckOptions {
   readonly adapter: ProxyPlatformAdapter
@@ -28,6 +28,9 @@ interface TargetedProxyCheckOptions {
   readonly restore: () => Promise<boolean>
   readonly setActiveSnapshot: (snapshot: RoutingSnapshot | null) => void
 }
+
+type SpeedProbe =
+  { readonly invalid: true } | { readonly invalid: false; readonly request: SpeedTestRequest }
 
 const escapeRegex = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
@@ -43,19 +46,27 @@ export class TargetedProxyCheckRequest implements ProxyCheckRequestPort {
 
   lookup(
     profile: ProxyProfile,
-    settings: Pick<
-      GeneralSettings,
-      'ipGeoProviderEndpoint' | 'proxyCheckTimeoutMs' | 'geoIpEnabled'
-    >,
+    settings: CheckSettings,
     signal: AbortSignal,
-  ): Promise<Result<IpGeoResult, IpGeoProviderError>> {
+    speed: SpeedTestRequest | null,
+  ): Promise<Result<ProxyLookupResult, IpGeoProviderError>> {
     return this.options.runExclusive(async () => {
       const normalized = normalizeUrl(profile.checkUrl)
       if (!normalized.ok) {
         return err({ code: 'INVALID_ENDPOINT', httpStatus: null })
       }
       const origin = normalized.value.originTarget
-      this.#activeOrigins.add(origin)
+      // The download origin is routed through the profile and kept out of user logs like the
+      // check origin; an unparsable speed URL is reported without blocking the check.
+      const speedTarget = speed === null ? null : normalizeUrl(speed.endpoint)
+      const speedOrigin = speedTarget?.ok === true ? speedTarget.value : null
+      const routedOrigins = [
+        { hostname: normalized.value.hostname, origin },
+        ...(speedOrigin === null || speedOrigin.originTarget === origin
+          ? []
+          : [{ hostname: speedOrigin.hostname, origin: speedOrigin.originTarget }]),
+      ]
+      for (const entry of routedOrigins) this.#activeOrigins.add(entry.origin)
       const config = await this.options.readConfig()
       const overrides = await this.options.readOverrides()
       const marker = await this.options.sessionRepository.getTransientState()
@@ -64,22 +75,22 @@ export class TargetedProxyCheckRequest implements ProxyCheckRequestPort {
         proxyCheckRecoveryRevision: config.revision,
       })
       try {
-        const checkOverride: TemporaryOverride = {
+        const checkOverrides: TemporaryOverride[] = routedOrigins.map((entry) => ({
           action: {
             targetProxyProfileId: profile.id,
             type: 'PROXY',
           },
           createdAt: asIsoTimestamp(new Date().toISOString()),
           expiresOnTabClose: true,
-          generatedPattern: `^${escapeRegex(origin)}$`,
+          generatedPattern: `^${escapeRegex(entry.origin)}$`,
           id: asTemporaryOverrideId(`proxy-check-${crypto.randomUUID()}`),
           incognito: false,
-          originKey: origin,
+          originKey: entry.origin,
           platformScope: 'ORIGIN',
           scope: 'EXACT_HOSTNAME',
-          sourceHostname: normalized.value.hostname,
+          sourceHostname: entry.hostname,
           sourceTabId: 0,
-        }
+        }))
         const temporaryConfig: AppConfig =
           config.general.mode === 'DIRECT'
             ? {
@@ -94,7 +105,7 @@ export class TargetedProxyCheckRequest implements ProxyCheckRequestPort {
             : config
         const snapshot = buildRoutingSnapshot(
           temporaryConfig,
-          [checkOverride, ...overrides],
+          [...checkOverrides, ...overrides],
           new Date(),
         )
         if (!snapshot.ok) {
@@ -105,11 +116,18 @@ export class TargetedProxyCheckRequest implements ProxyCheckRequestPort {
           return err({ code: 'NETWORK_ERROR', httpStatus: null })
         }
         this.options.setActiveSnapshot(snapshot.value)
+        const speedProbe: SpeedProbe | null =
+          speed === null
+            ? null
+            : speedOrigin === null
+              ? { invalid: true }
+              : { invalid: false, request: speed }
         return await this.lookupInTab(
           profile.checkUrl,
           settings.proxyCheckTimeoutMs,
           settings.geoIpEnabled,
           signal,
+          speedProbe,
         )
       } finally {
         this.options.setActiveSnapshot(null)
@@ -121,7 +139,7 @@ export class TargetedProxyCheckRequest implements ProxyCheckRequestPort {
             proxyCheckRecoveryRevision: null,
           })
         }
-        this.#activeOrigins.delete(origin)
+        for (const entry of routedOrigins) this.#activeOrigins.delete(entry.origin)
       }
     })
   }
@@ -131,7 +149,8 @@ export class TargetedProxyCheckRequest implements ProxyCheckRequestPort {
     timeoutMs: number,
     geoIpEnabled: boolean,
     signal: AbortSignal,
-  ): Promise<Result<IpGeoResult, IpGeoProviderError>> {
+    speed: SpeedProbe | null,
+  ): Promise<Result<ProxyLookupResult, IpGeoProviderError>> {
     const tab = await browser.tabs.create({ active: false, url: 'about:blank' })
     if (tab.id === undefined) {
       return err({ code: 'NETWORK_ERROR', httpStatus: null })
@@ -217,11 +236,44 @@ export class TargetedProxyCheckRequest implements ProxyCheckRequestPort {
       if (typeof injection?.result !== 'string') {
         return err({ code: 'MALFORMED_RESPONSE', httpStatus: navigation.value.httpStatus })
       }
-      return parseIpGeoPayload(injection.result, navigation.value.httpStatus, geoIpEnabled)
+      const parsed = parseIpGeoPayload(injection.result, navigation.value.httpStatus, geoIpEnabled)
+      if (!parsed.ok || speed === null) return parsed
+      const phaseStarted = performance.now()
+      const sample = speed.invalid
+        ? ({ code: 'INVALID_ENDPOINT', ok: false } as const)
+        : await this.probeSpeed(tabId, speed.request, signal)
+      return {
+        ok: true,
+        value: { ...parsed.value, speed: sample, speedPhaseMs: performance.now() - phaseStarted },
+      }
     } catch {
       return err({ code: 'NETWORK_ERROR', httpStatus: null })
     } finally {
       await browser.tabs.remove(tabId).catch(() => undefined)
     }
+  }
+
+  /** Downloads inside the check tab so the request uses the profile; cancel ends it early. */
+  private async probeSpeed(
+    tabId: number,
+    request: SpeedTestRequest,
+    signal: AbortSignal,
+  ): Promise<SpeedSample> {
+    const cancelled = new Promise<SpeedSample>((resolve) => {
+      if (signal.aborted) resolve({ code: 'TIMEOUT', ok: false })
+      signal.addEventListener('abort', () => resolve({ code: 'TIMEOUT', ok: false }), {
+        once: true,
+      })
+    })
+    const injected = browser.scripting
+      .executeScript({
+        args: [request.endpoint, request.maxBytes, request.maxMs],
+        func: measureDownloadInPage,
+        target: { tabId },
+      })
+      .then(([injection]) => injection?.result ?? null)
+      .then((sample): SpeedSample => sample ?? { code: 'NETWORK_ERROR', ok: false })
+      .catch((): SpeedSample => ({ code: 'NETWORK_ERROR', ok: false }))
+    return Promise.race([injected, cancelled])
   }
 }

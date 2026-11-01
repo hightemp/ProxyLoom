@@ -20,6 +20,8 @@ const office = profile('office', {
     connectDurationMs: null,
     country: 'DE',
     errorCode: null,
+    downloadMbps: null,
+    speedErrorCode: null,
     externalIp: '198.51.100.7',
     httpStatus: 200,
     totalDurationMs: 707.4,
@@ -139,5 +141,29 @@ describe('proxy rows', () => {
     await nextTick()
     expect(wrapper.find('dialog.modal').exists()).toBe(false)
     expect(document.activeElement).toBe(edit.element)
+  })
+})
+
+describe('Test speed', () => {
+  it('discloses the download endpoint and requests a check with a speed sample', async () => {
+    const { confirmController } = await import('../../../src/ui/confirm/confirm-controller')
+    const { flushPromises } = await import('@vue/test-utils')
+    const wrapper = mountSection()
+    const officeRow = row(wrapper, 'Office')
+    await officeRow
+      .get(`button[aria-label="${message('testSpeedNamed', 'Office')}"]`)
+      .trigger('click')
+    const pending = confirmController.pending.value
+    expect(pending?.title).toBe(message('speedTestTitle'))
+    expect(pending?.message).toContain('https://speed.cloudflare.com/__down?bytes=5000000')
+    confirmController.answer(true)
+    await flushPromises()
+    expect(wrapper.emitted('command')?.at(-1)?.[0]).toEqual({
+      measureSpeed: true,
+      profileId: office.id,
+      type: 'CHECK_PROFILE',
+    })
+    await wrapper.setProps({ busy: true })
+    expect(officeRow.get('.proxy-status').text()).toContain(message('testingSpeedNow'))
   })
 })

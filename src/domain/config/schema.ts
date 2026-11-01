@@ -22,9 +22,11 @@ const checkResultSchema = z
     checkedAt: timestamp,
     connectDurationMs: z.number().nonnegative().nullable(),
     country: z.string().max(128).nullable(),
+    downloadMbps: z.number().nonnegative().max(1_000_000).nullable(),
     errorCode: z.string().max(256).nullable(),
     externalIp: z.string().max(64).nullable(),
     httpStatus: z.number().int().min(100).max(599).nullable(),
+    speedErrorCode: z.string().max(256).nullable(),
     totalDurationMs: z.number().nonnegative(),
   })
   .strict()
@@ -100,12 +102,17 @@ export const appConfigSchema = z
         loggingPaused: z.boolean(),
         mode: z.enum(['DIRECT', 'PROXY', 'RULES']),
         proxyCheckTimeoutMs: z.number().int().min(1_000).max(120_000),
+        speedTestEndpoint: z
+          .string()
+          .url()
+          .max(2_048)
+          .refine((value) => /^https?:\/\//i.test(value)),
       })
       .strict(),
     profiles: z.array(profileSchema).max(10_000),
     revision: z.number().int().nonnegative(),
     rules: z.array(ruleSchema).max(10_000),
-    schemaVersion: z.literal(4),
+    schemaVersion: z.literal(5),
   })
   .strict()
 

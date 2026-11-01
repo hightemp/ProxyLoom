@@ -22,7 +22,7 @@ describe('default configuration', () => {
     const value = createDefaultConfig()
     expect(value.rules).toEqual([])
     expect(value).not.toHaveProperty('groups')
-    expect(value.schemaVersion).toBe(4)
+    expect(value.schemaVersion).toBe(5)
     expect(value.general.mode).toBe('DIRECT')
   })
 })
@@ -165,7 +165,7 @@ describe('configuration migrations', () => {
     const result = migrateConfig(legacy)
     expect(result.ok).toBe(true)
     if (result.ok) {
-      expect(result.value.schemaVersion).toBe(4)
+      expect(result.value.schemaVersion).toBe(5)
       expect(result.value.revision).toBe(4)
       expect(result.value.appearance.theme).toBe('SYSTEM')
       expect(result.value.general.loggingEnabled).toBe(true)
@@ -246,7 +246,7 @@ describe('configuration migrations', () => {
 
     expect(result.ok).toBe(true)
     if (!result.ok) return
-    expect(result.value.schemaVersion).toBe(4)
+    expect(result.value.schemaVersion).toBe(5)
     expect(result.value.rules[0]?.pattern).toContain('instagram\\.com')
     expect(result.value.rules[0]?.action).toEqual(placeholder.action)
     expect(result.value.rules[1]?.pattern).toBe('^https://social\\.example/$')

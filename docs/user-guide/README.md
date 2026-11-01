@@ -223,3 +223,12 @@ Each proxy row shows the whole result of its last check: Available or Unavailabl
 time, and either the reason for a failure or the external IP with the country's name and flag. The
 popup shows the same country next to the global proxy. Flags are bundled with the extension, so no
 image is downloaded; a country value that is not a two-letter ISO code is shown as text.
+
+### Speed test
+
+The gauge button in a proxy row runs **Test speed**: after the usual check it downloads a test file
+through that proxy for at most 15 seconds or 5 MB and shows the result in Mbit/s next to the
+response time. The download URL is shown before you confirm and can be changed in General →
+**Speed test download URL** (default: Cloudflare's speed endpoint, which must allow cross-origin
+requests). If the proxy works but the download fails, the proxy stays Available and the row says
+why the speed test failed.

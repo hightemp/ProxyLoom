@@ -74,7 +74,7 @@ export const runtimeState = (
     lastApplyError: null,
     persistedRevision: 1,
     platform: 'CHROMIUM',
-    schemaVersion: 4,
+    schemaVersion: 5,
   },
   inspection: null,
   logs: [],

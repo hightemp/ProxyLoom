@@ -1854,11 +1854,11 @@ rules`, compact check pill; `Use globally`/`Check` + «⋯» (Edit, Duplicate, C
     `hasFlag` — в основном bundle. Название страны — `Intl.DisplayNames` (en). Колонка действий
     строки прокси имеет фиксированную ширину, чтобы столбцы строк совпадали.
 
-- [ ] **PL-164 — Проверка скорости прокси**
+- [x] **PL-164 — Проверка скорости прокси**
   - **Цель:** отдельное действие `Test speed`: в одноразовой check-вкладке через выбранный профиль
     выполнить обычную проверку и скачать тестовый файл (по умолчанию
     `https://speed.cloudflare.com/__down?bytes=5000000`), показать Мбит/с.
-  - **Требования:** FR-043, FR-065, PRIV-006 (обновить PRD до реализации).
+  - **Требования:** FR-084, FR-043, FR-065, PRIV-006.
   - **Действия:** `general.speedTestEndpoint` и `ProxyCheckResult.downloadMbps` — schema v5,
     идемпотентная миграция, backward fixture, native import/export; endpoint показан и заменяем;
     origin скачивания исключён из user logs/error page; ограничение времени и объёма.

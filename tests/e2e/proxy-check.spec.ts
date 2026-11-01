@@ -289,3 +289,65 @@ test('recovers the committed route after the worker is interrupted during a chec
     await Promise.all([origin.close(), proxy.close()])
   }
 })
+
+test('tests the download speed through the profile without logging the download', async ({
+  extensionPage,
+}) => {
+  const origin = await startHttpOrigin()
+  const proxy = await startHttpProxy({ marker: 'speed-proxy' })
+  try {
+    const checkOrigin = origin.origin.replace('127.0.0.1', 'origin.proxyloom.test')
+    const speedOrigin = origin.origin.replace('127.0.0.1', 'speed.proxyloom.test')
+    const speedUrl = `${speedOrigin}/__down?bytes=400000`
+    await resetExtension(extensionPage)
+    await extensionPage.getByLabel('Speed test download URL').fill(speedUrl)
+    await extensionPage.getByRole('button', { name: 'Save general settings' }).click()
+    await expect(extensionPage.getByText('Saved and applied.')).toBeVisible()
+
+    await extensionPage.getByRole('button', { name: /Proxies/ }).click()
+    await extensionPage.getByRole('button', { name: 'Add profile' }).click()
+    await extensionPage.getByLabel('Name', { exact: true }).fill('Speedy')
+    await extensionPage.getByLabel('Host', { exact: true }).fill(proxy.host)
+    await extensionPage.getByLabel('Port', { exact: true }).fill(String(proxy.port))
+    await extensionPage.getByRole('tab', { name: 'Advanced' }).click()
+    await extensionPage.getByLabel('Check URL').fill(`${checkOrigin}/ip`)
+    await extensionPage.getByRole('button', { name: 'Save profile' }).click()
+
+    const card = extensionPage.locator('.proxy-row').filter({ hasText: 'Speedy' })
+    await card.getByRole('button', { name: 'Test speed of Speedy' }).click()
+    await expect(extensionPage.getByRole('dialog')).toContainText(speedUrl)
+    await acceptConfirm(extensionPage)
+
+    await expect(card.locator('.check-speed')).toContainText('Mbit/s', { timeout: 20_000 })
+    await expect(card.locator('.proxy-status')).toContainText('Available')
+    expect(proxy.requests.some((request) => request.target.startsWith(speedUrl))).toBe(true)
+    expect(
+      origin.requests.some(
+        (request) =>
+          request.path.startsWith('/__down') &&
+          request.headers['x-proxyloom-test-proxy'] === 'speed-proxy',
+      ),
+    ).toBe(true)
+
+    const state: unknown = await extensionPage.evaluate(async () => {
+      const api = (
+        globalThis as unknown as {
+          chrome: { runtime: { sendMessage(message: unknown): Promise<unknown> } }
+        }
+      ).chrome
+      return await api.runtime.sendMessage({
+        logQuery: {
+          errorsOnly: false,
+          hostname: 'speed.proxyloom.test',
+          limit: 100,
+          offset: 0,
+          platform: null,
+        },
+        type: 'GET_STATE',
+      })
+    })
+    expect(state).toMatchObject({ ok: true, value: { logs: [] } })
+  } finally {
+    await Promise.all([origin.close(), proxy.close()])
+  }
+})
