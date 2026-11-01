@@ -95,7 +95,7 @@ test('persists the option to keep the browser native proxy error page', async ({
 test('previews and imports supported FoxyProxy profiles only', async ({ extensionPage }) => {
   await extensionPage.getByRole('button', { name: /Import & Export/ }).click()
   const file = resolve('tests/fixtures/foxyproxy/v8-redacted.json')
-  await extensionPage.getByLabel('FoxyProxy JSON file').setInputFiles(file)
+  await extensionPage.locator('input[name="foxyproxy-json-file"]').setInputFiles(file)
   await extensionPage.getByRole('button', { name: 'Parse and preview' }).click()
 
   await expect(extensionPage.getByText('Detected FOXYPROXY_8_PLUS')).toBeVisible()
@@ -154,7 +154,7 @@ test('previews and atomically replaces configuration through the native import U
 
   await resetExtension(extensionPage)
   await extensionPage.getByRole('button', { name: /Import & Export/ }).click()
-  await extensionPage.getByLabel('Native JSON file').setInputFiles({
+  await extensionPage.locator('input[name="native-json-file"]').setInputFiles({
     buffer: exported,
     mimeType: 'application/json',
     name: 'native-replace.json',

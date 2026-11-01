@@ -1998,5 +1998,27 @@
   },
   "editorRoute": {
     "message": "Route"
+  },
+  "makePermanentFor": {
+    "message": "Make $SITE$ permanent",
+    "placeholders": {
+      "site": {
+        "content": "$1"
+      }
+    }
+  },
+  "removeOverrideFor": {
+    "message": "Remove $SITE$",
+    "placeholders": {
+      "site": {
+        "content": "$1"
+      }
+    }
+  },
+  "exportGroup": {
+    "message": "Export"
+  },
+  "importGroup": {
+    "message": "Import"
   }
 }

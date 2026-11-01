@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Clock, Link, Pin, ScrollText, Settings } from '@lucide/vue'
 import { computed, onMounted, shallowRef } from 'vue'
 
 import type { OverridePreview } from '../../src/application/overrides/override-service'
@@ -267,9 +268,11 @@ onMounted(() => {
         </p>
         <div class="button-row">
           <button class="primary" type="button" :disabled="busy" @click="siteAction(false)">
+            <Clock :size="16" aria-hidden="true" />
             {{ hasOwnOverride ? t('updateOnce') : t('once') }}
           </button>
           <button type="button" :disabled="busy" @click="siteAction(true)">
+            <Pin :size="16" aria-hidden="true" />
             {{ t('alwaysCreateRule') }}
           </button>
         </div>
@@ -315,6 +318,7 @@ onMounted(() => {
           <ProfileChip :profile="activeProfile" />
           <small>{{ lastCheckText }}</small>
           <button class="link-button" type="button" @click="void copyActiveUrl()">
+            <Link :size="14" aria-hidden="true" />
             {{ t('copyUrl') }}
           </button>
         </div>
@@ -336,6 +340,7 @@ onMounted(() => {
 
       <footer class="popup-footer">
         <button class="link-button" type="button" @click="execute({ type: 'OPEN_SETTINGS' })">
+          <Settings :size="15" aria-hidden="true" />
           {{ t('openSettings') }}
         </button>
         <button
@@ -343,6 +348,7 @@ onMounted(() => {
           type="button"
           @click="execute({ section: 'logs', type: 'OPEN_SETTINGS' })"
         >
+          <ScrollText :size="15" aria-hidden="true" />
           {{ t('logsLink') }}
         </button>
       </footer>

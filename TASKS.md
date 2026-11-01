@@ -1796,7 +1796,7 @@ rules`, compact check pill; `Use globally`/`Check` + «⋯» (Edit, Duplicate, C
   - **Зависимости:** PL-153, PL-154.
   - **Готово, когда:** unit/E2E/typecheck/lint/dual builds зелёные, version 0.1.22.
 
-- [ ] **PL-157 — Остальные разделы, popup и error page в новой системе**
+- [x] **PL-157 — Остальные разделы, popup и error page в новой системе**
   - **Требования:** FR-004, FR-012, FR-050–FR-056, NFR-007–NFR-012.
   - **Зависимости:** PL-153, PL-154.
   - **Готово, когда:** unit/E2E/typecheck/lint/dual builds зелёные, store-скриншот обновлён,

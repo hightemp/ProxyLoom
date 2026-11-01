@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Palette } from '@lucide/vue'
 import type { AppRuntimeState, RuntimeRequest } from '../../application/runtime/contracts'
 import { t } from '../../i18n/messages'
 
@@ -18,12 +19,12 @@ const themeLabels = {
 
 <template>
   <article class="surface card stack">
-    <div>
-      <p class="eyebrow">
-        {{ t('appearanceEyebrow') }}
-      </p>
-      <h2>{{ t('appearanceTitle') }}</h2>
-      <p>{{ t('appearanceDescription') }}</p>
+    <div class="card-heading">
+      <Palette :size="20" aria-hidden="true" />
+      <div>
+        <h2>{{ t('appearanceTitle') }}</h2>
+        <p>{{ t('appearanceDescription') }}</p>
+      </div>
     </div>
     <fieldset class="theme-grid" :disabled="busy">
       <legend>{{ t('theme') }}</legend>

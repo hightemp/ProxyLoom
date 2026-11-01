@@ -158,7 +158,7 @@ test('lists, edits, promotes and clears Once overrides in the options page', asy
   await expect(edited).toContainText('Office')
   await expect(edited).toContainText('Domain + subdomains')
 
-  await edited.getByRole('button', { name: 'Make permanent' }).click()
+  await edited.getByRole('button', { name: 'Make example.co.uk permanent' }).click()
   await acceptConfirm(extensionPage)
   await expect(rows).toHaveCount(1)
   await extensionPage.getByRole('button', { name: /Rules/ }).first().click()

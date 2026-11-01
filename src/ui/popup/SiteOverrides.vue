@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Pin, Trash2 } from '@lucide/vue'
 import { computed } from 'vue'
 
 import { overridesForSite } from '../../application/overrides/site-overrides'
@@ -91,17 +92,19 @@ const promote = async (override: TemporaryOverride): Promise<void> => {
           </option>
         </select>
         <div class="button-row">
-          <button type="button" :disabled="busy" @click="void promote(override)">
+          <button type="button" class="small" :disabled="busy" @click="void promote(override)">
+            <Pin :size="14" aria-hidden="true" />
             {{ t('makePermanent') }}
           </button>
           <button
-            class="danger-text"
+            class="danger-text small"
             type="button"
             :disabled="busy"
             @click="
               emit('command', { overrideId: override.id, ...context, type: 'REMOVE_OVERRIDE' })
             "
           >
+            <Trash2 :size="14" aria-hidden="true" />
             {{ t('remove') }}
           </button>
         </div>

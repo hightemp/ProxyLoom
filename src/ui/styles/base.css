@@ -478,6 +478,40 @@ label > textarea {
   padding: var(--space-5);
 }
 
+/* Buttons keep their natural width inside stacked layouts instead of stretching. */
+.stack > button,
+.card > button,
+form > button {
+  justify-self: start;
+}
+
+.card-heading {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+.card-heading > svg {
+  margin-top: 2px;
+  color: var(--color-primary);
+}
+
+.card-heading > div {
+  display: grid;
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
+}
+
+.card-heading p {
+  color: var(--color-muted);
+}
+
+.card-heading > .status-pill,
+.card-heading > .badge {
+  margin-left: auto;
+}
+
 .section-heading {
   display: flex;
   flex-wrap: wrap;

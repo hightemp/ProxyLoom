@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Clock, EyeOff, Info, Pencil, Pin, Trash2 } from '@lucide/vue'
 import { computed, nextTick, shallowRef } from 'vue'
 
 import { previewOverrideForHostname } from '../../application/overrides/override-service'
@@ -7,6 +8,8 @@ import { asProxyProfileId } from '../../domain/types/brand'
 import type { OverrideScope, RuleAction, TemporaryOverride } from '../../domain/types/entities'
 import { t } from '../../i18n/messages'
 import { confirmController } from '../confirm/confirm-controller'
+import IconButton from '../components/IconButton.vue'
+import Modal from '../components/Modal.vue'
 import { decisionActionLabel, errorText } from '../labels'
 
 const props = defineProps<{
@@ -137,15 +140,18 @@ const clearAll = async (): Promise<void> => {
         :disabled="busy"
         @click="void clearAll()"
       >
+        <Trash2 :size="16" aria-hidden="true" />
         {{ t('clearAllOverrides') }}
       </button>
     </div>
 
     <p class="notice">
+      <EyeOff :size="16" aria-hidden="true" />
       {{ t('privateOverridesNote') }}
     </p>
 
     <div v-if="overrides.length === 0" class="surface empty-state">
+      <Clock :size="28" aria-hidden="true" />
       <p>{{ t('noOverrides') }}</p>
     </div>
 
@@ -183,44 +189,56 @@ const clearAll = async (): Promise<void> => {
         </thead>
         <tbody>
           <tr v-for="override in overrides" :key="override.id">
-            <th scope="row">
-              <code>{{ override.originKey }}</code>
+            <th scope="row" class="site-cell">
+              <code class="truncate" :title="override.originKey">{{ override.originKey }}</code>
             </th>
             <td>{{ scopeLabel(override.scope) }}</td>
             <td>{{ routeLabel(override.action) }}</td>
             <td>
-              {{ appliesToLabel(override) }}
-              <small v-if="override.platformScope === 'ORIGIN'" class="override-warning">
-                {{ t('temporaryOverrideWarning') }}
-              </small>
+              <span class="applies">
+                {{ appliesToLabel(override) }}
+                <span
+                  v-if="override.platformScope === 'ORIGIN'"
+                  class="hint-icon"
+                  :title="t('temporaryOverrideWarning')"
+                >
+                  <Info :size="14" aria-hidden="true" />
+                  <span class="sr-only">{{ t('temporaryOverrideWarning') }}</span>
+                </span>
+              </span>
             </td>
-            <td>{{ t('tabNumber', String(override.sourceTabId)) }}</td>
+            <td class="muted">
+              {{ t('tabNumber', String(override.sourceTabId)) }}
+            </td>
             <td>
               <time :datetime="override.createdAt">
                 {{ new Date(override.createdAt).toLocaleString() }}
               </time>
             </td>
             <td>
-              <div class="button-row">
-                <button
-                  type="button"
+              <div class="row-actions">
+                <IconButton
+                  :icon="Pencil"
+                  size="small"
+                  :label="t('editOverrideFor', override.originKey)"
                   :disabled="busy"
-                  :aria-label="t('editOverrideFor', override.originKey)"
                   @click="edit(override, $event)"
-                >
-                  {{ t('edit') }}
-                </button>
-                <button type="button" :disabled="busy" @click="void promote(override)">
-                  {{ t('makePermanent') }}
-                </button>
-                <button
-                  class="danger-text"
-                  type="button"
+                />
+                <IconButton
+                  :icon="Pin"
+                  size="small"
+                  :label="t('makePermanentFor', override.originKey)"
+                  :disabled="busy"
+                  @click="void promote(override)"
+                />
+                <IconButton
+                  :icon="Trash2"
+                  size="small"
+                  variant="danger-text"
+                  :label="t('removeOverrideFor', override.originKey)"
                   :disabled="busy"
                   @click="emit('command', { overrideId: override.id, type: 'REMOVE_OVERRIDE' })"
-                >
-                  {{ t('remove') }}
-                </button>
+                />
               </div>
             </td>
           </tr>
@@ -228,61 +246,100 @@ const clearAll = async (): Promise<void> => {
       </table>
     </div>
 
-    <form
-      v-if="editing"
-      class="surface card stack override-editor"
-      :aria-label="t('editOverrideFor', editing.originKey)"
-      @submit.prevent="save"
+    <Modal
+      :open="editing !== null"
+      :title="editing ? t('editOverrideFor', editing.originKey) : ''"
+      @close="closeEditor"
     >
-      <h3>{{ t('editOverrideFor', editing.originKey) }}</h3>
-      <div class="form-grid">
-        <label>
-          {{ t('scope') }}
-          <select ref="editorScope" v-model="draftScope" name="override-scope">
-            <option value="EXACT_HOSTNAME">{{ t('exactHostname') }}</option>
-            <option value="REGISTRABLE_DOMAIN">{{ t('domainSubdomains') }}</option>
-          </select>
-        </label>
-        <label>
-          {{ t('route') }}
-          <select v-model="draftRoute" name="override-route">
-            <option value="DIRECT">{{ decisionActionLabel('DIRECT') }}</option>
-            <option
-              v-for="profile in state.config.profiles"
-              :key="profile.id"
-              :value="`${PROFILE_PREFIX}${profile.id}`"
-            >
-              {{ profile.name }} ({{ profile.shortName ?? profile.generatedShortName }})
-            </option>
-          </select>
-        </label>
-      </div>
-      <p class="override-preview" aria-live="polite">
-        <template v-if="preview?.ok">
-          {{ t('generatedPattern') }}:
-          <code>{{ preview.value.generatedPattern }}</code>
-        </template>
-        <span v-else-if="preview" class="notice danger">{{ errorText(preview.error) }}</span>
-      </p>
-      <div class="button-row">
-        <button class="primary" type="submit" :disabled="busy || preview?.ok !== true">
-          {{ t('saveOverride') }}
-        </button>
+      <form v-if="editing" id="override-form" class="stack override-editor" @submit.prevent="save">
+        <div class="form-grid">
+          <label>
+            {{ t('scope') }}
+            <select ref="editorScope" v-model="draftScope" name="override-scope">
+              <option value="EXACT_HOSTNAME">{{ t('exactHostname') }}</option>
+              <option value="REGISTRABLE_DOMAIN">{{ t('domainSubdomains') }}</option>
+            </select>
+          </label>
+          <label>
+            {{ t('route') }}
+            <select v-model="draftRoute" name="override-route">
+              <option value="DIRECT">{{ decisionActionLabel('DIRECT') }}</option>
+              <option
+                v-for="profile in state.config.profiles"
+                :key="profile.id"
+                :value="`${PROFILE_PREFIX}${profile.id}`"
+              >
+                {{ profile.name }} ({{ profile.shortName ?? profile.generatedShortName }})
+              </option>
+            </select>
+          </label>
+        </div>
+        <div class="override-preview" aria-live="polite">
+          <template v-if="preview?.ok">
+            <span class="field-label">{{ t('generatedPattern') }}</span>
+            <code>{{ preview.value.generatedPattern }}</code>
+          </template>
+          <span v-else-if="preview" class="notice danger">{{ errorText(preview.error) }}</span>
+        </div>
+      </form>
+      <template #footer>
         <button type="button" @click="closeEditor">
           {{ t('cancel') }}
         </button>
-      </div>
-    </form>
+        <button
+          class="primary"
+          type="submit"
+          form="override-form"
+          :disabled="busy || preview?.ok !== true"
+        >
+          {{ t('saveOverride') }}
+        </button>
+      </template>
+    </Modal>
   </div>
 </template>
 
 <style scoped>
-.override-warning {
+.site-cell {
+  max-width: 240px;
+}
+
+.site-cell code {
   display: block;
+  white-space: nowrap;
+}
+
+.applies {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.hint-icon {
+  display: inline-flex;
   color: var(--color-muted);
+  cursor: help;
+}
+
+td.muted {
+  white-space: nowrap;
+}
+
+.override-preview {
+  display: grid;
+  gap: 6px;
+  padding: var(--space-3);
+  border-radius: var(--radius);
+  background: var(--color-surface-2);
 }
 
 .override-preview code {
   word-break: break-all;
+}
+
+.field-label {
+  color: var(--color-muted);
+  font-size: 12.5px;
+  font-weight: 550;
 }
 </style>

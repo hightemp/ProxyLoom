@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ChevronLeft, ChevronRight, Filter, Trash2 } from '@lucide/vue'
 import { shallowRef } from 'vue'
 
 import type { AppRuntimeState, RuntimeRequest } from '../../application/runtime/contracts'
@@ -59,13 +60,11 @@ const clear = async (): Promise<void> => {
   <div class="stack">
     <div class="section-heading">
       <div>
-        <p class="eyebrow">
-          {{ t('localDiagnostics') }}
-        </p>
         <h2>{{ t('routingLogs') }}</h2>
         <p>{{ t('routingLogsDescription') }}</p>
       </div>
       <button class="danger-text" type="button" :disabled="busy" @click="void clear()">
+        <Trash2 :size="16" aria-hidden="true" />
         {{ t('clearLogs') }}
       </button>
     </div>
@@ -94,6 +93,7 @@ const clear = async (): Promise<void> => {
           <span>{{ t('errorsAuthOnly') }}</span>
         </label>
         <button type="button" @click="applyFilters">
+          <Filter :size="16" aria-hidden="true" />
           {{ t('applyFilters') }}
         </button>
       </div>
@@ -173,10 +173,12 @@ const clear = async (): Promise<void> => {
     </div>
     <div class="button-row">
       <button type="button" :disabled="offset === 0" @click="newer">
+        <ChevronLeft :size="16" aria-hidden="true" />
         {{ t('newer') }}
       </button>
       <button type="button" :disabled="state.logs.length < 100" @click="older">
         {{ t('older') }}
+        <ChevronRight :size="16" aria-hidden="true" />
       </button>
       <span class="muted">{{ t('offset') }} {{ offset }}</span>
     </div>

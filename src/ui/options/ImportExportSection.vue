@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Download, FileDown, FileJson, FileText, PackageOpen, TriangleAlert } from '@lucide/vue'
 import { shallowRef } from 'vue'
 
 import type {
@@ -12,6 +13,7 @@ import { t } from '../../i18n/messages'
 import { errorText, foxyProxySkipLabel } from '../labels'
 import { confirmController } from '../confirm/confirm-controller'
 import { runtimeClient } from '../runtime/client'
+import FileInput from '../components/FileInput.vue'
 import ProxyLineImportPanel from './ProxyLineImportPanel.vue'
 
 const props = defineProps<{
@@ -33,9 +35,7 @@ const foxyPreview = shallowRef<FoxyProxyPreviewView | null>(null)
 const selectedFoxy = shallowRef<ReadonlySet<number>>(new Set())
 const working = shallowRef(false)
 
-const readFile = async (event: Event, target: 'NATIVE' | 'FOXY'): Promise<void> => {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (file === undefined) return
+const readFile = async (file: File, target: 'NATIVE' | 'FOXY'): Promise<void> => {
   const text = await file.text()
   if (target === 'NATIVE') {
     nativeText.value = text
@@ -147,154 +147,189 @@ const applyFoxy = async (): Promise<void> => {
 
 <template>
   <div class="stack">
+    <h2 class="group-title">
+      {{ t('exportGroup') }}
+    </h2>
+    <div class="io-grid">
+      <article class="surface card stack">
+        <div class="card-heading">
+          <Download :size="20" aria-hidden="true" />
+          <div>
+            <h3>{{ t('nativeExport') }}</h3>
+            <p>{{ t('nativeExportDescription') }}</p>
+          </div>
+        </div>
+        <label class="check-row">
+          <input v-model="includeCredentials" type="checkbox" />
+          <span>
+            <strong>{{ t('includeProxyCredentials') }}</strong>
+            <small>{{ t('includeProxyCredentialsDescription') }}</small>
+          </span>
+        </label>
+        <p v-if="includeCredentials" class="notice warning">
+          <TriangleAlert :size="16" aria-hidden="true" />
+          {{ t('credentialExportWarning') }}
+        </p>
+        <button class="primary" type="button" :disabled="busy || working" @click="downloadExport">
+          <Download :size="16" aria-hidden="true" />
+          {{ t('downloadJsonExport') }}
+        </button>
+      </article>
+
+      <article class="surface card stack">
+        <div class="card-heading">
+          <FileText :size="20" aria-hidden="true" />
+          <div>
+            <h3>{{ t('textExport') }}</h3>
+            <p>{{ t('textExportDescription') }}</p>
+          </div>
+        </div>
+        <label>
+          {{ t('textExportFormat') }}
+          <select v-model="textFormat" name="text-export-format">
+            <option value="URL">{{ t('copyAsUrl') }}</option>
+            <option value="COMPACT">{{ t('copyAsCompact') }}</option>
+          </select>
+        </label>
+        <button type="button" :disabled="state.config.profiles.length === 0" @click="exportText">
+          <FileDown :size="16" aria-hidden="true" />
+          {{ t('exportProxiesAsText') }}
+        </button>
+      </article>
+    </div>
+
+    <h2 class="group-title">
+      {{ t('importGroup') }}
+    </h2>
     <ProxyLineImportPanel
       :state="state"
       :busy="busy"
       @status="(message, error) => emit('status', message, error)"
       @refresh="emit('refresh')"
     />
-    <article class="surface card stack">
-      <div>
-        <p class="eyebrow">
-          {{ t('portableBackup') }}
-        </p>
-        <h2>{{ t('nativeExport') }}</h2>
-        <p>{{ t('nativeExportDescription') }}</p>
-      </div>
-      <label class="check-row">
-        <input v-model="includeCredentials" type="checkbox" />
-        <span>
-          <strong>{{ t('includeProxyCredentials') }}</strong>
-          <small>{{ t('includeProxyCredentialsDescription') }}</small>
-        </span>
-      </label>
-      <p v-if="includeCredentials" class="notice warning">
-        {{ t('credentialExportWarning') }}
-      </p>
-      <button class="primary" type="button" :disabled="busy || working" @click="downloadExport">
-        {{ t('downloadJsonExport') }}
-      </button>
-    </article>
-
-    <article class="surface card stack">
-      <div>
-        <h2>{{ t('textExport') }}</h2>
-        <p>{{ t('textExportDescription') }}</p>
-      </div>
-      <label>
-        {{ t('textExportFormat') }}
-        <select v-model="textFormat" name="text-export-format">
-          <option value="URL">{{ t('copyAsUrl') }}</option>
-          <option value="COMPACT">{{ t('copyAsCompact') }}</option>
-        </select>
-      </label>
-      <button type="button" :disabled="state.config.profiles.length === 0" @click="exportText">
-        {{ t('exportProxiesAsText') }}
-      </button>
-    </article>
-
-    <article class="surface card stack">
-      <div>
-        <p class="eyebrow">
-          {{ t('validatedAtomic') }}
-        </p>
-        <h2>{{ t('nativeImport') }}</h2>
-        <p>{{ t('nativeImportDescription') }}</p>
-      </div>
-      <label>
-        {{ t('nativeJsonFile') }}
-        <input type="file" accept="application/json,.json" @change="readFile($event, 'NATIVE')" />
-      </label>
-      <button type="button" :disabled="nativeText === '' || working" @click="previewNative">
-        {{ t('validatePreview') }}
-      </button>
-      <div v-if="nativePreview" class="preview-box">
-        <strong>
-          {{ nativePreview.profiles }} {{ t('profilesCountLabel') }} · {{ nativePreview.rules }}
-          {{ t('rulesCountLabel') }}
-        </strong>
-        <p>
-          {{ t('credentials') }}
-          {{ nativePreview.includesCredentials ? t('presentInFile') : t('notPresent') }}
-        </p>
-        <ul>
-          <li v-for="warning in nativePreview.warnings" :key="warning">
-            {{ warning }}
-          </li>
-        </ul>
-        <fieldset class="segmented compact">
-          <legend>{{ t('importStrategy') }}</legend>
-          <button
-            type="button"
-            :aria-pressed="nativeMode === 'MERGE'"
-            @click="nativeMode = 'MERGE'"
-          >
-            {{ t('merge') }}
-          </button>
-          <button
-            type="button"
-            :aria-pressed="nativeMode === 'REPLACE'"
-            @click="nativeMode = 'REPLACE'"
-          >
-            {{ t('replace') }}
-          </button>
-        </fieldset>
-        <button class="primary" type="button" :disabled="working" @click="applyNative">
-          {{ t('apply') }} {{ nativeMode === 'MERGE' ? t('merge') : t('replace') }}
+    <div class="io-grid">
+      <article class="surface card stack">
+        <div class="card-heading">
+          <FileJson :size="20" aria-hidden="true" />
+          <div>
+            <h3>{{ t('nativeImport') }}</h3>
+            <p>{{ t('nativeImportDescription') }}</p>
+          </div>
+        </div>
+        <FileInput
+          accept="application/json,.json"
+          name="native-json-file"
+          :label="t('nativeJsonFile')"
+          @file="(file) => void readFile(file, 'NATIVE')"
+        />
+        <button type="button" :disabled="nativeText === '' || working" @click="previewNative">
+          {{ t('validatePreview') }}
         </button>
-      </div>
-    </article>
+        <div v-if="nativePreview" class="preview-box">
+          <strong>
+            {{ nativePreview.profiles }} {{ t('profilesCountLabel') }} · {{ nativePreview.rules }}
+            {{ t('rulesCountLabel') }}
+          </strong>
+          <p>
+            {{ t('credentials') }}
+            {{ nativePreview.includesCredentials ? t('presentInFile') : t('notPresent') }}
+          </p>
+          <ul>
+            <li v-for="warning in nativePreview.warnings" :key="warning">
+              {{ warning }}
+            </li>
+          </ul>
+          <fieldset class="segmented compact">
+            <legend>{{ t('importStrategy') }}</legend>
+            <button
+              type="button"
+              :aria-pressed="nativeMode === 'MERGE'"
+              @click="nativeMode = 'MERGE'"
+            >
+              {{ t('merge') }}
+            </button>
+            <button
+              type="button"
+              :aria-pressed="nativeMode === 'REPLACE'"
+              @click="nativeMode = 'REPLACE'"
+            >
+              {{ t('replace') }}
+            </button>
+          </fieldset>
+          <button class="primary" type="button" :disabled="working" @click="applyNative">
+            {{ t('apply') }} {{ nativeMode === 'MERGE' ? t('merge') : t('replace') }}
+          </button>
+        </div>
+      </article>
 
-    <article class="surface card stack">
-      <div>
-        <p class="eyebrow">
-          {{ t('profilesOnly') }}
-        </p>
-        <h2>{{ t('foxyProxyImport') }}</h2>
-        <p>{{ t('foxyProxyImportDescription') }}</p>
-      </div>
-      <label>
-        {{ t('foxyProxyJsonFile') }}
-        <input type="file" accept="application/json,.json" @change="readFile($event, 'FOXY')" />
-      </label>
-      <button type="button" :disabled="foxyText === '' || working" @click="previewFoxy">
-        {{ t('parsePreview') }}
-      </button>
-      <div v-if="foxyPreview" class="preview-box stack">
-        <strong>{{ t('detected') }} {{ foxyPreview.adapter }}</strong>
-        <label
-          v-for="candidate in foxyPreview.candidates"
-          :key="candidate.sourceIndex"
-          class="check-row candidate-row"
-        >
-          <input
-            type="checkbox"
-            :checked="selectedFoxy.has(candidate.sourceIndex)"
-            @change="toggleFoxy(candidate.sourceIndex, ($event.target as HTMLInputElement).checked)"
-          />
-          <span>
-            <strong>{{ candidate.title }}</strong>
-            <small>
-              {{ candidate.transport }} {{ candidate.hostname }}:{{ candidate.port }}
-              {{ candidate.hasCredentials ? `· ${t('credentialsPresent')}` : '' }}
-            </small>
-          </span>
-        </label>
-        <ul v-if="foxyPreview.skipped.length > 0">
-          <li v-for="entry in foxyPreview.skipped" :key="entry.sourceIndex">
-            {{ t('skipped') }} {{ entry.title || `${t('entry')} ${entry.sourceIndex + 1}` }}:
-            {{ foxyProxySkipLabel(entry.reason) }}
-          </li>
-        </ul>
-        <button
-          class="primary"
-          type="button"
-          :disabled="working || selectedFoxy.size === 0"
-          @click="applyFoxy"
-        >
-          {{ t('importSelectedProfiles') }}
+      <article class="surface card stack">
+        <div class="card-heading">
+          <PackageOpen :size="20" aria-hidden="true" />
+          <div>
+            <h3>{{ t('foxyProxyImport') }}</h3>
+            <p>{{ t('foxyProxyImportDescription') }}</p>
+          </div>
+        </div>
+        <FileInput
+          accept="application/json,.json"
+          name="foxyproxy-json-file"
+          :label="t('foxyProxyJsonFile')"
+          @file="(file) => void readFile(file, 'FOXY')"
+        />
+        <button type="button" :disabled="foxyText === '' || working" @click="previewFoxy">
+          {{ t('parsePreview') }}
         </button>
-      </div>
-    </article>
+        <div v-if="foxyPreview" class="preview-box stack">
+          <strong>{{ t('detected') }} {{ foxyPreview.adapter }}</strong>
+          <label
+            v-for="candidate in foxyPreview.candidates"
+            :key="candidate.sourceIndex"
+            class="check-row candidate-row"
+          >
+            <input
+              type="checkbox"
+              :checked="selectedFoxy.has(candidate.sourceIndex)"
+              @change="
+                toggleFoxy(candidate.sourceIndex, ($event.target as HTMLInputElement).checked)
+              "
+            />
+            <span>
+              <strong>{{ candidate.title }}</strong>
+              <small>
+                {{ candidate.transport }} {{ candidate.hostname }}:{{ candidate.port }}
+                {{ candidate.hasCredentials ? `· ${t('credentialsPresent')}` : '' }}
+              </small>
+            </span>
+          </label>
+          <ul v-if="foxyPreview.skipped.length > 0">
+            <li v-for="entry in foxyPreview.skipped" :key="entry.sourceIndex">
+              {{ t('skipped') }} {{ entry.title || `${t('entry')} ${entry.sourceIndex + 1}` }}:
+              {{ foxyProxySkipLabel(entry.reason) }}
+            </li>
+          </ul>
+          <button
+            class="primary"
+            type="button"
+            :disabled="working || selectedFoxy.size === 0"
+            @click="applyFoxy"
+          >
+            {{ t('importSelectedProfiles') }}
+          </button>
+        </div>
+      </article>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.group-title {
+  margin-top: var(--space-2);
+}
+
+.io-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  align-items: start;
+}
+</style>

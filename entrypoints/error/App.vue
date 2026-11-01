@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ExternalLink, RotateCw, Server, Settings, ShieldX } from '@lucide/vue'
 import { onMounted, shallowRef } from 'vue'
 
 import type { ErrorPageContext } from '../../src/application/errors/error-correlation-store'
@@ -59,7 +60,9 @@ onMounted(() => {
 <template>
   <main class="error-page">
     <article class="surface error-card">
-      <span class="symbol" aria-hidden="true"> ! </span>
+      <span class="symbol" aria-hidden="true">
+        <ShieldX :size="24" />
+      </span>
       <p class="eyebrow">
         {{ t('bestEffortRecovery') }}
       </p>
@@ -104,15 +107,19 @@ onMounted(() => {
         </p>
         <div class="actions">
           <button class="primary" type="button" :disabled="busy" @click="recover(false)">
+            <RotateCw :size="16" aria-hidden="true" />
             {{ t('retry') }}
           </button>
           <button type="button" :disabled="busy" @click="openSettings('proxies')">
+            <Server :size="16" aria-hidden="true" />
             {{ t('switchProxy') }}
           </button>
           <button type="button" :disabled="busy" @click="recover(true)">
+            <ExternalLink :size="16" aria-hidden="true" />
             {{ t('openDirectlyOnce') }}
           </button>
           <button type="button" @click="openSettings()">
+            <Settings :size="16" aria-hidden="true" />
             {{ t('openSettings') }}
           </button>
         </div>
@@ -150,10 +157,8 @@ onMounted(() => {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  color: white;
-  background: var(--color-danger);
-  font-size: 22px;
-  font-weight: 800;
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
   place-items: center;
 }
 

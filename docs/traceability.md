@@ -72,7 +72,7 @@ complete acceptance evidence exists.
 | PL-154        | A      | Options shell component test (icon nav names, header subtitle, apply status) and full Chromium E2E incl. keyboard order and zoom  | None beyond aggregate release gates                                |
 | PL-155        | A      | Proxy row/modal/paste/copy/bulk component tests incl. long-value truncation and full Chromium E2E                                 | None beyond aggregate release gates                                |
 | PL-156        | A      | Rule row/menu/modal and temporary-disable component tests and full Chromium E2E incl. drag/keyboard order                         | None beyond aggregate release gates                                |
-| PL-157        | P      | Planned UI rework; no implementation evidence yet                                                                                 | Full task acceptance                                               |
+| PL-157        | A      | Overrides/import/popup component tests, full Chromium E2E and recaptured store screenshot in the new design                       | Firefox visual pass in PL-122 matrix                               |
 
 ## Product requirement evidence
 

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { EyeOff, Route, Save, ShieldCheck } from '@lucide/vue'
 import { reactive } from 'vue'
 
 import type { AppRuntimeState, RuntimeRequest } from '../../application/runtime/contracts'
@@ -28,12 +29,10 @@ const save = (): void => {
 
 <template>
   <div class="stack">
-    <article class="surface card">
-      <div class="section-heading">
+    <article class="surface card stack">
+      <div class="card-heading">
+        <Route :size="20" aria-hidden="true" />
         <div>
-          <p class="eyebrow">
-            {{ t('connectionPolicy') }}
-          </p>
           <h2>{{ t('globalRouting') }}</h2>
           <p>{{ t('globalRoutingDescription') }}</p>
         </div>
@@ -84,11 +83,12 @@ const save = (): void => {
     </article>
 
     <form class="surface card stack" @submit.prevent="save">
-      <div>
-        <p class="eyebrow">
-          {{ t('privacyControls') }}
-        </p>
-        <h2>{{ t('loggingAndErrors') }}</h2>
+      <div class="card-heading">
+        <ShieldCheck :size="20" aria-hidden="true" />
+        <div>
+          <h2>{{ t('loggingAndErrors') }}</h2>
+          <p>{{ t('privacyControls') }}</p>
+        </div>
       </div>
 
       <label class="check-row">
@@ -158,16 +158,22 @@ const save = (): void => {
           <small>{{ t('readCountryDescription') }}</small>
         </span>
       </label>
-      <button class="primary" type="submit" :disabled="busy">
-        {{ t('saveGeneralSettings') }}
-      </button>
+      <div class="form-actions">
+        <button class="primary" type="submit" :disabled="busy">
+          <Save :size="16" aria-hidden="true" />
+          {{ t('saveGeneralSettings') }}
+        </button>
+      </div>
     </form>
 
-    <article class="surface card">
-      <p class="eyebrow">
-        {{ t('privateBrowsing') }}
-      </p>
-      <h2>{{ t('incognitoAccess') }}</h2>
+    <article class="surface card stack">
+      <div class="card-heading">
+        <EyeOff :size="20" aria-hidden="true" />
+        <div>
+          <h2>{{ t('incognitoAccess') }}</h2>
+          <p>{{ t('privateBrowsing') }}</p>
+        </div>
+      </div>
       <p>
         {{ t('browserPermission') }}
         <strong>
@@ -193,3 +199,12 @@ const save = (): void => {
     </article>
   </div>
 </template>
+
+<style scoped>
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+</style>

@@ -32,7 +32,9 @@ const mountSection = (overrides = [once], platform: 'CHROMIUM' | 'FIREFOX' = 'CH
 }
 
 const button = (wrapper: VueWrapper, name: string) => {
-  const found = wrapper.findAll('button').find((candidate) => candidate.text() === name)
+  const found = wrapper
+    .findAll('button')
+    .find((candidate) => candidate.text() === name || candidate.attributes('aria-label') === name)
   if (found === undefined) throw new Error(`Button not found: ${name}`)
   return found
 }
@@ -78,12 +80,13 @@ describe('Temporary overrides section', () => {
 
   it('edits scope and route with a preview generated from the source hostname', async () => {
     const wrapper = mountSection()
-    await button(wrapper, message('edit')).trigger('click')
+    await button(wrapper, message('editOverrideFor', once.originKey)).trigger('click')
     await wrapper.get('select[name="override-scope"]').setValue('REGISTRABLE_DOMAIN')
     await wrapper.get('select[name="override-route"]').setValue(`PROFILE:${office.id}`)
     expect(wrapper.get('.override-preview code').text()).toBe(
       '^(?:https?|wss?)://(?:[^./]+\\.)*example\\.co\\.uk(?::\\d+)?/$',
     )
+    expect(wrapper.find('dialog.modal').exists()).toBe(true)
     await wrapper.get('form.override-editor').trigger('submit')
     expect(wrapper.emitted('command')?.[0]?.[0]).toEqual({
       action: { targetProxyProfileId: office.id, type: 'PROXY' },
@@ -95,7 +98,7 @@ describe('Temporary overrides section', () => {
 
   it('returns focus to the Edit button when the editor closes', async () => {
     const wrapper = mountSection()
-    const editButton = button(wrapper, message('edit'))
+    const editButton = button(wrapper, message('editOverrideFor', once.originKey))
     ;(editButton.element as HTMLButtonElement).focus()
     await editButton.trigger('click')
     await button(wrapper, message('cancel')).trigger('click')
@@ -105,7 +108,7 @@ describe('Temporary overrides section', () => {
 
   it('removes one override without a confirmation', async () => {
     const wrapper = mountSection()
-    await button(wrapper, message('remove')).trigger('click')
+    await button(wrapper, message('removeOverrideFor', once.originKey)).trigger('click')
     expect(wrapper.emitted('command')?.[0]?.[0]).toEqual({
       overrideId: once.id,
       type: 'REMOVE_OVERRIDE',
@@ -114,7 +117,7 @@ describe('Temporary overrides section', () => {
 
   it('previews the rule before making an override permanent', async () => {
     const wrapper = mountSection()
-    await button(wrapper, message('makePermanent')).trigger('click')
+    await button(wrapper, message('makePermanentFor', once.originKey)).trigger('click')
     expect(confirmController.pending.value?.code).toBe(once.generatedPattern)
     confirmController.answer(true)
     await flushPromises()

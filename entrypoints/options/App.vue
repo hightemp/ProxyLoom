@@ -275,6 +275,8 @@ onBeforeUnmount(() => {
   display: grid;
   grid-template-columns: 232px minmax(0, 1fr);
   min-height: 100vh;
+  /* Paint the sidebar column for pages taller than the viewport. */
+  background: linear-gradient(to right, var(--color-surface) 232px, transparent 232px);
 }
 
 .sidebar {

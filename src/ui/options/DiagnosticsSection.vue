@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ClipboardCheck, Copy, Info, Stethoscope } from '@lucide/vue'
 import { computed, shallowRef } from 'vue'
 
 import type { AppRuntimeState } from '../../application/runtime/contracts'
@@ -35,12 +36,12 @@ const copy = async (): Promise<void> => {
 <template>
   <div class="stack">
     <article class="surface card stack">
-      <div>
-        <p class="eyebrow">
-          {{ t('diagnosticsEyebrow') }}
-        </p>
-        <h2>{{ t('diagnosticsTitle') }}</h2>
-        <p>{{ t('diagnosticsPrivacy') }}</p>
+      <div class="card-heading">
+        <Stethoscope :size="20" aria-hidden="true" />
+        <div>
+          <h2>{{ t('diagnosticsTitle') }}</h2>
+          <p>{{ t('diagnosticsPrivacy') }}</p>
+        </div>
       </div>
       <dl class="diagnostics-grid">
         <div>
@@ -92,13 +93,20 @@ const copy = async (): Promise<void> => {
         {{ t('lastApplyError') }} {{ state.diagnostics.lastApplyError }}
       </p>
       <button type="button" @click="copy">
+        <ClipboardCheck v-if="copied" :size="16" aria-hidden="true" />
+        <Copy v-else :size="16" aria-hidden="true" />
         {{ copied ? t('copiedSafeDiagnostics') : t('copySafeDiagnostics') }}
       </button>
     </article>
 
-    <article class="surface card">
-      <h3>{{ t('knownPlatformBoundaries') }}</h3>
-      <ul>
+    <article class="surface card stack">
+      <div class="card-heading">
+        <Info :size="20" aria-hidden="true" />
+        <div>
+          <h3>{{ t('knownPlatformBoundaries') }}</h3>
+        </div>
+      </div>
+      <ul class="boundaries">
         <li>{{ t('boundaryFullUrl') }}</li>
         <li>{{ t('boundaryChromiumOnce') }}</li>
         <li>{{ t('boundaryErrorPage') }}</li>
@@ -119,3 +127,13 @@ const copy = async (): Promise<void> => {
     </article>
   </div>
 </template>
+
+<style scoped>
+.boundaries {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 20px;
+  color: var(--color-muted);
+}
+</style>

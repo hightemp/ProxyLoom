@@ -4,7 +4,7 @@ import { shallowRef, useId } from 'vue'
 
 import { t } from '../../i18n/messages'
 
-defineProps<{ accept: string; label: string }>()
+defineProps<{ accept: string; label: string; name?: string }>()
 const emit = defineEmits<{ file: [file: File] }>()
 
 const input = shallowRef<HTMLInputElement | null>(null)
@@ -55,6 +55,7 @@ const onDrop = (event: DragEvent): void => {
       tabindex="-1"
       aria-hidden="true"
       :accept="accept"
+      :name="name"
       @change="onChange"
     />
   </div>
