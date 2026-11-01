@@ -7,7 +7,9 @@ Clear, deterministic HTTP and HTTPS proxy routing with ordered rules and no hidd
 ## Full description
 
 ProxyLoom gives you explicit DIRECT, PROXY, and RULES modes; separate HTTP/HTTPS endpoints;
-first-match ordered rules; per-site Once/Always actions; local diagnostics; and safe import/export.
+first-match ordered rules; per-site Once/Always actions with a manageable list of Once overrides;
+proxy import from pasted lines or text files with a preview; copy as URL or curl; local
+diagnostics; and safe import/export.
 
 Assigned proxy routes fail closed. Origin Rules work across Chromium and Firefox. Firefox also
 supports Full URL path/query rules. Chromium clearly marks and skips those rules because its PAC

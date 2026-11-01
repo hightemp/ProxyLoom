@@ -31,11 +31,17 @@ the HTTPS endpoint.
   templates plus editable Russian-sites and social-network examples, search, filters,
   drag-and-drop and keyboard ordering;
 - local regex and full routing testers with no network requests;
-- Once/Always site actions and private-session isolation;
+- Once/Always site actions with a Temporary overrides list (edit scope and route, make
+  permanent, remove) in settings and the popup, and private-session isolation;
+- proxy import from pasted text or `.txt`/`.csv` (URI, `host:port`, `user:pass@host:port`,
+  `host:port:user:pass`, CSV/TSV, IPv6) with a preview, plus a paste-to-fill profile editor;
+- copy a profile as URL, curl command or `host:port:user:pass`, and export the list as text;
+- profile search, filters and bulk check/delete; rule bulk enable/disable/delete;
 - redacted local routing logs and an optional best-effort main-frame error page with a safe origin
   link;
 - inactive-profile checks through the selected proxy, only after an explicit click;
-- native JSON merge/replace/export and profiles-only FoxyProxy 6–9 import;
+- native JSON merge/replace/export (credentials included by default, opt-out available) and
+  profiles-only FoxyProxy 6–9 import;
 - system/light/dark themes and localized English UI;
 - local-only storage, no analytics, telemetry, accounts, ads, remote config, or remote code.
 

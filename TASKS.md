@@ -1620,7 +1620,7 @@
   - **Тесты:** application unit, E2E 500 profiles.
   - **Готово, когда:** unit/E2E/typecheck/lint/dual builds зелёные, version 0.1.12/docs обновлены.
 
-- [ ] **PL-143 — Обновить user guide, store тексты и скриншоты**
+- [x] **PL-143 — Обновить user guide, store тексты и скриншоты**
   - **Цель:** документация соответствует PL-133…PL-142 и PL-146…PL-150.
   - **Требования:** FR-012, FR-054.
   - **Действия:** user guide (Once management, Import from text, Copy as), store listing,
