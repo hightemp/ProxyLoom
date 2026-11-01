@@ -19,9 +19,11 @@ export const message = (key: string, substitutions?: string | readonly string[])
   const values = substitutions === undefined ? [] : [substitutions].flat()
   const positional = (text: string): string =>
     text.replace(/\$(\d)/gu, (_, index: string) => values[Number(index) - 1] ?? '')
-  return entry.message.replace(/\$([A-Za-z0-9_]+)\$/gu, (_, name: string) =>
-    positional(entry.placeholders?.[name.toLowerCase()]?.content ?? ''),
-  )
+  return entry.message
+    .replace(/\$([A-Za-z0-9_]+)\$/gu, (_, name: string) =>
+      positional(entry.placeholders?.[name.toLowerCase()]?.content ?? ''),
+    )
+    .replaceAll('$$', '$')
 }
 
 const sentMessages: unknown[] = []

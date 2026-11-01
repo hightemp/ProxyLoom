@@ -197,12 +197,6 @@
   "selectProfile": {
     "message": "Select a profile"
   },
-  "applyFailurePrefix": {
-    "message": "Persisted revision"
-  },
-  "applyFailureSuffix": {
-    "message": "could not be applied:"
-  },
   "privacyControls": {
     "message": "Privacy controls"
   },
@@ -506,12 +500,6 @@
   "validatePreview": {
     "message": "Validate and preview"
   },
-  "profilesCountLabel": {
-    "message": "profiles"
-  },
-  "rulesCountLabel": {
-    "message": "rules"
-  },
   "credentials": {
     "message": "Credentials:"
   },
@@ -607,9 +595,6 @@
   },
   "applyFilters": {
     "message": "Apply filters"
-  },
-  "privateEntriesPrefix": {
-    "message": "private entry/entries are held only in memory and are not included in this persistent page."
   },
   "noLogEntries": {
     "message": "No log entries"
@@ -888,7 +873,7 @@
     "message": "Regular expression"
   },
   "regexGuidance": {
-    "message": "Anchor with ^/$, escape dots as \\., and account for optional ports. Origin targets end in /. Full URL includes path/query but no fragment and works in Firefox only."
+    "message": "Anchor with ^/$$, escape dots as \\., and account for optional ports. Origin targets end in /. Full URL includes path/query but no fragment and works in Firefox only."
   },
   "template": {
     "message": "Template"
@@ -1022,9 +1007,6 @@
   },
   "downloadFailed": {
     "message": "Proxy download failed"
-  },
-  "downloadFailedFrom": {
-    "message": "A download from"
   },
   "openLogsForDetails": {
     "message": "Open Logs for safe details."
@@ -2145,10 +2127,10 @@
     "message": "Rules are checked strictly from top to bottom and the first enabled match wins. Drag rules or use the arrows to change the order."
   },
   "helpRulesBody2": {
-    "message": "An Origin rule matches scheme, host and port, for example ^https://example\\.com/$, and works in every browser. A Full URL rule also sees the path and query and works only in Firefox."
+    "message": "An Origin rule matches scheme, host and port, for example ^https://example\\.com/$$, and works in every browser. A Full URL rule also sees the path and query and works only in Firefox."
   },
   "helpRulesBody3": {
-    "message": "Patterns are regular expressions: anchor them with ^ and $, escape dots as \\. and use (?::\\d+)? for an optional port. Templates generate a pattern you can then edit, and the Test tab checks it against sample URLs without any network request."
+    "message": "Patterns are regular expressions: anchor them with ^ and $$, escape dots as \\. and use (?::\\d+)? for an optional port. Templates generate a pattern you can then edit, and the Test tab checks it against sample URLs without any network request."
   },
   "helpOnceTitle": {
     "message": "Once and Always for the current site"
@@ -2260,7 +2242,7 @@
     "message": "Multiline (m)"
   },
   "flagMultilineHint": {
-    "message": "^ and $ also match at line breaks. URLs have none, so it is rarely needed."
+    "message": "^ and $$ also match at line breaks. URLs have none, so it is rarely needed."
   },
   "tipFlags": {
     "message": "Flags change how the pattern is applied. Ignore case is on by default because hostnames are case-insensitive. Multiline only matters for text with line breaks, which URLs never contain."
@@ -2320,7 +2302,7 @@
     "message": "Most characters match themselves. Characters with a special meaning, such as . ? + * ( ) [ ] and /, need a backslash when you mean them literally; a dot in a hostname is written \\."
   },
   "helpRegexBody3": {
-    "message": "Example: ^https://([a-z0-9-]+\\.)*example\\.com(?::\\d+)?/$ matches example.com and all its subdomains over HTTPS on any port. Use the Test tab to try a pattern on sample URLs before saving."
+    "message": "Example: ^https://([a-z0-9-]+\\.)*example\\.com(?::\\d+)?/$$ matches example.com and all its subdomains over HTTPS on any port. Use the Test tab to try a pattern on sample URLs before saving."
   },
   "regexExampleSite": {
     "message": "Only example.com over HTTPS"
@@ -2378,5 +2360,43 @@
   },
   "tipSpeedEndpoint": {
     "message": "Used only by Test speed. The file is downloaded through the proxy for at most 15 seconds or 5 MB, and the server sees the proxy's exit IP. The server must allow cross-origin requests."
+  },
+  "applyFailureRevision": {
+    "message": "Persisted revision $REVISION$ could not be applied:",
+    "placeholders": {
+      "revision": {
+        "content": "$1"
+      }
+    }
+  },
+  "privateEntriesHeld": {
+    "message": "Private entries held only in memory and not included in this persistent page: $COUNT$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "nativePreviewCounts": {
+    "message": "Profiles: $PROFILES$ · rules: $RULES$",
+    "placeholders": {
+      "profiles": {
+        "content": "$1"
+      },
+      "rules": {
+        "content": "$2"
+      }
+    }
+  },
+  "downloadFailedMessage": {
+    "message": "A download from $HOST$ failed ($CODE$).",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      },
+      "code": {
+        "content": "$2"
+      }
+    }
   }
 }

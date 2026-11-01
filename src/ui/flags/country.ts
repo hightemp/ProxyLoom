@@ -1,14 +1,16 @@
 import { hasFlag } from 'country-flag-icons'
 import { shallowRef, watchEffect, type Ref } from 'vue'
 
+import { uiLanguage } from '../../i18n/messages'
+
 export interface CountryDisplay {
   /** Upper-case ISO 3166-1 alpha-2 code with a bundled flag, or null for free-text values. */
   readonly code: string | null
   readonly name: string
 }
 
-// The UI is English; region names follow it.
-const regionNames = new Intl.DisplayNames(['en'], { fallback: 'none', type: 'region' })
+const regionNames = (): Intl.DisplayNames =>
+  new Intl.DisplayNames([uiLanguage(), 'en'], { fallback: 'none', type: 'region' })
 
 /** Turns a check provider's country value into a readable name and, when known, an ISO code. */
 export const countryDisplay = (value: string): CountryDisplay => {
@@ -20,7 +22,7 @@ export const countryDisplay = (value: string): CountryDisplay => {
   }
   let name: string | undefined
   try {
-    name = regionNames.of(code)
+    name = regionNames().of(code)
   } catch {
     name = undefined
   }

@@ -114,7 +114,7 @@ const clear = async (): Promise<void> => {
         </button>
       </div>
       <p v-if="state.privateLogCount > 0" class="notice">
-        {{ state.privateLogCount }} {{ t('privateEntriesPrefix') }}
+        {{ t('privateEntriesHeld', String(state.privateLogCount)) }}
       </p>
     </article>
 

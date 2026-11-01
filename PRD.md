@@ -6,14 +6,14 @@
 **Документ:** PRD  
 **Статус:** базовая спецификация первой версии, готовая к техническим spikes и реализации  
 **Язык документа:** русский  
-**Язык интерфейса:** только английский, через систему локализации с `en` по умолчанию  
+**Язык интерфейса:** английский и русский по языку интерфейса браузера (`chrome.i18n`), `en` по умолчанию и как fallback  
 **Целевой стек:** WXT, Vue 3, TypeScript strict, Composition API, `<script setup>`, Manifest V3
 
 Этот документ является источником истины для продуктовой семантики. `ProxyLoom` — рабочее отображаемое название; оно хранится в централизованной конфигурации и не используется как namespace схемы данных, ключей хранилища или экспортного формата.
 
 ## 2. Executive summary
 
-ProxyLoom — кроссбраузерное расширение для явного и предсказуемого управления HTTP- и HTTPS-прокси. Оно предоставляет три недублирующихся режима (`DIRECT`, `PROXY`, `RULES`), ordered ruleset с семантикой first match, постоянные и временные site overrides, раздельные HTTP/HTTPS endpoints, диагностику, безопасный импорт/экспорт и современный английский интерфейс.
+ProxyLoom — кроссбраузерное расширение для явного и предсказуемого управления HTTP- и HTTPS-прокси. Оно предоставляет три недублирующихся режима (`DIRECT`, `PROXY`, `RULES`), ordered ruleset с семантикой first match, постоянные и временные site overrides, раздельные HTTP/HTTPS endpoints, диагностику, безопасный импорт/экспорт и современный англо-русский интерфейс.
 
 Одна доменная модель и чистый resolver используются во всех пользовательских и платформенных сценариях. Chromium применяет inline PAC через `chrome.proxy`; Firefox выбирает маршрут через `proxy.onRequest`. Различия скрыты за платформенными адаптерами и capability service. Если назначенный прокси недоступен, скрытого перехода на прямое соединение нет. Ограничения браузерных API показываются в UI и документируются, а не маскируются.
 
@@ -400,7 +400,7 @@ Native JSON и FoxyProxy profiles-only workflows с preview/result.
 App/browser/build versions, capabilities, proxy control, storage schema versions, safe copyable diagnostics без URL path/query/credentials и ссылки на privacy/support.
 
 - `FR-053`: options сохраняет изменения через application service, а не напрямую в storage.
-- `FR-054`: validation messages, empty states и confirmation text полностью английские и локализуемые.
+- `FR-054`: validation messages, empty states и confirmation text полностью локализуемые; поставляются каталоги `en` и `ru` с одинаковым набором ключей и плейсхолдеров, язык выбирается браузером, `<html lang>`, названия стран и десятичные разделители следуют языку UI, литеральный `$` в сообщениях экранируется как `$$`.
 
 ## 19. Error page
 

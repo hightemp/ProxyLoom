@@ -3,7 +3,7 @@ import { CircleCheck, CircleX, Gauge } from '@lucide/vue'
 import { computed } from 'vue'
 
 import type { ProxyCheckResult } from '../../domain/types/entities'
-import { t } from '../../i18n/messages'
+import { formatDecimal, t } from '../../i18n/messages'
 import { countryDisplay } from '../flags/country'
 import CountryFlag from './CountryFlag.vue'
 import { checkErrorLabel, speedErrorLabel } from '../labels'
@@ -35,7 +35,7 @@ const countryTitle = computed(() =>
       >
       <span v-if="result.downloadMbps !== null" class="check-speed">
         <Gauge :size="13" aria-hidden="true" />
-        {{ t('speedMbps', result.downloadMbps.toFixed(1)) }}
+        {{ t('speedMbps', formatDecimal(result.downloadMbps, 1)) }}
       </span>
       <span v-else-if="result.speedErrorCode !== null" class="check-speed failed">
         <Gauge :size="13" aria-hidden="true" />

@@ -1,0 +1,2402 @@
+{
+  "extensionName": {
+    "message": "ProxyLoom"
+  },
+  "extensionDescription": {
+    "message": "Понятная и детерминированная маршрутизация через HTTP- и HTTPS-прокси."
+  },
+  "loading": {
+    "message": "Загрузка…"
+  },
+  "openSettings": {
+    "message": "Открыть настройки"
+  },
+  "direct": {
+    "message": "DIRECT"
+  },
+  "proxy": {
+    "message": "PROXY"
+  },
+  "rules": {
+    "message": "RULES"
+  },
+  "settingsTitle": {
+    "message": "Настройки ProxyLoom"
+  },
+  "errorTitle": {
+    "message": "Не удалось подключиться через прокси"
+  },
+  "badgeProxyConnectionFailed": {
+    "message": "Не удалось подключиться через прокси"
+  },
+  "badgeDirect": {
+    "message": "DIRECT · Прямое подключение"
+  },
+  "badgeConfigurationError": {
+    "message": "Ошибка конфигурации · $ERROR$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "badgeGlobalProxyMissing": {
+    "message": "PROXY · Нет действующего глобального профиля прокси"
+  },
+  "badgeGlobalProxy": {
+    "message": "PROXY · Через $PROFILE$",
+    "placeholders": {
+      "profile": {
+        "content": "$1"
+      }
+    }
+  },
+  "badgeRulesDirect": {
+    "message": "RULES · Прямое подключение"
+  },
+  "badgeRulesProxy": {
+    "message": "RULES · Через $PROFILE$",
+    "placeholders": {
+      "profile": {
+        "content": "$1"
+      }
+    }
+  },
+  "unknownError": {
+    "message": "Неизвестная ошибка"
+  },
+  "applyStatusHealthy": {
+    "message": "Сохранённая конфигурация маршрутизации применена."
+  },
+  "applyStatusFailed": {
+    "message": "Не удалось применить сохранённую конфигурацию маршрутизации."
+  },
+  "routingApplyFailed": {
+    "message": "Сохранённая конфигурация маршрутизации сейчас не применена."
+  },
+  "retryApply": {
+    "message": "Повторить применение"
+  },
+  "appearanceEyebrow": {
+    "message": "Во всех разделах"
+  },
+  "appearanceTitle": {
+    "message": "Оформление"
+  },
+  "appearanceDescription": {
+    "message": "Системная тема следует настройке цвета браузера или операционной системы."
+  },
+  "theme": {
+    "message": "Тема"
+  },
+  "themeSystem": {
+    "message": "Системная"
+  },
+  "themeLight": {
+    "message": "Светлая"
+  },
+  "themeDark": {
+    "message": "Тёмная"
+  },
+  "diagnosticsEyebrow": {
+    "message": "Безопасный снимок для поддержки"
+  },
+  "diagnosticsTitle": {
+    "message": "О программе / Диагностика"
+  },
+  "diagnosticsPrivacy": {
+    "message": "Здесь не отображаются учётные данные, адреса посещённых страниц, журнал и приватное состояние."
+  },
+  "version": {
+    "message": "Версия"
+  },
+  "platform": {
+    "message": "Платформа"
+  },
+  "control": {
+    "message": "Управление"
+  },
+  "schema": {
+    "message": "Схема"
+  },
+  "persistedRevision": {
+    "message": "Сохранённая ревизия"
+  },
+  "appliedRevision": {
+    "message": "Применённая ревизия"
+  },
+  "fullUrlRules": {
+    "message": "Правила по полному URL"
+  },
+  "tabSpecificOverrides": {
+    "message": "Переопределения для вкладки"
+  },
+  "notApplied": {
+    "message": "Не применено"
+  },
+  "supported": {
+    "message": "Поддерживается"
+  },
+  "firefoxOnly": {
+    "message": "Только Firefox"
+  },
+  "originScopedCompatibility": {
+    "message": "Режим совместимости на уровне origin"
+  },
+  "lastApplyError": {
+    "message": "Последняя ошибка применения:"
+  },
+  "copySafeDiagnostics": {
+    "message": "Копировать безопасную диагностику"
+  },
+  "copiedSafeDiagnostics": {
+    "message": "Безопасная диагностика скопирована"
+  },
+  "knownPlatformBoundaries": {
+    "message": "Известные ограничения платформ"
+  },
+  "productResources": {
+    "message": "Ресурсы продукта"
+  },
+  "supportLink": {
+    "message": "Поддержка"
+  },
+  "privacyPolicyLink": {
+    "message": "Политика конфиденциальности"
+  },
+  "boundaryFullUrl": {
+    "message": "Маршрутизация по пути и query полного URL доступна только в Firefox; PAC в Chromium получает только origin."
+  },
+  "boundaryChromiumOnce": {
+    "message": "В Chromium переопределения «Однократно» могут затрагивать другие вкладки того же origin до очистки."
+  },
+  "boundaryErrorPage": {
+    "message": "Переход на страницу ошибки выполняется по возможности и только для поддерживаемых сбоев основного фрейма."
+  },
+  "boundaryFailClosed": {
+    "message": "Назначенные маршруты через прокси работают fail-closed и никогда не добавляют скрытый запасной DIRECT."
+  },
+  "boundaryWebSocket": {
+    "message": "Содержимое сообщений установленных WebSocket-соединений не отслеживается и не записывается в журнал."
+  },
+  "connectionPolicy": {
+    "message": "Политика подключений"
+  },
+  "globalRouting": {
+    "message": "Глобальная маршрутизация"
+  },
+  "globalRoutingDescription": {
+    "message": "Правила проверяются в режимах Proxy и Rules. Трафик без совпадений в режиме Proxy идёт через выбранный глобальный профиль, а в режиме Rules — напрямую."
+  },
+  "globalRoutingMode": {
+    "message": "Режим глобальной маршрутизации"
+  },
+  "globalProxyProfile": {
+    "message": "Глобальный профиль прокси"
+  },
+  "selectProfile": {
+    "message": "Выберите профиль"
+  },
+  "privacyControls": {
+    "message": "Конфиденциальность"
+  },
+  "loggingAndErrors": {
+    "message": "Журнал и обработка ошибок"
+  },
+  "enableLocalLog": {
+    "message": "Включить локальный журнал маршрутизации"
+  },
+  "enableLocalLogDescription": {
+    "message": "Сохраняются имя хоста и схема, но никогда — путь, query, заголовки или учётные данные."
+  },
+  "pauseLogging": {
+    "message": "Приостановить журнал"
+  },
+  "pauseLoggingDescription": {
+    "message": "Маршрутизация продолжает работать как прежде."
+  },
+  "collectionMode": {
+    "message": "Режим сбора"
+  },
+  "navigationsAndFailures": {
+    "message": "Переходы и сбои"
+  },
+  "allSupportedRequests": {
+    "message": "Все поддерживаемые запросы"
+  },
+  "bestEffortErrorPage": {
+    "message": "Показывать страницу ошибки ProxyLoom"
+  },
+  "bestEffortErrorPageDescription": {
+    "message": "Отключите, чтобы при будущих сбоях перехода через прокси показывалась стандартная страница ошибки браузера."
+  },
+  "manualCheckEndpoint": {
+    "message": "Эндпоинт ручной проверки"
+  },
+  "timeoutMilliseconds": {
+    "message": "Тайм-аут (мс)"
+  },
+  "readCountry": {
+    "message": "Определять страну из ответа провайдера"
+  },
+  "readCountryDescription": {
+    "message": "Обращение к эндпоинту выполняется только после явного нажатия «Проверить»."
+  },
+  "saveGeneralSettings": {
+    "message": "Сохранить общие настройки"
+  },
+  "privateBrowsing": {
+    "message": "Приватный просмотр"
+  },
+  "incognitoAccess": {
+    "message": "Доступ в режиме инкогнито"
+  },
+  "browserPermission": {
+    "message": "Разрешение браузера:"
+  },
+  "unknown": {
+    "message": "Неизвестно"
+  },
+  "allowed": {
+    "message": "Разрешено"
+  },
+  "notAllowed": {
+    "message": "Не разрешено"
+  },
+  "incognitoPermissionDescription": {
+    "message": "ProxyLoom не может сам включить это разрешение браузера. Приватный журнал хранится только в памяти и очищается после закрытия последнего приватного окна."
+  },
+  "incognitoHelpChromium": {
+    "message": "Чтобы изменить доступ, откройте страницу сведений об этом расширении в браузере, включите «Разрешить использование в режиме инкогнито» и снова откройте ProxyLoom."
+  },
+  "incognitoHelpFirefox": {
+    "message": "Чтобы изменить доступ, откройте «Управление расширением» в Firefox, перейдите на вкладку «Подробности», измените «Запуск в приватных окнах» и снова откройте ProxyLoom."
+  },
+  "deterministicRouting": {
+    "message": "Детерминированная маршрутизация"
+  },
+  "settings": {
+    "message": "Настройки"
+  },
+  "sectionGeneral": {
+    "message": "Общие"
+  },
+  "sectionGeneralEyebrow": {
+    "message": "Политика маршрутизации"
+  },
+  "sectionProxies": {
+    "message": "Прокси"
+  },
+  "sectionProxiesEyebrow": {
+    "message": "Эндпоинты"
+  },
+  "sectionRules": {
+    "message": "Правила"
+  },
+  "sectionRulesEyebrow": {
+    "message": "Приоритет"
+  },
+  "sectionLogs": {
+    "message": "Журнал"
+  },
+  "sectionLogsEyebrow": {
+    "message": "Только локально"
+  },
+  "sectionImportExport": {
+    "message": "Импорт и экспорт"
+  },
+  "sectionImportExportEyebrow": {
+    "message": "Переносимые данные"
+  },
+  "sectionAppearanceEyebrow": {
+    "message": "Тема"
+  },
+  "sectionAboutEyebrow": {
+    "message": "Поддержка"
+  },
+  "revision": {
+    "message": "Ревизия"
+  },
+  "applying": {
+    "message": "Применение…"
+  },
+  "loadingSettings": {
+    "message": "Загрузка настроек…"
+  },
+  "settingsUnavailable": {
+    "message": "Настройки недоступны"
+  },
+  "backgroundInvalidConfiguration": {
+    "message": "Фоновая служба не вернула корректную конфигурацию."
+  },
+  "retry": {
+    "message": "Повторить"
+  },
+  "savedAndApplied": {
+    "message": "Сохранено и применено."
+  },
+  "bestEffortRecovery": {
+    "message": "Восстановление по возможности"
+  },
+  "loadingSafeErrorDetails": {
+    "message": "Загрузка безопасных сведений об ошибке…"
+  },
+  "errorContextExpired": {
+    "message": "Контекст этой ошибки устарел. Повторите загрузку страницы в браузере."
+  },
+  "noSafeErrorContext": {
+    "message": "Безопасный контекст ошибки недоступен."
+  },
+  "proxyFailureBeforeHost": {
+    "message": "Назначенный прокси не смог выполнить переход на"
+  },
+  "proxyFailureAfterHost": {
+    "message": "Путь, query, фрагмент и учётные данные скрыты; «Повторить» один раз использует исходный адрес."
+  },
+  "technicalCode": {
+    "message": "Технический код"
+  },
+  "proxyProfile": {
+    "message": "Профиль прокси"
+  },
+  "matchedRule": {
+    "message": "Совпавшее правило"
+  },
+  "occurred": {
+    "message": "Время"
+  },
+  "unavailable": {
+    "message": "Недоступен"
+  },
+  "globalRouteFallback": {
+    "message": "Глобальный маршрут / по умолчанию"
+  },
+  "chromiumDirectOnceWarning": {
+    "message": "В Chromium действие «Открыть напрямую один раз» может затронуть и другие вкладки с этим сайтом, пока исходная вкладка не закрыта."
+  },
+  "switchProxy": {
+    "message": "Сменить прокси"
+  },
+  "openDirectlyOnce": {
+    "message": "Открыть напрямую один раз"
+  },
+  "noSupportedTab": {
+    "message": "Нет поддерживаемой вкладки"
+  },
+  "invalidProxyRoute": {
+    "message": "Недопустимый маршрут через прокси"
+  },
+  "via": {
+    "message": "Через"
+  },
+  "directConnection": {
+    "message": "Прямое подключение"
+  },
+  "configurationError": {
+    "message": "Ошибка конфигурации"
+  },
+  "missingRule": {
+    "message": "Правило не найдено"
+  },
+  "selectProxyFirst": {
+    "message": "Сначала выберите профиль прокси."
+  },
+  "temporaryOverrideWarning": {
+    "message": "В Chromium временное переопределение может затронуть другие вкладки с этим сайтом, пока исходная вкладка не закрыта."
+  },
+  "createPermanentRule": {
+    "message": "Создать постоянное правило"
+  },
+  "createTemporaryOverride": {
+    "message": "Создать временное переопределение"
+  },
+  "pattern": {
+    "message": "Шаблон"
+  },
+  "action": {
+    "message": "Действие"
+  },
+  "globalMode": {
+    "message": "Глобальный режим"
+  },
+  "useProxyGlobally": {
+    "message": "Использовать прокси глобально"
+  },
+  "currentSite": {
+    "message": "Текущий сайт"
+  },
+  "unsupportedPage": {
+    "message": "Неподдерживаемая страница"
+  },
+  "noActiveTab": {
+    "message": "Нет активной вкладки"
+  },
+  "scope": {
+    "message": "Область"
+  },
+  "exactHostname": {
+    "message": "Точное имя хоста"
+  },
+  "domainSubdomains": {
+    "message": "Домен и поддомены"
+  },
+  "route": {
+    "message": "Маршрут"
+  },
+  "directLabel": {
+    "message": "Напрямую"
+  },
+  "proxyLabel": {
+    "message": "Прокси"
+  },
+  "selectProfileShort": {
+    "message": "Выберите профиль"
+  },
+  "once": {
+    "message": "Однократно"
+  },
+  "alwaysCreateRule": {
+    "message": "Всегда (создать правило)"
+  },
+  "editMatchedRule": {
+    "message": "Изменить совпавшее правило"
+  },
+  "portableBackup": {
+    "message": "Переносимая резервная копия"
+  },
+  "nativeExport": {
+    "message": "Собственный экспорт"
+  },
+  "nativeExportDescription": {
+    "message": "Включает профили, правила, общие настройки и оформление. Журнал, переопределения и другое временное состояние никогда не экспортируются."
+  },
+  "includeProxyCredentials": {
+    "message": "Включить учётные данные прокси"
+  },
+  "includeProxyCredentialsDescription": {
+    "message": "Включено по умолчанию, чтобы файл восстанавливал рабочие профили. Снимите флажок, чтобы поделиться файлом без паролей."
+  },
+  "downloadJsonExport": {
+    "message": "Скачать экспорт JSON"
+  },
+  "credentialExportWarning": {
+    "message": "Файл будет содержать имена пользователей и пароли прокси в открытом виде."
+  },
+  "exported": {
+    "message": "Экспортировано"
+  },
+  "validatedAtomic": {
+    "message": "С проверкой и атомарно"
+  },
+  "nativeImport": {
+    "message": "Собственный импорт"
+  },
+  "nativeImportDescription": {
+    "message": "Выберите файл, проверьте количество и конфликты, затем объедините или явно замените данные."
+  },
+  "nativeJsonFile": {
+    "message": "Собственный файл JSON"
+  },
+  "validatePreview": {
+    "message": "Проверить и просмотреть"
+  },
+  "credentials": {
+    "message": "Учётные данные:"
+  },
+  "presentInFile": {
+    "message": "есть в файле"
+  },
+  "notPresent": {
+    "message": "отсутствуют"
+  },
+  "importStrategy": {
+    "message": "Способ импорта"
+  },
+  "merge": {
+    "message": "Объединить"
+  },
+  "replace": {
+    "message": "Заменить"
+  },
+  "apply": {
+    "message": "Применить"
+  },
+  "replaceImportWarning": {
+    "message": "Заменить все профили, правила и настройки содержимым этого файла? Резервная копия для восстановления сохраняется локально."
+  },
+  "nativeImportCommitted": {
+    "message": "Собственный импорт сохранён и применён."
+  },
+  "profilesOnly": {
+    "message": "Только профили"
+  },
+  "foxyProxyImport": {
+    "message": "Импорт из FoxyProxy"
+  },
+  "foxyProxyImportDescription": {
+    "message": "Поддерживаются воспроизводимые варианты JSON FoxyProxy 6–9. Можно импортировать HTTP/HTTPS-эндпоинты; шаблоны, правила, подписки, PAC, прямые и SOCKS-записи исключаются."
+  },
+  "foxyProxyJsonFile": {
+    "message": "Файл JSON FoxyProxy"
+  },
+  "parsePreview": {
+    "message": "Разобрать и просмотреть"
+  },
+  "detected": {
+    "message": "Обнаружено"
+  },
+  "credentialsPresent": {
+    "message": "есть учётные данные"
+  },
+  "skipped": {
+    "message": "Пропущено"
+  },
+  "entry": {
+    "message": "запись"
+  },
+  "importSelectedProfiles": {
+    "message": "Импортировать выбранные профили"
+  },
+  "foxyProxyProfilesImported": {
+    "message": "Выбранные профили FoxyProxy импортированы."
+  },
+  "localDiagnostics": {
+    "message": "Локальная диагностика"
+  },
+  "routingLogs": {
+    "message": "Журнал маршрутизации"
+  },
+  "routingLogsDescription": {
+    "message": "Загружены 100 последних записей. Хранилище ограничено 1000 записями. Пути, query, фрагменты, заголовки, тела запросов, cookie и учётные данные никогда не сохраняются."
+  },
+  "clearLogs": {
+    "message": "Очистить журнал"
+  },
+  "clearLogsWarning": {
+    "message": "Очистить постоянный журнал маршрутизации и журнал текущего приватного сеанса? Это действие нельзя отменить."
+  },
+  "hostnameContains": {
+    "message": "Имя хоста содержит"
+  },
+  "exampleHostname": {
+    "message": "example.com"
+  },
+  "all": {
+    "message": "Все"
+  },
+  "chromium": {
+    "message": "Chromium"
+  },
+  "firefox": {
+    "message": "Firefox"
+  },
+  "errorsAuthOnly": {
+    "message": "Только ошибки и сбои аутентификации"
+  },
+  "applyFilters": {
+    "message": "Применить фильтры"
+  },
+  "noLogEntries": {
+    "message": "Записей нет"
+  },
+  "noLogEntriesDescription": {
+    "message": "Откройте поддерживаемую страницу или измените фильтры. Также журнал может быть приостановлен или отключён."
+  },
+  "localRoutingLog": {
+    "message": "Локальный журнал маршрутизации"
+  },
+  "time": {
+    "message": "Время"
+  },
+  "request": {
+    "message": "Запрос"
+  },
+  "hostname": {
+    "message": "Имя хоста"
+  },
+  "plannedRoute": {
+    "message": "Плановый маршрут"
+  },
+  "rule": {
+    "message": "Правило"
+  },
+  "status": {
+    "message": "Статус"
+  },
+  "actual": {
+    "message": "Фактически:"
+  },
+  "authFailure": {
+    "message": "СБОЙ АУТЕНТИФИКАЦИИ"
+  },
+  "completed": {
+    "message": "Завершено"
+  },
+  "newer": {
+    "message": "Новее"
+  },
+  "older": {
+    "message": "Старше"
+  },
+  "offset": {
+    "message": "Смещение"
+  },
+  "endpoints": {
+    "message": "Эндпоинты"
+  },
+  "proxyProfiles": {
+    "message": "Профили прокси"
+  },
+  "proxyProfilesDescription": {
+    "message": "Для целевого трафика HTTP и HTTPS можно задать разные эндпоинты прокси."
+  },
+  "addProfile": {
+    "message": "Добавить профиль"
+  },
+  "credentialsStorageNotice": {
+    "message": "Учётные данные прокси хранятся локально в расширении браузера и не защищены мастер-паролем."
+  },
+  "noProxyProfiles": {
+    "message": "Профилей прокси пока нет"
+  },
+  "noProxyProfilesDescription": {
+    "message": "Добавьте эндпоинт HTTP- или HTTPS-прокси, чтобы использовать режимы Proxy и Rules."
+  },
+  "global": {
+    "message": "Глобальный"
+  },
+  "httpWs": {
+    "message": "HTTP / WS"
+  },
+  "httpsWss": {
+    "message": "HTTPS / WSS"
+  },
+  "available": {
+    "message": "Доступен"
+  },
+  "noIp": {
+    "message": "Нет IP"
+  },
+  "connectDuration": {
+    "message": "Время подключения:"
+  },
+  "notAvailable": {
+    "message": "Нет данных"
+  },
+  "millisecondsShort": {
+    "message": "мс"
+  },
+  "edit": {
+    "message": "Изменить"
+  },
+  "duplicate": {
+    "message": "Дублировать"
+  },
+  "check": {
+    "message": "Проверить"
+  },
+  "checking": {
+    "message": "Проверка…"
+  },
+  "cancelCheck": {
+    "message": "Отменить проверку"
+  },
+  "delete": {
+    "message": "Удалить"
+  },
+  "addProxyProfile": {
+    "message": "Добавить профиль прокси"
+  },
+  "editProxyProfile": {
+    "message": "Изменить профиль прокси"
+  },
+  "close": {
+    "message": "Закрыть"
+  },
+  "name": {
+    "message": "Имя"
+  },
+  "shortNameDescription": {
+    "message": "Короткое имя (необязательно, 1–3 латинские буквы или цифры)"
+  },
+  "color": {
+    "message": "Цвет"
+  },
+  "checkUrl": {
+    "message": "URL проверки"
+  },
+  "note": {
+    "message": "Заметка"
+  },
+  "useHttpForAll": {
+    "message": "Использовать HTTP-эндпоинт для всех поддерживаемых схем"
+  },
+  "useHttpForAllDescription": {
+    "message": "Для целей HTTPS и WSS будет использоваться точная каноническая копия."
+  },
+  "httpWsEndpoint": {
+    "message": "Эндпоинт HTTP / WS"
+  },
+  "httpsWssEndpoint": {
+    "message": "Эндпоинт HTTPS / WSS"
+  },
+  "transport": {
+    "message": "Транспорт"
+  },
+  "httpProxy": {
+    "message": "HTTP-прокси"
+  },
+  "httpsProxy": {
+    "message": "HTTPS-прокси"
+  },
+  "host": {
+    "message": "Хост"
+  },
+  "port": {
+    "message": "Порт"
+  },
+  "username": {
+    "message": "Имя пользователя"
+  },
+  "password": {
+    "message": "Пароль"
+  },
+  "effectiveHttpsEndpoint": {
+    "message": "Действующий эндпоинт HTTPS / WSS:"
+  },
+  "hostNotSet": {
+    "message": "хост не задан"
+  },
+  "showPasswords": {
+    "message": "Показывать пароли при редактировании"
+  },
+  "saveProfile": {
+    "message": "Сохранить профиль"
+  },
+  "cancel": {
+    "message": "Отмена"
+  },
+  "manualCheckDisclosure": {
+    "message": "Эндпоинт получит ваш исходящий IP прокси."
+  },
+  "firstMatchWins": {
+    "message": "Побеждает первое совпадение"
+  },
+  "orderedRules": {
+    "message": "Упорядоченные правила"
+  },
+  "orderedRulesDescription": {
+    "message": "Правила проверяются сверху вниз. Побеждает первое совпавшее включённое правило."
+  },
+  "addRule": {
+    "message": "Добавить правило"
+  },
+  "search": {
+    "message": "Поиск"
+  },
+  "nameOrPattern": {
+    "message": "Имя или шаблон"
+  },
+  "allActions": {
+    "message": "Все действия"
+  },
+  "allProxyProfiles": {
+    "message": "Все профили прокси"
+  },
+  "enabled": {
+    "message": "Включено"
+  },
+  "disabled": {
+    "message": "Отключено"
+  },
+  "anyState": {
+    "message": "Любое состояние"
+  },
+  "compatibility": {
+    "message": "Совместимость"
+  },
+  "chromeFirefox": {
+    "message": "Chrome + Firefox"
+  },
+  "clearFilters": {
+    "message": "Сбросить фильтры"
+  },
+  "clearFiltersToReorder": {
+    "message": "Сбросьте фильтры, чтобы изменить порядок правил."
+  },
+  "noMatchingRules": {
+    "message": "Нет подходящих правил"
+  },
+  "noMatchingRulesDescription": {
+    "message": "Создайте правило или сбросьте фильтры. Трафик без совпадений следует выбранному режиму."
+  },
+  "rulesGlobalOrder": {
+    "message": "Правила в порядке глобального приоритета"
+  },
+  "missingProfile": {
+    "message": "Профиль отсутствует"
+  },
+  "missingProxyRoute": {
+    "message": "Профиль прокси отсутствует"
+  },
+  "enable": {
+    "message": "Включить"
+  },
+  "move": {
+    "message": "Переместить"
+  },
+  "up": {
+    "message": "вверх"
+  },
+  "down": {
+    "message": "вниз"
+  },
+  "editRule": {
+    "message": "Изменить правило"
+  },
+  "matcherTarget": {
+    "message": "Область сопоставления"
+  },
+  "originPortable": {
+    "message": "Origin (переносимое)"
+  },
+  "fullUrlFirefoxOnly": {
+    "message": "Полный URL (только Firefox)"
+  },
+  "flags": {
+    "message": "Флаги"
+  },
+  "description": {
+    "message": "Описание"
+  },
+  "regularExpression": {
+    "message": "Регулярное выражение"
+  },
+  "regexGuidance": {
+    "message": "Используйте якоря ^/$$, экранируйте точки как \\. и учитывайте необязательные порты. Цели origin заканчиваются на /. Полный URL включает путь/запрос, но не фрагмент, и работает только в Firefox."
+  },
+  "template": {
+    "message": "Шаблон"
+  },
+  "domainSuffixes": {
+    "message": "Доменные суффиксы"
+  },
+  "domainSuffixesPlaceholder": {
+    "message": ".ru, .рф, .de"
+  },
+  "russianSitesExample": {
+    "message": "Пример: российские сайты (.ru, .рф, .su)"
+  },
+  "socialNetworksExample": {
+    "message": "Пример: социальные сети"
+  },
+  "exactOrigin": {
+    "message": "Точный origin"
+  },
+  "httpOnly": {
+    "message": "Только HTTP"
+  },
+  "httpsOnly": {
+    "message": "Только HTTPS"
+  },
+  "customPort": {
+    "message": "Свой порт"
+  },
+  "localhost": {
+    "message": "Localhost"
+  },
+  "privateIpv4": {
+    "message": "Частные IPv4"
+  },
+  "firefoxUrlPath": {
+    "message": "Путь URL (Firefox)"
+  },
+  "firefoxQueryParameter": {
+    "message": "Параметр запроса (Firefox)"
+  },
+  "templateHostname": {
+    "message": "Имя хоста для шаблона"
+  },
+  "invalidDomainSuffixes": {
+    "message": "Введите один или несколько допустимых доменных суффиксов через запятую, например .ru, .рф, .de."
+  },
+  "generateEditablePattern": {
+    "message": "Создать редактируемый шаблон"
+  },
+  "routeVia": {
+    "message": "Маршрут через"
+  },
+  "selectRoute": {
+    "message": "Выберите маршрут"
+  },
+  "proxyRouteOption": {
+    "message": "Прокси · $PROFILE$",
+    "placeholders": {
+      "profile": {
+        "content": "$1"
+      }
+    }
+  },
+  "viaProxy": {
+    "message": "Через $PROFILE$",
+    "placeholders": {
+      "profile": {
+        "content": "$1"
+      }
+    }
+  },
+  "chooseAvailableRoute": {
+    "message": "Назначенный профиль прокси больше не существует. Перед сохранением выберите доступный маршрут."
+  },
+  "singleMultipleTester": {
+    "message": "Проверка одного или нескольких URL"
+  },
+  "testerPrivacyDescription": {
+    "message": "Ни один URL не покидает расширение. Не более 1000 строк обрабатываются в отменяемом фоновом обработчике."
+  },
+  "urlsOnePerLine": {
+    "message": "URL, по одному на строку"
+  },
+  "testPattern": {
+    "message": "Проверить шаблон"
+  },
+  "match": {
+    "message": "Совпадение"
+  },
+  "noMatch": {
+    "message": "Нет совпадения"
+  },
+  "saveRule": {
+    "message": "Сохранить правило"
+  },
+  "fullUrlSaveWarning": {
+    "message": "Правила по полному URL работают только в Firefox. Всё равно сохранить эту переносимую конфигурацию?"
+  },
+  "templateApplied": {
+    "message": "Шаблон применён. Проверьте и отредактируйте его перед сохранением."
+  },
+  "testingLocally": {
+    "message": "Локальная проверка…"
+  },
+  "linesLabel": {
+    "message": "строк(и)"
+  },
+  "noNetworkRequest": {
+    "message": "Сетевые запросы не выполнялись."
+  },
+  "authoritativeResolver": {
+    "message": "Эталонный резолвер"
+  },
+  "globalRoutingTester": {
+    "message": "Глобальная проверка маршрутизации"
+  },
+  "url": {
+    "message": "URL"
+  },
+  "resolveRoute": {
+    "message": "Определить маршрут"
+  },
+  "dragHandleSymbol": {
+    "message": "⋮⋮"
+  },
+  "upSymbol": {
+    "message": "↑"
+  },
+  "downSymbol": {
+    "message": "↓"
+  },
+  "downloadFailed": {
+    "message": "Загрузка через прокси не удалась"
+  },
+  "openLogsForDetails": {
+    "message": "Безопасные подробности смотрите в журнале."
+  },
+  "confirmDangerousActions": {
+    "message": "Подтверждать необратимые действия"
+  },
+  "confirmDangerousActionsDescription": {
+    "message": "Спрашивать перед удалением профилей или правил, очисткой журнала или заменой конфигурации. Уведомления о конфиденциальности показываются всегда."
+  },
+  "deleteProfileTitle": {
+    "message": "Удалить профиль прокси?"
+  },
+  "deleteProfileMessage": {
+    "message": "Удалить «$NAME$»? Это действие нельзя отменить.",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteProfileImpactGlobal": {
+    "message": "Это активный глобальный прокси."
+  },
+  "deleteProfileImpactRules": {
+    "message": "Его используют правила ($COUNT$); они останутся видны как недействительные.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteRuleTitle": {
+    "message": "Удалить правило?"
+  },
+  "deleteRuleMessage": {
+    "message": "Удалить «$NAME$»? Это действие нельзя отменить.",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "manualCheckTitle": {
+    "message": "Запустить ручную проверку прокси?"
+  },
+  "manualCheckMessage": {
+    "message": "Отправить один запрос на $URL$ через «$NAME$»?",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      },
+      "name": {
+        "content": "$2"
+      }
+    }
+  },
+  "runCheck": {
+    "message": "Проверить"
+  },
+  "clearLogsTitle": {
+    "message": "Очистить журнал?"
+  },
+  "replaceImportTitle": {
+    "message": "Заменить конфигурацию?"
+  },
+  "fullUrlSaveTitle": {
+    "message": "Сохранить правило только для Firefox?"
+  },
+  "siteActionMessage": {
+    "message": "Проверьте созданный шаблон перед созданием правила."
+  },
+  "create": {
+    "message": "Создать"
+  },
+  "decisionDirect": {
+    "message": "Напрямую"
+  },
+  "decisionProxy": {
+    "message": "Прокси"
+  },
+  "decisionConfigError": {
+    "message": "Ошибка конфигурации"
+  },
+  "sourceMode": {
+    "message": "Глобальный режим"
+  },
+  "sourceOverride": {
+    "message": "Переопределение «Однократно»"
+  },
+  "sourceRule": {
+    "message": "Правило"
+  },
+  "sourceFallback": {
+    "message": "Ни одно правило не совпало"
+  },
+  "reasonNoActiveTab": {
+    "message": "Нет активной вкладки"
+  },
+  "reasonUnsupportedUrl": {
+    "message": "Расширения не могут маршрутизировать эту страницу"
+  },
+  "controlThisExtension": {
+    "message": "Управляется этим расширением"
+  },
+  "controlControllable": {
+    "message": "Доступно этому расширению"
+  },
+  "controlOtherExtension": {
+    "message": "Управляется другим расширением"
+  },
+  "controlPolicy": {
+    "message": "Управляется политикой браузера"
+  },
+  "controlNotControllable": {
+    "message": "Настройки прокси нельзя изменить"
+  },
+  "validityValid": {
+    "message": "Действительно"
+  },
+  "validityInvalidReference": {
+    "message": "Недействительная ссылка на прокси"
+  },
+  "validityInvalidPattern": {
+    "message": "Недопустимый шаблон"
+  },
+  "traceMatched": {
+    "message": "Совпало"
+  },
+  "traceNoMatch": {
+    "message": "Нет совпадения"
+  },
+  "traceDisabled": {
+    "message": "Отключено"
+  },
+  "traceTemporarilyDisabled": {
+    "message": "Временно отключено"
+  },
+  "traceIncompatible": {
+    "message": "Не поддерживается в этом браузере"
+  },
+  "traceInvalidPattern": {
+    "message": "Недопустимый шаблон"
+  },
+  "requestMainFrame": {
+    "message": "Страница"
+  },
+  "requestSubFrame": {
+    "message": "Фрейм"
+  },
+  "requestXhr": {
+    "message": "Fetch/XHR"
+  },
+  "requestWebSocket": {
+    "message": "WebSocket"
+  },
+  "requestDownload": {
+    "message": "Загрузка"
+  },
+  "requestOther": {
+    "message": "Другое"
+  },
+  "proxyInfoDirect": {
+    "message": "Напрямую"
+  },
+  "proxyInfoHttp": {
+    "message": "HTTP"
+  },
+  "proxyInfoHttps": {
+    "message": "HTTPS"
+  },
+  "proxyInfoSocks": {
+    "message": "SOCKS"
+  },
+  "proxyInfoUnknown": {
+    "message": "Неизвестно"
+  },
+  "skipMalformedEntry": {
+    "message": "Некорректная запись"
+  },
+  "skipUnsupportedSocks": {
+    "message": "SOCKS не поддерживается"
+  },
+  "skipUnsupportedPac": {
+    "message": "PAC не поддерживается"
+  },
+  "skipDirectEntry": {
+    "message": "Прямое подключение"
+  },
+  "skipInvalidHost": {
+    "message": "Недопустимый хост"
+  },
+  "skipInvalidPort": {
+    "message": "Недопустимый порт"
+  },
+  "skipOther": {
+    "message": "Не поддерживается"
+  },
+  "errorActiveProfileRequired": {
+    "message": "Выберите профиль глобального прокси перед переключением в PROXY."
+  },
+  "errorProfileNotFound": {
+    "message": "Профиль прокси больше не существует."
+  },
+  "errorRuleNotFound": {
+    "message": "Правило больше не существует."
+  },
+  "errorInvalidUrl": {
+    "message": "Введите допустимый URL http, https, ws или wss."
+  },
+  "errorNoActiveTab": {
+    "message": "Нет активной вкладки для выполнения действия."
+  },
+  "errorDomainScopeUnavailable": {
+    "message": "Вариант «Домен и поддомены» недоступен для этого хоста. Используйте точное имя хоста."
+  },
+  "errorPatternInvalid": {
+    "message": "Шаблон не является допустимым поддерживаемым регулярным выражением."
+  },
+  "errorProfileInvalid": {
+    "message": "В профиле прокси есть недопустимые поля."
+  },
+  "errorRuleInvalid": {
+    "message": "В правиле есть недопустимые поля."
+  },
+  "errorNotControllable": {
+    "message": "Настройками прокси управляет другое расширение или политика браузера."
+  },
+  "errorCheckAlreadyRunning": {
+    "message": "Проверка прокси уже выполняется."
+  },
+  "errorInputTooLarge": {
+    "message": "Входные данные слишком велики."
+  },
+  "errorUnsupportedFormat": {
+    "message": "Формат файла не поддерживается."
+  },
+  "errorInvalidConfig": {
+    "message": "Конфигурация недопустима."
+  },
+  "errorFilteredReorder": {
+    "message": "Сбросьте фильтры, чтобы изменить порядок правил."
+  },
+  "errorTimeBudgetExceeded": {
+    "message": "Проверка заняла слишком много времени и была остановлена."
+  },
+  "errorGeneric": {
+    "message": "Не удалось выполнить действие (код $CODE$).",
+    "placeholders": {
+      "code": {
+        "content": "$1"
+      }
+    }
+  },
+  "templateInvalid": {
+    "message": "Не удалось создать шаблон из этих значений."
+  },
+  "errorAlreadyRunning": {
+    "message": "Проверка уже выполняется."
+  },
+  "errorCancelled": {
+    "message": "Отменено."
+  },
+  "errorWorkerFailed": {
+    "message": "Фоновая проверка неожиданно остановилась. Попробуйте ещё раз."
+  },
+  "checkInvalidEndpoint": {
+    "message": "Недопустимый URL проверки"
+  },
+  "checkTimeout": {
+    "message": "Время ожидания истекло"
+  },
+  "checkNetworkError": {
+    "message": "Ошибка сети"
+  },
+  "checkHttpError": {
+    "message": "Ошибка HTTP"
+  },
+  "checkResponseTooLarge": {
+    "message": "Слишком большой ответ"
+  },
+  "checkMalformedResponse": {
+    "message": "Нечитаемый ответ"
+  },
+  "checkInvalidIp": {
+    "message": "Недопустимый IP в ответе"
+  },
+  "checkInvalidCountry": {
+    "message": "Недопустимая страна в ответе"
+  },
+  "checkFailed": {
+    "message": "Проверка не удалась"
+  },
+  "invalidOverridesRemoved": {
+    "message": "Переопределения «Однократно» удалены после удаления профиля"
+  },
+  "sectionOverrides": {
+    "message": "Временные переопределения"
+  },
+  "sectionOverridesEyebrow": {
+    "message": "Однократно"
+  },
+  "overridesTitle": {
+    "message": "Активные переопределения «Однократно»"
+  },
+  "overridesDescription": {
+    "message": "Маршруты только для текущего сеанса, созданные кнопкой «Однократно» во всплывающем окне. Они имеют приоритет над всеми правилами и действуют, пока не закрыта исходная вкладка или не перезапущен браузер."
+  },
+  "noOverrides": {
+    "message": "Нет активных переопределений «Однократно». Нажмите «Однократно» во всплывающем окне, чтобы направить текущий сайт по маршруту только на этот сеанс."
+  },
+  "privateOverridesNote": {
+    "message": "Переопределения, созданные в приватных окнах, видны только во всплывающем окне приватного окна."
+  },
+  "overrideSite": {
+    "message": "Сайт"
+  },
+  "overrideAppliesTo": {
+    "message": "Применяется к"
+  },
+  "overrideSourceTab": {
+    "message": "Исходная вкладка"
+  },
+  "overrideCreated": {
+    "message": "Создано"
+  },
+  "overrideActions": {
+    "message": "Действия"
+  },
+  "overrideThisTab": {
+    "message": "Эта вкладка"
+  },
+  "overrideAllTabsOnSite": {
+    "message": "Все вкладки этого сайта"
+  },
+  "remove": {
+    "message": "Убрать"
+  },
+  "makePermanent": {
+    "message": "Сделать постоянным"
+  },
+  "makePermanentTitle": {
+    "message": "Сделать это переопределение постоянным?"
+  },
+  "makePermanentMessage": {
+    "message": "В начало списка правил будет добавлено постоянное правило по origin с этим шаблоном, а переопределение «Однократно» будет удалено."
+  },
+  "clearAllOverrides": {
+    "message": "Очистить все"
+  },
+  "clearOverridesTitle": {
+    "message": "Очистить все переопределения «Однократно»?"
+  },
+  "clearOverridesMessage": {
+    "message": "Удалить все переопределения «Однократно» этого сеанса? Затронутые сайты вернутся к обычной маршрутизации."
+  },
+  "saveOverride": {
+    "message": "Сохранить переопределение"
+  },
+  "generatedPattern": {
+    "message": "Созданный шаблон"
+  },
+  "tabNumber": {
+    "message": "Вкладка $ID$",
+    "placeholders": {
+      "id": {
+        "content": "$1"
+      }
+    }
+  },
+  "editOverrideFor": {
+    "message": "Изменить переопределение для $SITE$",
+    "placeholders": {
+      "site": {
+        "content": "$1"
+      }
+    }
+  },
+  "activeForThisSite": {
+    "message": "Переопределения «Однократно» для этого сайта"
+  },
+  "fromAnotherTab": {
+    "message": "из другой вкладки"
+  },
+  "manageAllOverrides": {
+    "message": "Управлять всеми"
+  },
+  "updateOnce": {
+    "message": "Обновить «Однократно»"
+  },
+  "routeFor": {
+    "message": "Маршрут для $SITE$",
+    "placeholders": {
+      "site": {
+        "content": "$1"
+      }
+    }
+  },
+  "importStatusNew": {
+    "message": "Новый"
+  },
+  "importStatusUpdate": {
+    "message": "Обновление"
+  },
+  "importStatusUnchanged": {
+    "message": "Без изменений"
+  },
+  "importStatusDuplicate": {
+    "message": "Дубликат"
+  },
+  "importStatusError": {
+    "message": "Ошибка"
+  },
+  "proxyStringEmpty": {
+    "message": "Пустая строка"
+  },
+  "proxyStringTooLong": {
+    "message": "Строка слишком длинная"
+  },
+  "proxyStringControl": {
+    "message": "Содержит управляющие символы"
+  },
+  "proxyStringFormat": {
+    "message": "Нераспознанный формат"
+  },
+  "proxyStringPortRequired": {
+    "message": "Не указан порт"
+  },
+  "proxyStringPortInvalid": {
+    "message": "Порт должен быть от 1 до 65535"
+  },
+  "proxyStringHostRequired": {
+    "message": "Не указан хост"
+  },
+  "proxyStringHostInvalid": {
+    "message": "Недопустимое имя хоста"
+  },
+  "proxyStringIpv4Invalid": {
+    "message": "Недопустимый адрес IPv4"
+  },
+  "proxyStringIpv6Invalid": {
+    "message": "Недопустимый адрес IPv6"
+  },
+  "proxyStringSchemeUnsupported": {
+    "message": "Неподдерживаемая схема; используйте http или https"
+  },
+  "proxyStringSocks5Unsupported": {
+    "message": "SOCKS5 пока не поддерживается"
+  },
+  "proxyStringSocks4Unsupported": {
+    "message": "SOCKS4 не поддерживается"
+  },
+  "proxyStringSocksAmbiguous": {
+    "message": "SOCKS не поддерживается"
+  },
+  "proxyStringProtocolConflict": {
+    "message": "Указанный протокол противоречит схеме URL"
+  },
+  "proxyStringProtocolColumn": {
+    "message": "Последний столбец должен быть http или https"
+  },
+  "proxyStringPathNotAllowed": {
+    "message": "URL прокси не должен содержать путь, запрос или фрагмент"
+  },
+  "proxyStringPercentInvalid": {
+    "message": "Некорректное percent-кодирование"
+  },
+  "proxyStringUtf8Invalid": {
+    "message": "Учётные данные не являются корректным UTF-8"
+  },
+  "proxyStringUsernameRequired": {
+    "message": "Пароль без имени пользователя"
+  },
+  "proxyStringCredentialsControl": {
+    "message": "Учётные данные содержат управляющие символы"
+  },
+  "proxyStringFourFields": {
+    "message": "Не соответствует host:port:user:pass или user:pass:host:port"
+  },
+  "importFromText": {
+    "message": "Импорт из текста"
+  },
+  "importFromTextDescription": {
+    "message": "Вставьте по одному прокси на строку или загрузите файл .txt или .csv. Строки, начинающиеся с # или //, игнорируются. По сети ничего не проверяется."
+  },
+  "proxyLines": {
+    "message": "Строки прокси"
+  },
+  "loadFile": {
+    "message": "Загрузить файл"
+  },
+  "defaultTransport": {
+    "message": "Протокол для строк без протокола"
+  },
+  "fieldOrder": {
+    "message": "Порядок полей в строках a:b:c:d"
+  },
+  "hostFirstOrder": {
+    "message": "host:port:user:pass"
+  },
+  "credentialsFirstOrder": {
+    "message": "user:pass:host:port"
+  },
+  "importLine": {
+    "message": "Строка"
+  },
+  "importProxy": {
+    "message": "Прокси"
+  },
+  "importNote": {
+    "message": "Примечание"
+  },
+  "ambiguousLine": {
+    "message": "Неоднозначно; прочитано по порядку выше"
+  },
+  "supportedFormats": {
+    "message": "Поддерживаемые форматы"
+  },
+  "importProxies": {
+    "message": "Импортировать ($COUNT$)",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "proxyImportResult": {
+    "message": "Импортировано: создано $CREATED$, обновлено $UPDATED$, пропущено $SKIPPED$.",
+    "placeholders": {
+      "created": {
+        "content": "$1"
+      },
+      "updated": {
+        "content": "$2"
+      },
+      "skipped": {
+        "content": "$3"
+      }
+    }
+  },
+  "updatesProfile": {
+    "message": "Обновит $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "droppedLines": {
+    "message": "Пропущено строк сверх лимита в 1000: $COUNT$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorNothingToImport": {
+    "message": "Нет новых или изменённых прокси для импорта."
+  },
+  "pasteProxyString": {
+    "message": "Вставить строку прокси"
+  },
+  "pasteProxyStringDescription": {
+    "message": "Например, http://user:pass@host:port или host:port:user:pass. Заполняет эндпоинт ниже; никуда ничего не отправляется."
+  },
+  "fillFromString": {
+    "message": "Заполнить"
+  },
+  "chooseReading": {
+    "message": "Эту строку можно прочитать двумя способами. Выберите один:"
+  },
+  "useReading": {
+    "message": "Использовать этот вариант"
+  },
+  "copyAs": {
+    "message": "Копировать как"
+  },
+  "copyAsUrl": {
+    "message": "URL"
+  },
+  "copyAsCurl": {
+    "message": "curl"
+  },
+  "copyAsCompact": {
+    "message": "host:port:user:pass"
+  },
+  "copyAllAsUrls": {
+    "message": "Копировать все как URL"
+  },
+  "copied": {
+    "message": "Скопировано."
+  },
+  "copiedWithPassword": {
+    "message": "Скопировано. Текст содержит пароль прокси."
+  },
+  "copyFailed": {
+    "message": "Не удалось скопировать в буфер обмена. Переключитесь на страницу и попробуйте снова."
+  },
+  "copyUrl": {
+    "message": "Копировать URL"
+  },
+  "textExport": {
+    "message": "Список прокси в виде текста"
+  },
+  "textExportDescription": {
+    "message": "По одному прокси на строку, читается функцией «Импорт из текста». Пароли включены."
+  },
+  "textExportFormat": {
+    "message": "Формат"
+  },
+  "exportProxiesAsText": {
+    "message": "Экспортировать прокси как текст"
+  },
+  "copyProfileAs": {
+    "message": "Копировать $NAME$ как",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "searchProfiles": {
+    "message": "Поиск по имени или хосту"
+  },
+  "filterLastCheck": {
+    "message": "Последняя проверка"
+  },
+  "neverChecked": {
+    "message": "Не проверялся"
+  },
+  "showingCount": {
+    "message": "Показано $SHOWN$ из $TOTAL$",
+    "placeholders": {
+      "shown": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "selectAllShown": {
+    "message": "Выбрать все показанные"
+  },
+  "clearSelection": {
+    "message": "Снять выделение"
+  },
+  "deleteSelected": {
+    "message": "Удалить выбранные ($COUNT$)",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "checkSelected": {
+    "message": "Проверить выбранные ($COUNT$)",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "checkingProgress": {
+    "message": "Проверка $DONE$ из $TOTAL$…",
+    "placeholders": {
+      "done": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "stopChecks": {
+    "message": "Остановить"
+  },
+  "deleteProfilesTitle": {
+    "message": "Удалить профили прокси ($COUNT$)?",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteProfilesMessage": {
+    "message": "Выбранные профили будут удалены. Это действие нельзя отменить."
+  },
+  "bulkCheckMessage": {
+    "message": "Проверить выбранные профили ($COUNT$) по очереди? Для каждого отправляется один запрос на его URL проверки через этот профиль.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "selectProfileNamed": {
+    "message": "Выбрать $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "noMatchingProfiles": {
+    "message": "Нет профилей, соответствующих поиску и фильтрам."
+  },
+  "dismissMessage": {
+    "message": "Закрыть сообщение"
+  },
+  "applyStateApplied": {
+    "message": "Применено"
+  },
+  "applyStateFailed": {
+    "message": "Ошибка применения"
+  },
+  "modeDescriptionDirect": {
+    "message": "Весь трафик идёт напрямую. Правила и переопределения сохраняются, но не используются."
+  },
+  "modeDescriptionProxy": {
+    "message": "Сначала переопределения «Однократно», затем первое совпавшее правило, затем глобальный прокси."
+  },
+  "modeDescriptionRules": {
+    "message": "Сначала переопределения «Однократно», затем первое совпавшее правило; всё остальное идёт напрямую."
+  },
+  "sourceRuleNamed": {
+    "message": "Правило: $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "siteActionsTitle": {
+    "message": "Маршрут для этого сайта"
+  },
+  "logsLink": {
+    "message": "Журнал"
+  },
+  "moreActionsFor": {
+    "message": "Другие действия для $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "useGlobally": {
+    "message": "Использовать глобально"
+  },
+  "usedByRules": {
+    "message": "Используется в правилах: $COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "notUsedByRules": {
+    "message": "Не используется ни в одном правиле"
+  },
+  "allSchemes": {
+    "message": "Все схемы"
+  },
+  "copyCurl": {
+    "message": "Копировать команду curl"
+  },
+  "copyCompact": {
+    "message": "Копировать host:port:user:pass"
+  },
+  "userNamed": {
+    "message": "пользователь $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "enableRule": {
+    "message": "Включить $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "moveRuleUp": {
+    "message": "Переместить $NAME$ вверх",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "moveRuleDown": {
+    "message": "Переместить $NAME$ вниз",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "moreFilters": {
+    "message": "Больше фильтров"
+  },
+  "fewerFilters": {
+    "message": "Меньше фильтров"
+  },
+  "showFullPattern": {
+    "message": "Показать шаблон полностью"
+  },
+  "hideFullPattern": {
+    "message": "Скрыть полный шаблон"
+  },
+  "enableSelected": {
+    "message": "Включить выбранные ($COUNT$)",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "disableSelected": {
+    "message": "Отключить выбранные ($COUNT$)",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteRulesTitle": {
+    "message": "Удалить правила ($COUNT$)?",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteRulesMessage": {
+    "message": "Выбранные правила будут удалены, остальные сохранят свой порядок. Это действие нельзя отменить."
+  },
+  "selectRuleNamed": {
+    "message": "Выбрать $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "ruleActionsFor": {
+    "message": "Другие действия для $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "disableFor5Minutes": {
+    "message": "Отключить на 5 минут"
+  },
+  "disableFor15Minutes": {
+    "message": "Отключить на 15 минут"
+  },
+  "disableFor1Hour": {
+    "message": "Отключить на 1 час"
+  },
+  "disableUntilRestart": {
+    "message": "Отключить до перезапуска браузера"
+  },
+  "reenableNow": {
+    "message": "Включить сейчас"
+  },
+  "disabledUntilRestart": {
+    "message": "Отключено до перезапуска браузера"
+  },
+  "disabledUntilTime": {
+    "message": "Отключено до $TIME$",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "chooseFile": {
+    "message": "Выбрать файл"
+  },
+  "dropFileHint": {
+    "message": "Перетащите файл сюда или выберите его"
+  },
+  "showPassword": {
+    "message": "Показать пароль"
+  },
+  "hidePassword": {
+    "message": "Скрыть пароль"
+  },
+  "editProfileNamed": {
+    "message": "Изменить $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "checkProfileNamed": {
+    "message": "Проверить $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "useProfileGloballyNamed": {
+    "message": "Использовать $NAME$ глобально",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "allProtocols": {
+    "message": "Все протоколы"
+  },
+  "anyCheckResult": {
+    "message": "Любой результат проверки"
+  },
+  "noAuth": {
+    "message": "Без аутентификации"
+  },
+  "editorGeneral": {
+    "message": "Общие"
+  },
+  "editorEndpoint": {
+    "message": "Эндпоинт"
+  },
+  "editorAdvanced": {
+    "message": "Дополнительно"
+  },
+  "shortNameLabel": {
+    "message": "Короткое имя"
+  },
+  "shortNamePlaceholder": {
+    "message": "Авто"
+  },
+  "colorSwatch": {
+    "message": "Цвет $HEX$",
+    "placeholders": {
+      "hex": {
+        "content": "$1"
+      }
+    }
+  },
+  "customColor": {
+    "message": "Свой цвет"
+  },
+  "useHttpForAllShort": {
+    "message": "Один эндпоинт для всего трафика"
+  },
+  "pasteProxyStringPlaceholder": {
+    "message": "http://user:pass@host:port"
+  },
+  "editRuleNamed": {
+    "message": "Изменить $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "editorMatch": {
+    "message": "Сопоставление"
+  },
+  "editorRoute": {
+    "message": "Маршрут"
+  },
+  "makePermanentFor": {
+    "message": "Сделать $SITE$ постоянным",
+    "placeholders": {
+      "site": {
+        "content": "$1"
+      }
+    }
+  },
+  "removeOverrideFor": {
+    "message": "Удалить $SITE$",
+    "placeholders": {
+      "site": {
+        "content": "$1"
+      }
+    }
+  },
+  "exportGroup": {
+    "message": "Экспорт"
+  },
+  "importGroup": {
+    "message": "Импорт"
+  },
+  "globalProxyMarker": {
+    "message": "Глобальный прокси"
+  },
+  "checkingNow": {
+    "message": "Проверка…"
+  },
+  "allPlatforms": {
+    "message": "Все платформы"
+  },
+  "tabRule": {
+    "message": "Правило"
+  },
+  "tabTest": {
+    "message": "Тест"
+  },
+  "tabNotes": {
+    "message": "Заметки"
+  },
+  "tabConnection": {
+    "message": "Подключение"
+  },
+  "ruleEditorTabs": {
+    "message": "Разделы редактора правил"
+  },
+  "profileEditorTabs": {
+    "message": "Разделы редактора профиля"
+  },
+  "accentColor": {
+    "message": "Акцентный цвет"
+  },
+  "accentDescription": {
+    "message": "Используется для кнопок, ссылок, выделения и фокуса. С любым акцентом текст остаётся читаемым в светлой и тёмной темах."
+  },
+  "accentIndigo": {
+    "message": "Индиго"
+  },
+  "accentTeal": {
+    "message": "Бирюзовый"
+  },
+  "accentViolet": {
+    "message": "Фиолетовый"
+  },
+  "accentRose": {
+    "message": "Розовый"
+  },
+  "accentAmber": {
+    "message": "Янтарный"
+  },
+  "accentSlate": {
+    "message": "Графитовый"
+  },
+  "sectionHelp": {
+    "message": "Справка"
+  },
+  "sectionHelpEyebrow": {
+    "message": "Руководства и ответы"
+  },
+  "helpMoreInfo": {
+    "message": "Подробнее"
+  },
+  "helpLearnMore": {
+    "message": "Узнать больше"
+  },
+  "helpSearch": {
+    "message": "Поиск по справке"
+  },
+  "helpNoResults": {
+    "message": "По вашему запросу статей справки не найдено."
+  },
+  "helpIntro": {
+    "message": "Краткие руководства о том, как работает маршрутизация, и ответы на частые вопросы. Отсюда никуда ничего не отправляется."
+  },
+  "helpModesTitle": {
+    "message": "Режимы: DIRECT, PROXY и RULES"
+  },
+  "helpModesBody1": {
+    "message": "DIRECT отправляет весь трафик без прокси. Правила и переопределения «Однократно» сохраняются, но не используются."
+  },
+  "helpModesBody2": {
+    "message": "PROXY сначала применяет переопределение «Однократно» для сайта, затем первое совпавшее правило, а всё остальное отправляет через глобальный прокси."
+  },
+  "helpModesBody3": {
+    "message": "RULES сначала применяет переопределение «Однократно», затем первое совпавшее правило, а всё остальное отправляет напрямую."
+  },
+  "helpProxiesTitle": {
+    "message": "Профили прокси и эндпоинты"
+  },
+  "helpProxiesBody1": {
+    "message": "Профиль — это прокси-сервер с именем, цветом и коротким именем для значка. Его транспорт (HTTP или HTTPS) определяет, как браузер связывается с прокси, а не какие сайты он обслуживает."
+  },
+  "helpProxiesBody2": {
+    "message": "По умолчанию один эндпоинт обрабатывает весь трафик. Выключите «Один эндпоинт для всего трафика», чтобы направлять HTTPS- и WSS-адреса на другой эндпоинт."
+  },
+  "helpProxiesBody3": {
+    "message": "Имена пользователей и пароли хранятся в обычном хранилище расширения без мастер-пароля и передаются только соответствующему прокси."
+  },
+  "helpImportTitle": {
+    "message": "Импорт и копирование прокси"
+  },
+  "helpImportBody1": {
+    "message": "«Импорт из текста» принимает по одному прокси на строку: http://user:pass@host:port, host:port, user:pass@host:port, host:port:user:pass, user:pass:host:port, слово протокола до или после записи, поля через пробел и строки CSV. IPv6-хосты указываются в квадратных скобках."
+  },
+  "helpImportBody2": {
+    "message": "Если строку вида 1.2.3.4:8080:john.doe:12345 можно прочитать двумя способами, выберите порядок полей. Более поздняя строка с тем же хостом, портом и именем пользователя заменяет более раннюю, а у совпадающего профиля обновляются только пароль и протокол."
+  },
+  "helpImportBody3": {
+    "message": "«Копировать как» URL, curl или host:port:user:pass и «Экспортировать прокси как текст» включают пароль, поэтому обращайтесь со скопированным текстом как с секретом."
+  },
+  "helpCheckTitle": {
+    "message": "Проверка прокси"
+  },
+  "helpCheckBody1": {
+    "message": "Проверка отправляет один запрос на URL проверки профиля через этот профиль и показывает, сработал ли он, сколько времени занял, а также внешний IP и страну, которые вернул эндпоинт."
+  },
+  "helpCheckBody2": {
+    "message": "Эндпоинт проверки получает выходной IP вашего прокси. В фоне ничего не проверяется; запрос отправляется только по явному нажатию «Проверить»."
+  },
+  "helpRulesTitle": {
+    "message": "Правила и регулярные выражения"
+  },
+  "helpRulesBody1": {
+    "message": "Правила проверяются строго сверху вниз, и побеждает первое включённое совпадение. Перетаскивайте правила или используйте стрелки, чтобы изменить порядок."
+  },
+  "helpRulesBody2": {
+    "message": "Правило по origin сопоставляет схему, хост и порт, например ^https://example\\.com/$$, и работает в любом браузере. Правило по полному URL видит также путь и запрос и работает только в Firefox."
+  },
+  "helpRulesBody3": {
+    "message": "Шаблоны — это регулярные выражения: привязывайте их с помощью ^ и $$, экранируйте точки как \\. и используйте (?::\\d+)? для необязательного порта. Шаблоны-заготовки генерируют выражение, которое можно затем изменить, а вкладка «Тест» проверяет его на примерах URL без сетевых запросов."
+  },
+  "helpOnceTitle": {
+    "message": "«Однократно» и «Всегда» для текущего сайта"
+  },
+  "helpOnceBody1": {
+    "message": "«Однократно» задаёт маршрут для текущего сайта только на эту сессию браузера. Оно имеет приоритет над правилами и действует, пока не закроется его вкладка или не перезапустится браузер. «Всегда» вместо этого создаёт постоянное правило."
+  },
+  "helpOnceBody2": {
+    "message": "В Chromium переопределение «Однократно» действует во всех вкладках этого сайта, пока не закроется исходная вкладка, потому что браузер не сообщает прокси, какая вкладка сделала запрос. Firefox ограничивает его вкладкой."
+  },
+  "helpOnceBody3": {
+    "message": "В разделе «Временные переопределения» перечислены все они: измените область действия или маршрут, сделайте переопределение постоянным или удалите его."
+  },
+  "helpLogsTitle": {
+    "message": "Журнал и конфиденциальность"
+  },
+  "helpLogsBody1": {
+    "message": "В журнале сохраняются время, тип запроса, схема и имя хоста, запланированный маршрут и результат. Пути, запросы, заголовки, cookie и учётные данные никогда не сохраняются."
+  },
+  "helpLogsBody2": {
+    "message": "Хранится не более 1000 записей. Записи из приватных окон хранятся в памяти и удаляются при закрытии последнего приватного окна. Журнал можно приостановить или отключить в разделе «Общие»."
+  },
+  "helpLimitsTitle": {
+    "message": "Различия браузеров и безопасность"
+  },
+  "helpLimitsBody1": {
+    "message": "Назначенный прокси никогда не переключается на прямое подключение или другой прокси. Если он недоступен, запрос завершается ошибкой, а страница ошибки предлагает «Повторить», «Сменить прокси» или «Открыть напрямую один раз»."
+  },
+  "helpLimitsBody2": {
+    "message": "Chromium не умеет маршрутизировать по пути, поэтому правила по полному URL там пропускаются и отмечаются как «Только Firefox». Страница ошибки показывается по возможности и только при загрузке страниц."
+  },
+  "helpTroubleTitle": {
+    "message": "Устранение неполадок"
+  },
+  "helpTroubleBody1": {
+    "message": "Сайт не загружается: проверьте профиль кнопкой «Проверить», посмотрите маршрут во всплывающем окне и запись в журнале или используйте «Открыть напрямую один раз» на странице ошибки."
+  },
+  "helpTroubleBody2": {
+    "message": "Элементы управления маршрутизацией отключены: настройками прокси управляет другое расширение или политика браузера. Отключите другое расширение или обратитесь к администратору; ProxyLoom не борется за управление."
+  },
+  "helpTroubleBody3": {
+    "message": "Повторяющиеся запросы аутентификации: прокси отклонил сохранённые имя пользователя или пароль. На каждый запрос отвечается только один раз, поэтому обновите учётные данные в профиле."
+  },
+  "helpAppearanceTitle": {
+    "message": "Оформление"
+  },
+  "helpAppearanceBody1": {
+    "message": "Выберите Системную, Светлую или Тёмную тему и один из шести акцентных цветов. При любом сочетании текст остаётся читаемым с контрастом WCAG AA."
+  },
+  "tipModes": {
+    "message": "DIRECT игнорирует правила, PROXY направляет несовпавший трафик через глобальный прокси, а RULES отправляет его напрямую."
+  },
+  "tipCheckEndpoint": {
+    "message": "Используется только при нажатии «Проверить». Получает выходной IP прокси и должен вернуть JSON с IP и, при желании, страной."
+  },
+  "tipPasteString": {
+    "message": "Вставьте http://user:pass@host:port, host:port:user:pass или любую другую поддерживаемую строку, чтобы заполнить эндпоинт."
+  },
+  "tipOneEndpoint": {
+    "message": "Вкл.: один эндпоинт для HTTP, HTTPS, WS и WSS. Выкл.: HTTPS- и WSS-адреса используют отдельный эндпоинт."
+  },
+  "tipMatcher": {
+    "message": "Origin сопоставляет схему, хост и порт в любом браузере. Полный URL видит также путь и запрос, но работает только в Firefox."
+  },
+  "tipOnce": {
+    "message": "«Однократно» действует только в этой сессии и имеет приоритет над правилами; «Всегда» создаёт постоянное правило."
+  },
+  "tipLogs": {
+    "message": "Сохраняются только имя хоста и схема, но никогда пути, запросы или учётные данные. Хранится до 1000 записей."
+  },
+  "tipImportFormats": {
+    "message": "По одному прокси на строку в виде URL, host:port:user:pass, user:pass@host:port, CSV или полей через пробел. Строки с # или // игнорируются."
+  },
+  "testSummary": {
+    "message": "Проверено: $TESTED$ · совпадают: $MATCHED$ · не совпадают: $MISSED$",
+    "placeholders": {
+      "tested": {
+        "content": "$1"
+      },
+      "matched": {
+        "content": "$2"
+      },
+      "missed": {
+        "content": "$3"
+      }
+    }
+  },
+  "testElapsedLocal": {
+    "message": "$MS$ мс, проверено локально без сетевых запросов",
+    "placeholders": {
+      "ms": {
+        "content": "$1"
+      }
+    }
+  },
+  "testedAs": {
+    "message": "Проверено как"
+  },
+  "testError": {
+    "message": "Ошибка"
+  },
+  "flagIgnoreCase": {
+    "message": "Без учёта регистра (i)"
+  },
+  "flagIgnoreCaseHint": {
+    "message": "Example.COM и example.com совпадают с одним и тем же шаблоном."
+  },
+  "flagMultiline": {
+    "message": "Многострочный (m)"
+  },
+  "flagMultilineHint": {
+    "message": "^ и $$ также совпадают на переносах строк. В URL их нет, поэтому флаг нужен редко."
+  },
+  "tipFlags": {
+    "message": "Флаги меняют способ применения шаблона. «Без учёта регистра» включён по умолчанию, потому что имена хостов нечувствительны к регистру. «Многострочный» важен только для текста с переносами строк, которых в URL не бывает."
+  },
+  "tipRegexBasics": {
+    "message": "Регулярное выражение описывает, какие URL совпадают. Самые полезные элементы:"
+  },
+  "regexToken": {
+    "message": "Шаблон"
+  },
+  "regexMeaning": {
+    "message": "Значение"
+  },
+  "regexStart": {
+    "message": "Начало URL"
+  },
+  "regexEnd": {
+    "message": "Конец URL"
+  },
+  "regexAnyChar": {
+    "message": "Любой одиночный символ"
+  },
+  "regexLiteralDot": {
+    "message": "Буквальная точка, как в example\\.com"
+  },
+  "regexZeroOrMore": {
+    "message": "Повторить предыдущий элемент ноль или более раз"
+  },
+  "regexOneOrMore": {
+    "message": "Повторить предыдущий элемент один или более раз"
+  },
+  "regexOptional": {
+    "message": "Сделать предыдущий элемент необязательным"
+  },
+  "regexClass": {
+    "message": "Один символ из набора: буква, цифра или дефис"
+  },
+  "regexDigit": {
+    "message": "Одна цифра"
+  },
+  "regexAlternatives": {
+    "message": "Один из вариантов"
+  },
+  "regexGroup": {
+    "message": "Группировка элементов, например необязательный поддомен ([a-z0-9-]+\\.)?"
+  },
+  "regexExamplesTitle": {
+    "message": "Примеры"
+  },
+  "helpRegexTitle": {
+    "message": "Основы регулярных выражений"
+  },
+  "helpRegexBody1": {
+    "message": "Шаблон правила — это регулярное выражение, которое сопоставляется с нормализованным URL: схемой, хостом, портом и завершающим / для правил по origin и полным URL без фрагмента для правил по полному URL."
+  },
+  "helpRegexBody2": {
+    "message": "Большинство символов совпадают сами с собой. Символы со специальным значением, такие как . ? + * ( ) [ ] и /, нужно экранировать обратной косой чертой, если они нужны буквально; точка в имени хоста записывается как \\."
+  },
+  "helpRegexBody3": {
+    "message": "Пример: ^https://([a-z0-9-]+\\.)*example\\.com(?::\\d+)?/$$ совпадает с example.com и всеми его поддоменами по HTTPS на любом порту. Перед сохранением проверьте шаблон на примерах URL во вкладке «Тест»."
+  },
+  "regexExampleSite": {
+    "message": "Только example.com по HTTPS"
+  },
+  "regexExampleSubdomains": {
+    "message": "example.com и его поддомены, любой порт"
+  },
+  "speedMbps": {
+    "message": "$SPEED$ Мбит/с",
+    "placeholders": {
+      "speed": {
+        "content": "$1"
+      }
+    }
+  },
+  "speedTestFailed": {
+    "message": "Проверка скорости не удалась"
+  },
+  "speedTooLittleData": {
+    "message": "получено слишком мало данных"
+  },
+  "testSpeedNamed": {
+    "message": "Проверить скорость $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "speedTestTitle": {
+    "message": "Проверка скорости прокси"
+  },
+  "speedTestMessage": {
+    "message": "Проверить $PROFILE$ и скачать через него тестовый файл с $URL$ — не дольше 15 секунд или не более 5 МБ.",
+    "placeholders": {
+      "profile": {
+        "content": "$1"
+      },
+      "url": {
+        "content": "$2"
+      }
+    }
+  },
+  "speedTestDisclosure": {
+    "message": "Сервер загрузки видит выходной IP-адрес прокси. Скорость никогда не проверяется в фоне; URL загрузки можно изменить в разделе «Общие»."
+  },
+  "runSpeedTest": {
+    "message": "Проверить скорость"
+  },
+  "testingSpeedNow": {
+    "message": "Проверка скорости…"
+  },
+  "speedTestEndpoint": {
+    "message": "URL загрузки для проверки скорости"
+  },
+  "tipSpeedEndpoint": {
+    "message": "Используется только функцией «Проверить скорость». Файл скачивается через прокси не дольше 15 секунд или не более 5 МБ, а сервер видит выходной IP прокси. Сервер должен разрешать cross-origin-запросы."
+  },
+  "applyFailureRevision": {
+    "message": "Сохранённую ревизию $REVISION$ не удалось применить:",
+    "placeholders": {
+      "revision": {
+        "content": "$1"
+      }
+    }
+  },
+  "privateEntriesHeld": {
+    "message": "Приватных записей только в памяти (не входят в эту постоянную страницу): $COUNT$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "nativePreviewCounts": {
+    "message": "Профилей: $PROFILES$ · правил: $RULES$",
+    "placeholders": {
+      "profiles": {
+        "content": "$1"
+      },
+      "rules": {
+        "content": "$2"
+      }
+    }
+  },
+  "downloadFailedMessage": {
+    "message": "Не удалось загрузить файл с $HOST$ ($CODE$).",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      },
+      "code": {
+        "content": "$2"
+      }
+    }
+  }
+}

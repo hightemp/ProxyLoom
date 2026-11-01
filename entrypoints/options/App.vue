@@ -19,7 +19,7 @@ import { computed, onBeforeUnmount, onMounted, shallowRef } from 'vue'
 
 import type { AppRuntimeState, RuntimeRequest } from '../../src/application/runtime/contracts'
 import type { LogQuery } from '../../src/application/logging/log-types'
-import { t } from '../../src/i18n/messages'
+import { applyDocumentLanguage, t } from '../../src/i18n/messages'
 import ConfirmDialog from '../../src/ui/components/ConfirmDialog.vue'
 import { isHelpArticleId, type HelpArticleId } from '../../src/ui/help/articles'
 import HelpSection from '../../src/ui/options/HelpSection.vue'
@@ -36,6 +36,8 @@ import OverridesSection from '../../src/ui/options/OverridesSection.vue'
 import ProfilesSection from '../../src/ui/options/ProfilesSection.vue'
 import RulesSection from '../../src/ui/options/RulesSection.vue'
 import { runtimeClient } from '../../src/ui/runtime/client'
+
+applyDocumentLanguage(document.documentElement)
 
 type SectionId =
   | 'general'
@@ -340,8 +342,13 @@ nav {
 nav button {
   justify-content: flex-start;
   gap: 10px;
+  min-width: 0;
   min-height: 36px;
-  padding: 0 10px;
+  padding: 6px 10px;
+  /* Long translated labels wrap inside the fixed sidebar instead of overflowing it. */
+  white-space: normal;
+  text-align: left;
+  line-height: 1.25;
   border: 0;
   color: var(--color-muted);
   background: transparent;

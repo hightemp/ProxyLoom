@@ -949,7 +949,7 @@ watch(() => props.busy, restoreFocus)
 
   display: grid;
   grid-template-columns:
-    auto minmax(150px, 1.3fr) minmax(170px, 1.5fr) minmax(90px, 0.9fr)
+    auto minmax(170px, 1.6fr) minmax(170px, 1.4fr) minmax(80px, 0.7fr)
     minmax(170px, 1.3fr) var(--row-actions-width);
   gap: var(--space-4);
   align-items: center;

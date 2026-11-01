@@ -80,8 +80,7 @@ const save = (): void => {
       </label>
 
       <p v-if="state.diagnostics.lastApplyError" class="notice danger" role="alert">
-        {{ t('applyFailurePrefix') }} {{ state.diagnostics.persistedRevision }}
-        {{ t('applyFailureSuffix') }}
+        {{ t('applyFailureRevision', String(state.diagnostics.persistedRevision)) }}
         {{ state.diagnostics.lastApplyError }}
       </p>
     </article>

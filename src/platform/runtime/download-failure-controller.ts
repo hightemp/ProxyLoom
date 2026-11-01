@@ -88,7 +88,7 @@ export class DownloadFailureController {
 
     await browser.notifications.create(`${NOTIFICATION_PREFIX}${String(downloadId)}`, {
       iconUrl: browser.runtime.getURL('/icon.svg'),
-      message: `${t('downloadFailedFrom')} ${details.value.hostname} (${details.value.errorCode}). ${t('openLogsForDetails')}`,
+      message: `${t('downloadFailedMessage', [details.value.hostname, details.value.errorCode])} ${t('openLogsForDetails')}`,
       title: t('downloadFailed'),
       type: 'basic',
     })

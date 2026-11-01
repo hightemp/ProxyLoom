@@ -3,7 +3,7 @@ import { CircleCheck, CircleMinus, CircleX } from '@lucide/vue'
 import { computed } from 'vue'
 
 import type { RegexTestRow } from '../../application/regex-tester/regex-batch-tester'
-import { t } from '../../i18n/messages'
+import { formatDecimal, t } from '../../i18n/messages'
 import { errorText } from '../labels'
 
 const props = defineProps<{
@@ -30,7 +30,7 @@ const verdict = (row: RegexTestRow): { readonly label: string; readonly tone: st
       <strong>{{
         t('testSummary', [String(rows.length), String(counts.matched), String(counts.missed)])
       }}</strong>
-      <span class="muted">{{ t('testElapsedLocal', elapsedMs.toFixed(1)) }}</span>
+      <span class="muted">{{ t('testElapsedLocal', formatDecimal(elapsedMs, 1)) }}</span>
     </p>
     <ul class="test-results">
       <li v-for="(row, index) in rows" :key="index" class="test-row">

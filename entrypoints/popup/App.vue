@@ -8,7 +8,7 @@ import type { AppRuntimeState, RuntimeRequest } from '../../src/application/runt
 import { formatProfile } from '../../src/domain/profiles/proxy-format'
 import { asProxyProfileId } from '../../src/domain/types/brand'
 import type { GlobalMode, OverrideScope, RuleAction } from '../../src/domain/types/entities'
-import { t, type MessageKey } from '../../src/i18n/messages'
+import { applyDocumentLanguage, t, type MessageKey } from '../../src/i18n/messages'
 import { copyText } from '../../src/ui/clipboard'
 import ConfirmDialog from '../../src/ui/components/ConfirmDialog.vue'
 import { applyAppearance } from '../../src/ui/theme/accents'
@@ -27,6 +27,8 @@ import {
 import SiteOverrides from '../../src/ui/popup/SiteOverrides.vue'
 import HelpTip from '../../src/ui/components/HelpTip.vue'
 import { runtimeClient } from '../../src/ui/runtime/client'
+
+applyDocumentLanguage(document.documentElement)
 
 const PROFILE_PREFIX = 'PROFILE:'
 type RouteValue = 'DIRECT' | `PROFILE:${string}`

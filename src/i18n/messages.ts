@@ -16,3 +16,25 @@ export const requireMessage = (key: MessageKey, substitutions?: MessageSubstitut
   }
   return message
 }
+
+/** Browser UI language (e.g. `ru`, `en-US`); the extension shows its matching catalog. */
+export const uiLanguage = (): string => {
+  try {
+    const language = browser.i18n.getUILanguage()
+    return typeof language === 'string' && language.length > 0 ? language : 'en'
+  } catch {
+    return 'en'
+  }
+}
+
+/** Keeps `<html lang>` in step with the catalog the browser chose, for screen readers. */
+export const applyDocumentLanguage = (root: HTMLElement): void => {
+  root.lang = uiLanguage()
+}
+
+/** A number with fixed decimals and the UI language's separator (92.4 / 92,4). */
+export const formatDecimal = (value: number, fractionDigits: number): string =>
+  new Intl.NumberFormat([uiLanguage(), 'en'], {
+    maximumFractionDigits: fractionDigits,
+    minimumFractionDigits: fractionDigits,
+  }).format(value)

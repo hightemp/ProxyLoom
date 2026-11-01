@@ -160,7 +160,7 @@ test('previews and atomically replaces configuration through the native import U
     name: 'native-replace.json',
   })
   await extensionPage.getByRole('button', { name: 'Validate and preview' }).click()
-  await expect(extensionPage.getByText(/1 profiles/)).toBeVisible()
+  await expect(extensionPage.getByText(/Profiles: 1/)).toBeVisible()
   await expect(extensionPage.getByText(/Credentials:.*present in file/)).toBeVisible()
   await extensionPage.getByRole('button', { name: 'Replace', exact: true }).click()
   await extensionPage.getByRole('button', { name: 'Apply Replace' }).click()

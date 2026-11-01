@@ -16,7 +16,7 @@ ProxyLoom — кроссбраузерное Manifest V3 расширение д
 - Full URL Rules исполняются только Firefox;
 - назначенный proxy работает fail-closed, без скрытого `DIRECT`, system или другого proxy fallback;
 - credentials хранятся локально без master-password encryption и никогда не логируются;
-- UI полностью английский и локализуемый;
+- UI на английском и русском (по языку браузера) через locale messages;
 - telemetry/analytics/remote code отсутствуют.
 
 ## 2. Источники требований и иерархия решений
@@ -51,7 +51,7 @@ Checkbox нельзя отмечать за scaffold, partial implementation, gr
 
 ## 4. Языки
 
-- UI labels, buttons, modes, notifications, errors и help: английский, через locale messages.
+- UI labels, buttons, modes, notifications, errors и help: через locale messages; каждый новый ключ добавляется одновременно в `public/_locales/en` и `public/_locales/ru` (тест паритета каталогов).
 - Code identifiers, comments, test names, README, ADR filenames и commit messages: английский.
 - `PRD.md`, `TASKS.md`, `AGENTS.md`: русский.
 - ADR: русский для архитектурного объяснения; code/API identifiers остаются английскими.
