@@ -1,6 +1,6 @@
 {
   "name": "proxy-routing-extension",
-  "version": "0.1.29",
+  "version": "0.1.30",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.32.1",
@@ -51,6 +51,7 @@
   },
   "dependencies": {
     "@lucide/vue": "1.57.0",
+    "country-flag-icons": "1.6.20",
     "idb": "8.0.3",
     "tldts": "7.4.9",
     "vue": "3.5.40",

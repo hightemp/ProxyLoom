@@ -56,6 +56,8 @@ test('checks an inactive profile through that proxy, excludes the check from log
       })
     await expect(profileCard.locator('.proxy-status')).toContainText('Available')
     await expect(profileCard.locator('.proxy-status')).toContainText('192.0.2.10')
+    await expect(profileCard.locator('.proxy-status .check-country')).toHaveText('Germany')
+    await expect(profileCard.locator('.proxy-status img.flag')).toBeVisible()
     expect(proxy.requests.some((request) => request.target.startsWith(`${targetOrigin}/ip`))).toBe(
       true,
     )

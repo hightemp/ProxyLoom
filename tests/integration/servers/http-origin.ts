@@ -96,7 +96,7 @@ export const startHttpOrigin = async (): Promise<HttpOriginFixture> => {
     }
     if (requestUrl.pathname === '/ip') {
       response.writeHead(200, { 'content-type': 'application/json' })
-      response.end(JSON.stringify({ country: 'Testland', ip: '192.0.2.10' }))
+      response.end(JSON.stringify({ country: 'DE', ip: '192.0.2.10' }))
       return
     }
     if (requestUrl.pathname === '/site-auth') {

@@ -12,6 +12,8 @@ import { t, type MessageKey } from '../../src/i18n/messages'
 import { copyText } from '../../src/ui/clipboard'
 import ConfirmDialog from '../../src/ui/components/ConfirmDialog.vue'
 import { applyAppearance } from '../../src/ui/theme/accents'
+import { countryDisplay } from '../../src/ui/flags/country'
+import CountryFlag from '../../src/ui/components/CountryFlag.vue'
 import ProfileChip from '../../src/ui/components/ProfileChip.vue'
 import { confirmController } from '../../src/ui/confirm/confirm-controller'
 import {
@@ -77,10 +79,17 @@ const lastCheckText = computed(() => {
   if (check === null) return t('neverChecked')
   const duration = `${Math.round(check.totalDurationMs)} ${t('millisecondsShort')}`
   return check.availability
-    ? [t('available'), duration, check.country].filter(Boolean).join(' · ')
+    ? [t('available'), duration].join(' · ')
     : [t('unavailable'), check.errorCode === null ? '' : checkErrorLabel(check.errorCode)]
         .filter(Boolean)
         .join(' · ')
+})
+
+const lastCheckCountry = computed(() => {
+  const check = activeProfile.value?.lastCheck
+  return check?.availability === true && check.country !== null
+    ? countryDisplay(check.country)
+    : null
 })
 
 const hasOwnOverride = computed(() => {
@@ -322,6 +331,10 @@ onMounted(() => {
         <div v-if="activeProfile" class="global-status">
           <ProfileChip :profile="activeProfile" />
           <small>{{ lastCheckText }}</small>
+          <small v-if="lastCheckCountry" class="check-country" :title="lastCheckCountry.name">
+            <CountryFlag v-if="lastCheckCountry.code" :code="lastCheckCountry.code" />
+            {{ lastCheckCountry.name }}
+          </small>
           <button class="link-button" type="button" @click="void copyActiveUrl()">
             <Link :size="14" aria-hidden="true" />
             {{ t('copyUrl') }}
@@ -428,6 +441,12 @@ onMounted(() => {
   margin: 0;
   color: var(--color-muted);
   font-size: 12px;
+}
+
+.check-country {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
 }
 
 .global-status {

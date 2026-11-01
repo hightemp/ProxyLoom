@@ -216,3 +216,10 @@ detail. **Flags** are two switches: **Ignore case (i)** (on by default, because 
 case-insensitive) and **Multiline (m)**, which URLs never need. The **Test** tab lists every sample
 URL with a Match, No match or Error badge next to it and, when the URL was normalized first, the
 exact text that was tested.
+
+## Check results
+
+Each proxy row shows the whole result of its last check: Available or Unavailable, the response
+time, and either the reason for a failure or the external IP with the country's name and flag. The
+popup shows the same country next to the global proxy. Flags are bundled with the extension, so no
+image is downloaded; a country value that is not a two-letter ISO code is shown as text.

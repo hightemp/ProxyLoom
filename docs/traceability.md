@@ -78,7 +78,8 @@ complete acceptance evidence exists.
 | PL-160        | A      | v3→v4 migration/idempotence/import/storage-recovery tests, per-accent AA contrast unit test, Appearance component and accent E2E  | None beyond aggregate release gates                                |
 | PL-161        | A      | Help articles/tip/search unit tests, help E2E (tip, Escape focus, deep link, search), keyboard navigation E2E                     | None beyond aggregate release gates                                |
 | PL-162        | A      | Regex results/flags/cheat-sheet/tip-slot/toolbar-structure/placement unit tests; help and core-ui E2E                             | None beyond aggregate release gates                                |
-| PL-163…PL-164 | P      | Planned UI follow-up; no implementation evidence yet                                                                              | Full task acceptance                                               |
+| PL-163        | A      | Country/flag and check summary unit tests, popup layout test, proxy-check E2E (Germany + flag), row column alignment E2E          | None beyond aggregate release gates                                |
+| PL-164        | P      | Planned UI follow-up; no implementation evidence yet                                                                              | Full task acceptance                                               |
 
 ## Product requirement evidence
 

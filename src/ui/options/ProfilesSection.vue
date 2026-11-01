@@ -2,9 +2,7 @@
 import {
   Activity,
   Cable,
-  CircleCheck,
   CircleStop,
-  CircleX,
   ClipboardPaste,
   Copy,
   CopyPlus,
@@ -26,12 +24,7 @@ import {
 import { computed, nextTick, reactive, shallowRef, watch } from 'vue'
 
 import type { AppRuntimeState, RuntimeRequest } from '../../application/runtime/contracts'
-import type {
-  ProxyCheckResult,
-  ProxyEndpoint,
-  ProxyProfile,
-  ProxyTransport,
-} from '../../domain/types/entities'
+import type { ProxyEndpoint, ProxyProfile, ProxyTransport } from '../../domain/types/entities'
 import { t } from '../../i18n/messages'
 import { confirmController } from '../confirm/confirm-controller'
 import {
@@ -43,7 +36,7 @@ import { parseProxyString, type ParsedProxyString } from '../../domain/profiles/
 import { copyText } from '../clipboard'
 import { runtimeClient } from '../runtime/client'
 import { filterProfiles, type ProfileFilter } from '../../application/profiles/profile-filter'
-import { checkErrorLabel, proxyStringErrorLabel } from '../labels'
+import { proxyStringErrorLabel } from '../labels'
 import ProxyLineImportPanel from './ProxyLineImportPanel.vue'
 import IconButton from '../components/IconButton.vue'
 import Modal from '../components/Modal.vue'
@@ -51,6 +44,7 @@ import Tabs from '../components/Tabs.vue'
 import PasswordInput from '../components/PasswordInput.vue'
 import OverflowMenu from '../components/OverflowMenu.vue'
 import HelpTip from '../components/HelpTip.vue'
+import CheckSummary from '../components/CheckSummary.vue'
 
 const props = defineProps<{
   state: AppRuntimeState
@@ -409,16 +403,6 @@ const endpointRows = (profile: ProxyProfile) =>
 const ruleUsage = (profile: ProxyProfile): number =>
   props.state.config.rules.filter((rule) => rule.action.targetProxyProfileId === profile.id).length
 
-const checkSummary = (check: ProxyCheckResult): string =>
-  [
-    check.availability ? t('available') : t('unavailable'),
-    `${Math.round(check.totalDurationMs)} ${t('millisecondsShort')}`,
-    check.externalIp ?? (check.errorCode === null ? '' : checkErrorLabel(check.errorCode)),
-    check.country ?? '',
-  ]
-    .filter(Boolean)
-    .join(' · ')
-
 const cancelCheck = (): void => {
   checkingId.value = null
   emit('command', { type: 'CANCEL_PROXY_CHECK' })
@@ -635,16 +619,7 @@ watch(() => props.busy, restoreFocus)
               <LoaderCircle :size="12" aria-hidden="true" class="spin" />
               {{ t('checkingNow') }}
             </span>
-            <span
-              v-else-if="profile.lastCheck"
-              class="badge"
-              :class="profile.lastCheck.availability ? 'success' : 'danger'"
-              :title="checkSummary(profile.lastCheck)"
-            >
-              <CircleCheck v-if="profile.lastCheck.availability" :size="12" aria-hidden="true" />
-              <CircleX v-else :size="12" aria-hidden="true" />
-              <span class="truncate">{{ checkSummary(profile.lastCheck) }}</span>
-            </span>
+            <CheckSummary v-else-if="profile.lastCheck" :result="profile.lastCheck" />
             <span v-else class="muted">{{ t('neverChecked') }}</span>
           </div>
           <div class="row-actions">
@@ -947,10 +922,13 @@ watch(() => props.busy, restoreFocus)
 }
 
 .proxy-row {
+  /* Fixed so rows without the Use-globally button keep every column aligned. */
+  --row-actions-width: calc(4 * var(--control-height) + 3 * var(--space-1));
+
   display: grid;
   grid-template-columns:
-    auto minmax(150px, 1.3fr) minmax(170px, 1.6fr) minmax(90px, 1fr)
-    minmax(110px, 1.1fr) auto;
+    auto minmax(150px, 1.3fr) minmax(170px, 1.5fr) minmax(90px, 0.9fr)
+    minmax(170px, 1.3fr) var(--row-actions-width);
   gap: var(--space-4);
   align-items: center;
   padding: 10px var(--space-4);

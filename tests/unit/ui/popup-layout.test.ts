@@ -1,7 +1,7 @@
 import { message, runtimeMessages, runtimeState, setRuntimeResponder } from './support'
 
 import { flushPromises, mount } from '@vue/test-utils'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import PopupApp from '../../../entrypoints/popup/App.vue'
 import type { AppRuntimeState } from '../../../src/application/runtime/contracts'
@@ -91,6 +91,8 @@ describe('popup layout', () => {
     const wrapper = await mountPopup()
     expect(wrapper.get('.global-status').text()).toContain(message('available'))
     expect(wrapper.get('.global-status').text()).toContain('707')
+    expect(wrapper.get('.global-status .check-country').text()).toBe('Germany')
+    await vi.waitFor(() => expect(wrapper.find('.global-status img.flag').exists()).toBe(true))
   })
 
   it('creates a Once route to a profile from a single route selector', async () => {
