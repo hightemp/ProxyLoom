@@ -5,6 +5,7 @@ import { CoalescingTaskRunner } from '../src/application/config/coalescing-task-
 import { ErrorCorrelationStore } from '../src/application/errors/error-correlation-store'
 import { LoggingService } from '../src/application/logging/logging-service'
 import { PrivateLogBuffer } from '../src/application/logging/private-buffer'
+import { OverrideApplicationService } from '../src/application/overrides/override-service'
 import { BatchedLogStore } from '../src/application/logging/batched-log-store'
 import type { ProxyPlatformAdapter } from '../src/application/ports/proxy-platform'
 import { SessionLifecycleService } from '../src/application/session-lifecycle/session-lifecycle-service'
@@ -58,6 +59,12 @@ export default defineBackground(() => {
   let appliedRevision: number | null = null
   let appliedSnapshotHash: string | null = null
   let lastApplyError: string | null = null
+  let invalidOverridesRemoved = 0
+  const overrideCleanup = new OverrideApplicationService(
+    sessionRepository,
+    { next: () => crypto.randomUUID() },
+    { now: () => new Date() },
+  )
   let applyQueue = Promise.resolve()
   let markInitialSnapshotReady = (): void => undefined
   const initialSnapshotReady = new Promise<void>((resolve) => {
@@ -76,6 +83,8 @@ export default defineBackground(() => {
       lastApplyError = config.error.code
       return
     }
+    // A deleted proxy profile must not leave a Once override that fails every request (PRD §20).
+    invalidOverridesRemoved += (await overrideCleanup.removeInvalid(config.value)).removed
     const overrides = await sessionRepository.getOverrides()
     const now = new Date()
     const result = await applicationService.apply(config.value, overrides, now)
@@ -139,6 +148,7 @@ export default defineBackground(() => {
     diagnostics: () => ({
       appliedRevision,
       appliedSnapshotHash,
+      invalidOverridesRemoved,
       lastApplyError,
     }),
     errorStore,

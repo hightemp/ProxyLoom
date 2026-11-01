@@ -77,6 +77,7 @@ export class TargetedProxyCheckRequest implements ProxyCheckRequestPort {
           originKey: origin,
           platformScope: 'ORIGIN',
           scope: 'EXACT_HOSTNAME',
+          sourceHostname: normalized.value.hostname,
           sourceTabId: 0,
         }
         const temporaryConfig: AppConfig =

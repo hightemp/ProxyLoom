@@ -1499,10 +1499,10 @@
   - **Тесты:** unit exhaustive label map, popup component snapshot, E2E smoke.
   - **Готово, когда:** lint/typecheck/unit/E2E/dual builds зелёные, version 0.1.6/docs обновлены.
 
-- [ ] **PL-135 — Управление Once-оверрайдами в application и изоляция private**
+- [x] **PL-135 — Управление Once-оверрайдами в application и изоляция private**
   - **Цель:** list/update/promote/clear для session overrides; не отдавать private overrides
     обычному контексту.
-  - **Требования:** FR-005, FR-026, FR-057–FR-059, FR-074, SEC-003, PRIV-010.
+  - **Требования:** FR-005, FR-026, FR-057–FR-059, FR-074, FR-081, SEC-003, PRIV-010.
   - **Действия:** поле `sourceHostname` и versioned envelope `session.overrides` v2 с fail-safe
     очисткой malformed/future; команды `LIST_OVERRIDES`, `UPDATE_OVERRIDE`, `PROMOTE_OVERRIDE`,
     `CLEAR_OVERRIDES`; pattern пересчитывается только через `OverrideApplicationService.preview`;

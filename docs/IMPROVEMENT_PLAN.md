@@ -44,17 +44,19 @@
   тогда даст apex-домен; это явно показывается в preview). Malformed/future payload — fail-safe
   очистка, как в PL-129.
 - Новые команды (`src/application/runtime/contracts.ts`):
-  - `LIST_OVERRIDES` — возвращает только оверрайды той же incognito-сессии, что и вызывающий
-    контекст (исправление F1). Поле `incognito` caller'а определяется в platform adapter по
-    `sender.tab`/`sender.url` контексту, не по параметру UI.
+  - Отдельный `LIST_OVERRIDES` не понадобился: каждый ответ с `AppRuntimeState` проходит
+    `scopeStateToCaller` — остаются только оверрайды сессии вызывающего (исправление F1), а если
+    целевая вкладка из другой сессии, её URL/inspection не отдаются. Сессия определяется по
+    `sender.tab.incognito` (options/error page) или по целевой вкладке (popup без sender tab).
   - `UPDATE_OVERRIDE { overrideId, scope?, action? }` — copy → validate → atomic replace; pattern
     и `originKey` пересчитываются тем же `preview()` (единый generator, без копии в UI).
-  - `PROMOTE_OVERRIDE { overrideId, position: 'TOP' }` — создаёт permanent Origin Rule
-    (тот же путь, что `CREATE_SITE_RULE`) и удаляет оверрайд одной операцией; при ошибке commit
-    оверрайд остаётся.
+  - `PROMOTE_OVERRIDE { overrideId }` — создаёт permanent Origin Rule на позиции 1 (Once стоит
+    выше rules, поэтому позиция 1 сохраняет поведение; `Always` из popup, напротив, добавляет
+    правило в конец) и удаляет оверрайд только после успешного commit.
   - `CLEAR_OVERRIDES` — удаляет все оверрайды текущей сессии (destructive → подтверждение).
-- `removeInvalid` возвращает список удалённых, runtime пишет redacted diagnostic
-  (`originKey` + причина, без path/query) и показывает его в About/Diagnostics.
+- `removeInvalid` вызывается при каждом apply (раньше нигде не вызывался — оверрайд на удалённый
+  профиль давал configuration error до закрытия вкладки). В About / Diagnostics виден только
+  счётчик удалённых — без `originKey`, чтобы не раскрывать hostnames private-сессии.
 - Routing: после каждого update/remove — обычный monotonic apply (PAC в Chromium, snapshot в
   Firefox). Инвариант: оверрайд по-прежнему выше rules, `DIRECT` его игнорирует.
 
@@ -379,7 +381,7 @@ regression. Скриншоты store (`pnpm capture:store-assets`) пересо�
 
 ## 11. Принятые решения
 
-1. `Make permanent` для Once всегда создаёт правило в начале списка (как `Always` из popup).
+1. `Make permanent` для Once всегда создаёт правило в начале списка.
 2. Экспорт в `.txt` нужен — входит в PL-141.
 3. SOCKS5 с credentials в Chromium сохраняется с видимым статусом и fail-closed (см. 6.2).
 4. Native JSON export включает пароли по умолчанию, с видимым предупреждением (см. 5).

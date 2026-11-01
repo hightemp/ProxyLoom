@@ -466,6 +466,7 @@ stateDiagram-v2
 - `COMPAT-009`: Chromium PAC не имеет надёжного tab ID, поэтому override фактически origin-scoped во всех вкладках до закрытия source tab; warning показывается в popup/error page.
 - `FR-058`: normal/private session overrides не смешиваются.
 - `FR-059`: temporary disabled rules и temporary overrides используют session storage/эквивалент и alarms/reconciliation, а не только globals service worker.
+- `FR-081`: активные Once overrides видимы и управляемы: список, смена route и scope (в обе стороны — override хранит нормализованный `sourceHostname`), `Make permanent` (permanent Origin Rule в начало списка; override удаляется только после успешного commit правила), удаление и `Clear all` для своей сессии. Background отдаёт странице только overrides её сессии (normal/private) и не раскрывает URL/route private-вкладки normal-странице. Overrides с удалённым proxy profile удаляются при apply, их число видно в About / Diagnostics. Session envelope `session.overrides` версионирован (v2); v1 без `sourceHostname` мигрирует при чтении, malformed/future payload очищается fail-safe.
 
 ## 21. Logging
 

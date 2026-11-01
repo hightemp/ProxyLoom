@@ -10,6 +10,7 @@ import { inspectTab } from '../../application/inspection/current-tab-inspection'
 import type { LogQuery } from '../../application/logging/log-types'
 import type { PrivateLogBuffer } from '../../application/logging/private-buffer'
 import { IncognitoCapabilityService } from '../../application/incognito/incognito-capability-service'
+import { callerIncognito, scopeStateToCaller } from '../../application/overrides/caller-context'
 import { OverrideApplicationService } from '../../application/overrides/override-service'
 import type { ProxyPlatformAdapter } from '../../application/ports/proxy-platform'
 import type { LogStorePort } from '../../application/ports/log-store'
@@ -31,6 +32,7 @@ import {
   asProxyProfileId,
   asRuleId,
   asTemporaryOverrideId,
+  type TemporaryOverrideId,
 } from '../../domain/types/brand'
 import type { AppConfig } from '../../domain/types/entities'
 import type { Result } from '../../domain/types/result'
@@ -50,6 +52,7 @@ interface RuntimeControllerOptions {
   readonly diagnostics: () => {
     readonly appliedRevision: number | null
     readonly appliedSnapshotHash: string | null
+    readonly invalidOverridesRemoved: number
     readonly lastApplyError: string | null
   }
 }
@@ -60,6 +63,18 @@ type ConfigTransform = (config: AppConfig) =>
       readonly ok: true
       readonly value: { readonly config: AppConfig }
     }
+
+/** The part of `runtime.MessageSender` used to tell normal and private callers apart. */
+interface RuntimeSender {
+  readonly tab?: { readonly incognito?: boolean } | undefined
+}
+
+const isRuntimeState = (value: unknown): value is AppRuntimeState =>
+  typeof value === 'object' &&
+  value !== null &&
+  'overrides' in value &&
+  'config' in value &&
+  'diagnostics' in value
 
 const commandError = (error: unknown, fallbackCode = 'COMMAND_FAILED'): RuntimeResponse<never> => {
   if (typeof error === 'object' && error !== null && 'code' in error) {
@@ -116,14 +131,37 @@ export class RuntimeController {
       ) {
         return undefined
       }
-      void this.handle(message as RuntimeRequest).then(sendResponse)
+      void this.handle(message as RuntimeRequest, _sender as RuntimeSender).then(sendResponse)
       return true
     }
     browser.runtime.onMessage.addListener(listener)
     return () => browser.runtime.onMessage.removeListener(listener)
   }
 
-  async handle(request: RuntimeRequest): Promise<RuntimeResponse<unknown>> {
+  async handle(request: RuntimeRequest, sender?: RuntimeSender): Promise<RuntimeResponse<unknown>> {
+    const response = await this.dispatch(request, sender)
+    if (!response.ok || !isRuntimeState(response.value)) return response
+    const state = response.value
+    return {
+      ok: true,
+      value: scopeStateToCaller(
+        state,
+        callerIncognito(sender, { incognito: state.activeTabIncognito }),
+      ),
+    }
+  }
+
+  private async callerSession(sender: RuntimeSender | undefined, tabId?: number) {
+    return callerIncognito(
+      sender,
+      sender?.tab === undefined ? await this.targetTab(tabId) : undefined,
+    )
+  }
+
+  private async dispatch(
+    request: RuntimeRequest,
+    sender: RuntimeSender | undefined,
+  ): Promise<RuntimeResponse<unknown>> {
     try {
       switch (request.type) {
         case 'GET_STATE':
@@ -199,11 +237,38 @@ export class RuntimeController {
         case 'CREATE_SITE_RULE':
           return this.createSiteRule(request.scope, request.action, request.tabId)
         case 'REMOVE_OVERRIDE': {
-          const removed = await this.#overrides.remove(asTemporaryOverrideId(request.overrideId))
+          const removed = await this.#overrides.remove(
+            asTemporaryOverrideId(request.overrideId),
+            await this.callerSession(sender, request.tabId),
+          )
           if (!removed.ok) return commandError(removed.error)
           await this.options.applyConfiguration()
-          return { ok: true, value: await this.state() }
+          return { ok: true, value: await this.state(undefined, request.tabId) }
         }
+        case 'UPDATE_OVERRIDE': {
+          const config = await this.options.configRepository.initialize()
+          if (!config.ok) return commandError(config.error)
+          const updated = await this.#overrides.update(config.value, {
+            ...(request.action === undefined ? {} : { action: request.action }),
+            incognito: await this.callerSession(sender, request.tabId),
+            overrideId: asTemporaryOverrideId(request.overrideId),
+            platform: this.options.adapter.capabilities.platform,
+            ...(request.scope === undefined ? {} : { scope: request.scope }),
+          })
+          if (!updated.ok) return commandError(updated.error)
+          await this.options.applyConfiguration()
+          return { ok: true, value: await this.state(undefined, request.tabId) }
+        }
+        case 'PROMOTE_OVERRIDE':
+          return this.promoteOverride(
+            asTemporaryOverrideId(request.overrideId),
+            await this.callerSession(sender, request.tabId),
+            request.tabId,
+          )
+        case 'CLEAR_OVERRIDES':
+          await this.#overrides.clear(await this.callerSession(sender, request.tabId))
+          await this.options.applyConfiguration()
+          return { ok: true, value: await this.state(undefined, request.tabId) }
         case 'CLEAR_LOGS':
           await this.options.logs.clear()
           if (request.includePrivate) this.options.privateLogs.clear()
@@ -410,6 +475,34 @@ export class RuntimeController {
     )
   }
 
+  /** Commits the permanent rule first; the override is removed only after that succeeded. */
+  private async promoteOverride(
+    overrideId: TemporaryOverrideId,
+    incognito: boolean,
+    tabId?: number,
+  ): Promise<RuntimeResponse<unknown>> {
+    const promotion = await this.#overrides.promotion(overrideId, incognito)
+    if (!promotion.ok) return commandError(promotion.error)
+    const { action, originKey, pattern } = promotion.value
+    const committed = await this.mutate((config) => {
+      const created = this.#rules.create(config, {
+        action,
+        description: `Created from a Once override for ${originKey}.`,
+        enabled: true,
+        flags: 'i',
+        matcherType: 'ORIGIN',
+        name: `${originKey} ${action.type === 'DIRECT' ? 'direct' : 'proxy'}`,
+        pattern,
+      })
+      if (!created.ok) return created
+      return this.#rules.reorder(created.value.config, created.value.rule.id, 0, false)
+    })
+    if (!committed.ok) return committed
+    await this.#overrides.remove(overrideId, incognito)
+    await this.options.applyConfiguration()
+    return { ok: true, value: await this.state(undefined, tabId) }
+  }
+
   private async applyFoxyProxyImport(
     request: Extract<RuntimeRequest, { type: 'APPLY_FOXYPROXY_IMPORT' }>,
   ): Promise<RuntimeResponse<unknown>> {
@@ -527,6 +620,7 @@ export class RuntimeController {
       controlStatus,
       incognitoAllowed: incognitoStatus.allowed,
       incognitoHelp: incognitoStatus.help,
+      invalidOverridesRemoved: apply.invalidOverridesRemoved,
       lastApplyError: apply.lastApplyError,
       persistedRevision: config.revision,
       platform: this.options.adapter.capabilities.platform,

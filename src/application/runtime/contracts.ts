@@ -30,6 +30,8 @@ export interface RuntimeDiagnostics {
   readonly capabilities: PlatformCapabilities
   readonly incognitoAllowed: boolean | null
   readonly incognitoHelp: IncognitoHelp
+  /** Once overrides dropped since the worker started because their proxy profile was deleted. */
+  readonly invalidOverridesRemoved: number
 }
 
 export interface AppRuntimeState {
@@ -132,7 +134,16 @@ export type RuntimeRequest =
       readonly action: RuleAction
       readonly tabId?: number
     }
-  | { readonly type: 'REMOVE_OVERRIDE'; readonly overrideId: string }
+  | { readonly type: 'REMOVE_OVERRIDE'; readonly overrideId: string; readonly tabId?: number }
+  | {
+      readonly type: 'UPDATE_OVERRIDE'
+      readonly overrideId: string
+      readonly scope?: OverrideScope
+      readonly action?: RuleAction
+      readonly tabId?: number
+    }
+  | { readonly type: 'PROMOTE_OVERRIDE'; readonly overrideId: string; readonly tabId?: number }
+  | { readonly type: 'CLEAR_OVERRIDES'; readonly tabId?: number }
   | { readonly type: 'CLEAR_LOGS'; readonly includePrivate: boolean }
   | {
       readonly type: 'EXPORT_NATIVE'

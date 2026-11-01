@@ -51,7 +51,8 @@ complete acceptance evidence exists.
 | PL-132        | A      | Safe-origin context and disabled-coordinator unit coverage plus Chromium options/error-page E2E                                   | None beyond aggregate release gates                                |
 | PL-133        | A      | ConfirmDialog/controller and call-site component tests, lint ban on browser dialogs, full Chromium E2E with in-page confirms      | None beyond aggregate release gates                                |
 | PL-134        | A      | Exhaustive typed label maps, catalog-backed unit tests, source scan for raw enums/errors and full Chromium E2E                    | None beyond aggregate release gates                                |
-| PL-135…PL-145 | P      | Planned in `docs/IMPROVEMENT_PLAN.md`; no implementation evidence yet                                                             | Full task acceptance                                               |
+| PL-135        | A      | Override service/envelope/caller-scope unit tests and Chromium E2E for update, cross-session rejection, promote and clear         | Firefox private-window manual check in PL-122 matrix               |
+| PL-136…PL-145 | P      | Planned in `docs/IMPROVEMENT_PLAN.md`; no implementation evidence yet                                                             | Full task acceptance                                               |
 | PL-146        | A      | Brand asset unit test, Chromium-rendered icons, dual build manifest validation and accessibility/foundation E2E                   | Visual toolbar check on signed packages in release matrices        |
 | PL-147…PL-150 | P      | Planned in `docs/IMPROVEMENT_PLAN.md`; no implementation evidence yet                                                             | Full task acceptance                                               |
 | PL-151        | A      | about:blank completion regression unit test and repeated full Chromium E2E runs without proxy-check failures                      | None beyond aggregate release gates                                |
@@ -67,6 +68,7 @@ complete acceptance evidence exists.
 | FR-054…FR-059         | Popup inspection, Once/Always/Edit/Retry and isolated session overrides                              |
 | FR-060…FR-072         | Logs, proxy check, native import/export and fixture-backed FoxyProxy import                          |
 | FR-073…FR-080         | Incognito model, help/status, privacy, docs and release artifacts                                    |
+| FR-081                | Override service update/promote/clear/cleanup, caller-session scoping and background override E2E    |
 | NFR-001…NFR-017       | Strict builds, performance budgets, accessibility, local infrastructure, diagnostics and CI          |
 | COMPAT-001…COMPAT-014 | Dual WXT adapters/builds, capability UI, ADRs and platform-specific tests                            |
 | COMPAT-015            | Automated Chromium/Firefox gates and four branded-browser smokes; full signoff remains PL-121…PL-123 |

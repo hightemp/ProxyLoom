@@ -88,6 +88,8 @@ export interface TemporaryOverride {
   readonly incognito: boolean
   readonly scope: OverrideScope
   readonly originKey: string
+  /** Normalized hostname of the page the override was created from; lets scope change both ways. */
+  readonly sourceHostname: string
   readonly generatedPattern: string
   readonly action: RuleAction
   readonly platformScope: OverridePlatformScope

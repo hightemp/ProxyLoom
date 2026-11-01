@@ -70,6 +70,7 @@ export const override = (options: Partial<TemporaryOverride> = {}): TemporaryOve
   originKey: 'https://example.com/',
   platformScope: 'ORIGIN',
   scope: 'EXACT_HOSTNAME',
+  sourceHostname: 'example.com',
   sourceTabId: 7,
   ...options,
 })

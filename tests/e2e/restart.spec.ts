@@ -145,7 +145,7 @@ test('preserves local configuration and clears normal/private session state afte
         localMode: 'DIRECT',
         proxyMode: 'direct',
         schemaVersion: 3,
-        session: { 'session.overrides': [] },
+        session: { 'session.overrides': { overrides: [], schemaVersion: 2 } },
       })
   } finally {
     await firstContext?.close()

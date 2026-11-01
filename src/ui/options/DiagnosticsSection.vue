@@ -83,6 +83,10 @@ const copy = async (): Promise<void> => {
             }}
           </dd>
         </div>
+        <div>
+          <dt>{{ t('invalidOverridesRemoved') }}</dt>
+          <dd>{{ state.diagnostics.invalidOverridesRemoved }}</dd>
+        </div>
       </dl>
       <p v-if="state.diagnostics.lastApplyError" class="notice danger">
         {{ t('lastApplyError') }} {{ state.diagnostics.lastApplyError }}

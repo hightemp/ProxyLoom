@@ -9,6 +9,8 @@ import type { TemporaryOverride } from '../../domain/types/entities'
 import type { StorageArea } from '../config/storage-area'
 
 const OVERRIDES_KEY = 'session.overrides'
+/** v1 was a bare array without `sourceHostname`; v2 is a versioned envelope. */
+export const OVERRIDES_SCHEMA_VERSION = 2
 const DISABLES_KEY = 'session.rule-disables'
 const TRANSIENT_KEY = 'session.transient'
 export const ERROR_CONTEXTS_KEY = 'session.error-contexts'
@@ -42,7 +44,15 @@ const overrideSchema = z
     originKey: z.string().min(1).max(2_048),
     platformScope: z.enum(['TAB', 'ORIGIN']),
     scope: z.enum(['EXACT_HOSTNAME', 'REGISTRABLE_DOMAIN']),
+    sourceHostname: z.string().min(1).max(253),
     sourceTabId: z.number().int().nonnegative(),
+  })
+  .strict()
+const legacyOverrideSchema = overrideSchema.omit({ sourceHostname: true })
+const overridesEnvelopeSchema = z
+  .object({
+    overrides: z.array(overrideSchema).max(1_000),
+    schemaVersion: z.literal(OVERRIDES_SCHEMA_VERSION),
   })
   .strict()
 const disableSchema = z
@@ -99,12 +109,22 @@ export class SessionRepository implements SessionStatePort, ErrorContextStatePor
 
   async getOverrides(): Promise<readonly TemporaryOverride[]> {
     const values = await this.storage.get([OVERRIDES_KEY])
-    const parsed = z.array(overrideSchema).safeParse(values[OVERRIDES_KEY])
-    return parsed.success ? (parsed.data as unknown as TemporaryOverride[]) : []
+    const raw = values[OVERRIDES_KEY]
+    const current = overridesEnvelopeSchema.safeParse(raw)
+    if (current.success) return current.data.overrides as unknown as TemporaryOverride[]
+    // v1 → v2: the original hostname was not stored; originKey is the best available source.
+    const legacy = z.array(legacyOverrideSchema).safeParse(raw)
+    if (!legacy.success) return []
+    return legacy.data.map((entry) => ({
+      ...entry,
+      sourceHostname: entry.originKey,
+    })) as unknown as TemporaryOverride[]
   }
 
   async setOverrides(overrides: readonly TemporaryOverride[]): Promise<void> {
-    await this.storage.set({ [OVERRIDES_KEY]: overrides })
+    await this.storage.set({
+      [OVERRIDES_KEY]: { overrides, schemaVersion: OVERRIDES_SCHEMA_VERSION },
+    })
   }
 
   async getRuleDisables(): Promise<readonly RuleDisableRecord[]> {

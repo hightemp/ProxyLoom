@@ -116,7 +116,8 @@ describe('temporary override application service', () => {
       url: 'https://example.com/',
     })
 
-    expect(await service.removeInvalid(config())).toEqual([])
+    expect(await service.removeInvalid(config())).toEqual({ removed: 1 })
+    expect(await session.getOverrides()).toEqual([])
     expect(
       await service.create(config(), {
         action: { targetProxyProfileId: selectedProfile.id, type: 'PROXY' },

@@ -382,7 +382,7 @@ test('creates Once and Always routes from the real action popup and opens the ma
       }
     ).chrome
     const stored = await extensionApi.storage.session.get('session.overrides')
-    return stored['session.overrides']
+    return (stored['session.overrides'] as { overrides: unknown[] }).overrides
   })
   expect(sessionState).toMatchObject([
     {

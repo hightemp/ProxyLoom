@@ -1323,5 +1323,8 @@
   },
   "checkFailed": {
     "message": "Check failed"
+  },
+  "invalidOverridesRemoved": {
+    "message": "Once overrides removed after profile deletion"
   }
 }

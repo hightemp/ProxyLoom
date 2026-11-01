@@ -64,6 +64,7 @@ export const runtimeState = (
     controlStatus: 'CONTROLLED_BY_THIS_EXTENSION',
     incognitoAllowed: false,
     incognitoHelp: 'CHROMIUM_EXTENSION_DETAILS',
+    invalidOverridesRemoved: 0,
     lastApplyError: null,
     persistedRevision: 1,
     platform: 'CHROMIUM',
