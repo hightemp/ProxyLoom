@@ -30,6 +30,7 @@
 | F2  | Popup и options показывают сырые enum-значения: `DIRECT/PROXY/RULES`, `decision.action`, `decision.source`, `inspection.reason.replaceAll('_', ' ')`, ошибки как `${code}: ${message}`. Нарушает FR-012/FR-054 (всё через locale).                               | `entrypoints/popup/App.vue`, `src/ui/options/*`                        | PL-134        |
 | F3  | Подтверждения через `window.confirm`: нельзя показать форматированный preview pattern/impact, нет focus management (NFR-008), в popup системный диалог закрывает popup на части платформ, общий setting `confirmDangerousActions` учитывается непоследовательно. | `entrypoints/popup/App.vue`, `ProfilesSection.vue`, `RulesSection.vue` | PL-133        |
 | F4  | Once нельзя отменить до закрытия source tab — пользователь, ошибившийся с route, вынужден закрывать вкладку. Противоречит духу FR-005/FR-026 (preview → управляемое состояние).                                                                                  | popup, options                                                         | PL-135…PL-137 |
+| F6  | Manual check (Chromium) иногда возвращал `NETWORK_ERROR`: `complete` от начальной `about:blank` засчитывался как загрузка целевой страницы, и `executeScript` падал на `about:blank`. Проявлялось под нагрузкой в полном E2E-прогоне.                            | `src/platform/runtime/targeted-proxy-check.ts`                         | PL-151        |
 | F5  | При удалении профиля, на который ссылается Once, оверрайд молча удаляется `removeInvalid` без видимого diagnostic (PRD §20: `Invalid → Cleanup + diagnostic`).                                                                                                   | `override-service.ts`                                                  | PL-135        |
 
 ## 3. Once-оверрайды: список, редактирование, popup
@@ -368,6 +369,13 @@ regression. Скриншоты store (`pnpm capture:store-assets`) пересо�
   impact preview (сколько rules станут invalid), `Check selected` последовательно с отменой.
 - **PL-143 — Синхронизация user guide/store текстов** с новыми возможностями и скриншоты options
   (без реальных credentials).
+
+### Наблюдения по стабильности E2E
+
+- `performance.spec.ts` (cold popup p95 < 1500 ms) изредка падает под нагрузкой и на исходном
+  коммите `8c99c08` (1 из 4 прогонов) — бюджет чувствителен к загрузке машины.
+- `restart.spec.ts` упал 1 раз из 10 полных прогонов; изолированно 8 из 8 зелёные. Нужна
+  отдельная диагностика, если повторится.
 
 ## 11. Принятые решения
 

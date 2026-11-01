@@ -181,8 +181,16 @@ export class TargetedProxyCheckRequest implements ProxyCheckRequestPort {
         const onUpdated = (
           updatedTabId: number,
           changeInfo: { readonly status?: string | undefined },
+          tab: { readonly url?: string | undefined },
         ): void => {
-          if (updatedTabId === tabId && changeInfo.status === 'complete') {
+          // The placeholder about:blank document can report `complete` after navigation has
+          // started; reading the page then hits about:blank instead of the check response.
+          if (
+            updatedTabId === tabId &&
+            changeInfo.status === 'complete' &&
+            tab.url !== undefined &&
+            tab.url !== 'about:blank'
+          ) {
             documentComplete = true
             completeIfReady()
           }

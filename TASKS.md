@@ -1729,6 +1729,21 @@ rules`, compact check pill; `Use globally`/`Check` + «⋯» (Edit, Duplicate, C
   - **Тесты:** component tests, E2E CRUD/reorder/filter/tester, performance E2E.
   - **Готово, когда:** unit/E2E/typecheck/lint/dual builds зелёные, version 0.1.16/docs обновлены.
 
+- [x] **PL-151 — Устранить гонку about:blank в Chromium manual proxy check**
+  - **Цель:** manual check неактивного профиля не должен возвращать `NETWORK_ERROR`, когда событие
+    `complete` начальной `about:blank` приходит после старта навигации.
+  - **Требования:** FR-007, FR-064–FR-066, NFR-004.
+  - **Действия:** считать документ загруженным только по `tabs.onUpdated complete` для URL, отличного
+    от `about:blank`; routing/fail-closed/restore semantics не меняются.
+  - **Модули:** `src/platform/runtime/targeted-proxy-check.ts`, unit test.
+  - **Зависимости:** PL-007.
+  - **Критерии приёмки:** проверка читает ответ только целевой страницы; полный Chromium E2E без
+    сбоев `proxy-check.spec.ts` в серии прогонов.
+  - **Тесты:** `tests/unit/platform/targeted-proxy-check.test.ts` (красный до исправления: ответ
+    читался с `about:blank`); 10 полных E2E-прогонов без сбоя `proxy-check` (до исправления 3 из 11).
+  - **Миграции/permissions/privacy:** нет; `tab.url` доступен через существующий `<all_urls>`.
+  - **Готово, когда:** unit/E2E/typecheck/lint/dual builds зелёные, version 0.1.6.
+
 ---
 
 # Release checklist
