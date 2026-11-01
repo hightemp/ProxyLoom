@@ -95,7 +95,7 @@ describe('proxy rows', () => {
       profileId: office.id,
       type: 'USE_PROFILE',
     })
-    expect(row(wrapper, 'Split').text()).toContain(message('global'))
+    expect(row(wrapper, 'Split').find('.global-marker').exists()).toBe(true)
     expect(
       row(wrapper, 'Split')
         .find(`button[aria-label="${message('useProfileGloballyNamed', 'Split')}"]`)

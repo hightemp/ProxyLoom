@@ -225,11 +225,9 @@ test('shows redacted local logs and applies filters and clear through visible UI
   )
 
   await extensionPage.getByLabel('Hostname contains').fill('does-not-match.test')
-  await extensionPage.getByRole('button', { name: 'Apply filters' }).click()
   await expect(extensionPage.getByText('No log entries', { exact: true })).toBeVisible()
 
   await extensionPage.getByLabel('Hostname contains').fill('logs.proxyloom.test')
-  await extensionPage.getByRole('button', { name: 'Apply filters' }).click()
   await expect(extensionPage.getByText('http://logs.proxyloom.test').first()).toBeVisible()
   await extensionPage.getByRole('button', { name: 'Clear logs' }).click()
   await acceptConfirm(extensionPage)

@@ -76,6 +76,9 @@ const onImported = (): void => {
 }
 const filter = reactive<ProfileFilter>({ check: 'ALL', query: '', transport: 'ALL' })
 const selectedIds = shallowRef<ReadonlySet<string>>(new Set())
+const bulkCurrentId = shallowRef<string | null>(null)
+const isChecking = (profile: ProxyProfile): boolean =>
+  (checkingId.value === profile.id && props.busy) || bulkCurrentId.value === profile.id
 const bulkProgress = shallowRef<{ readonly done: number; readonly total: number } | null>(null)
 let stopRequested = false
 
@@ -142,8 +145,10 @@ const checkSelected = async (): Promise<void> => {
   for (const [index, profile] of profiles.entries()) {
     if (stopRequested) break
     bulkProgress.value = { done: index + 1, total: profiles.length }
+    bulkCurrentId.value = profile.id
     await runtimeClient.command({ profileId: profile.id, type: 'CHECK_PROFILE' })
   }
+  bulkCurrentId.value = null
   bulkProgress.value = null
   emit('refresh')
 }
@@ -581,9 +586,14 @@ watch(() => props.busy, restoreFocus)
                 <span class="badge neutral">{{
                   profile.shortName ?? profile.generatedShortName
                 }}</span>
-                <span v-if="state.config.general.activeProxyProfileId === profile.id" class="badge">
-                  <Globe :size="12" aria-hidden="true" />
-                  {{ t('global') }}
+                <span
+                  v-if="state.config.general.activeProxyProfileId === profile.id"
+                  class="global-marker"
+                  role="img"
+                  :aria-label="t('globalProxyMarker')"
+                  :title="t('globalProxyMarker')"
+                >
+                  <Globe :size="14" aria-hidden="true" />
                 </span>
               </div>
               <small>
@@ -613,8 +623,12 @@ watch(() => props.busy, restoreFocus)
             <span v-else class="muted">{{ t('noAuth') }}</span>
           </div>
           <div class="proxy-status">
+            <span v-if="isChecking(profile)" class="badge checking" role="status">
+              <LoaderCircle :size="12" aria-hidden="true" class="spin" />
+              {{ t('checkingNow') }}
+            </span>
             <span
-              v-if="profile.lastCheck"
+              v-else-if="profile.lastCheck"
               class="badge"
               :class="profile.lastCheck.availability ? 'success' : 'danger'"
               :title="checkSummary(profile.lastCheck)"
@@ -1027,6 +1041,22 @@ watch(() => props.busy, restoreFocus)
 
 .proxy-status .badge {
   max-width: 100%;
+}
+
+.badge.checking {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.global-marker {
+  display: inline-grid;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  place-items: center;
 }
 
 .row-actions {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChevronLeft, ChevronRight, Filter, Trash2 } from '@lucide/vue'
+import { ChevronLeft, ChevronRight, Search, Trash2 } from '@lucide/vue'
 import { shallowRef } from 'vue'
 
 import type { AppRuntimeState, RuntimeRequest } from '../../application/runtime/contracts'
@@ -37,6 +37,16 @@ const applyFilters = (): void => {
   load()
 }
 
+let typingTimer: number | undefined
+/** Hostname filtering follows typing after a short pause instead of an Apply button. */
+const scheduleFilters = (): void => {
+  window.clearTimeout(typingTimer)
+  typingTimer = window.setTimeout(applyFilters, 300)
+}
+
+const formatTime = (timestamp: string): string =>
+  new Date(timestamp).toLocaleString([], { dateStyle: 'short', timeStyle: 'medium' })
+
 const newer = (): void => {
   offset.value = Math.max(0, offset.value - 100)
   load()
@@ -63,38 +73,40 @@ const clear = async (): Promise<void> => {
         <h2>{{ t('routingLogs') }}</h2>
         <p>{{ t('routingLogsDescription') }}</p>
       </div>
-      <button class="danger-text" type="button" :disabled="busy" @click="void clear()">
-        <Trash2 :size="16" aria-hidden="true" />
-        {{ t('clearLogs') }}
-      </button>
     </div>
 
     <article class="surface card stack">
-      <div class="filter-grid">
-        <label>
-          {{ t('hostnameContains') }}
+      <div class="logs-toolbar">
+        <label class="search-field">
+          <span class="sr-only">{{ t('hostnameContains') }}</span>
+          <Search :size="16" aria-hidden="true" />
           <input
             v-model="hostname"
             type="search"
-            :placeholder="t('exampleHostname')"
-            @keyup.enter="load"
+            :placeholder="t('hostnameContains')"
+            :aria-label="t('hostnameContains')"
+            @input="scheduleFilters"
+            @keyup.enter="applyFilters"
           />
         </label>
-        <label>
-          {{ t('platform') }}
-          <select v-model="platform">
-            <option value="">{{ t('all') }}</option>
-            <option value="CHROMIUM">{{ t('chromium') }}</option>
-            <option value="FIREFOX">{{ t('firefox') }}</option>
-          </select>
+        <select v-model="platform" :aria-label="t('platform')" @change="applyFilters">
+          <option value="">
+            {{ t('allPlatforms') }}
+          </option>
+          <option value="CHROMIUM">
+            {{ t('chromium') }}
+          </option>
+          <option value="FIREFOX">
+            {{ t('firefox') }}
+          </option>
+        </select>
+        <label class="switch">
+          <input v-model="errorsOnly" type="checkbox" role="switch" @change="applyFilters" />
+          {{ t('errorsAuthOnly') }}
         </label>
-        <label class="check-row compact">
-          <input v-model="errorsOnly" type="checkbox" />
-          <span>{{ t('errorsAuthOnly') }}</span>
-        </label>
-        <button type="button" @click="applyFilters">
-          <Filter :size="16" aria-hidden="true" />
-          {{ t('applyFilters') }}
+        <button class="danger-text" type="button" :disabled="busy" @click="void clear()">
+          <Trash2 :size="16" aria-hidden="true" />
+          {{ t('clearLogs') }}
         </button>
       </div>
       <p v-if="state.privateLogCount > 0" class="notice">
@@ -125,7 +137,9 @@ const clear = async (): Promise<void> => {
         </thead>
         <tbody>
           <tr v-for="entry in state.logs" :key="`${entry.id ?? 0}-${entry.timestamp}`">
-            <td>{{ new Date(entry.timestamp).toLocaleString() }}</td>
+            <td class="time-cell">
+              {{ formatTime(entry.timestamp) }}
+            </td>
             <td>{{ requestTypeLabel(entry.requestType) }}</td>
             <td>
               <code>{{ entry.scheme }}://{{ entry.hostname }}</code>
@@ -184,3 +198,43 @@ const clear = async (): Promise<void> => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.logs-toolbar {
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) auto auto auto;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.logs-toolbar select {
+  width: auto;
+}
+
+.search-field {
+  position: relative;
+  display: block;
+  color: var(--color-muted);
+}
+
+.search-field svg {
+  position: absolute;
+  top: 50%;
+  left: 11px;
+  transform: translateY(-50%);
+}
+
+.search-field input {
+  padding-left: 34px;
+}
+
+.time-cell {
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .logs-toolbar {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
