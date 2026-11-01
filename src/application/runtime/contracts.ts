@@ -1,4 +1,5 @@
 import type { ProxyLineImportOptions } from '../profiles/proxy-line-import'
+import type { TemporaryDisableDuration } from '../rules/rule-disable-service'
 import type { EditableProfile } from '../profiles/profile-service'
 import type { EditableRule } from '../rules/rule-service'
 import type { LogEntry, LogQuery } from '../logging/log-types'
@@ -109,6 +110,12 @@ export type RuntimeRequest =
   | { readonly type: 'DUPLICATE_RULE'; readonly ruleId: string }
   | { readonly type: 'DELETE_RULE'; readonly ruleId: string }
   | { readonly type: 'DELETE_RULES'; readonly ruleIds: readonly string[] }
+  | {
+      readonly type: 'SET_RULE_TEMPORARY_DISABLE'
+      readonly ruleId: string
+      readonly duration: TemporaryDisableDuration
+    }
+  | { readonly type: 'CLEAR_RULE_TEMPORARY_DISABLE'; readonly ruleId: string }
   | {
       readonly type: 'SET_RULES_ENABLED'
       readonly ruleIds: readonly string[]

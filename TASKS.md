@@ -1744,7 +1744,7 @@ rules`, compact check pill; `Use globally`/`Check` + «⋯» (Edit, Duplicate, C
   - **Миграции/permissions/privacy:** нет; `tab.url` доступен через существующий `<all_urls>`.
   - **Готово, когда:** unit/E2E/typecheck/lint/dual builds зелёные, version 0.1.6.
 
-- [ ] **PL-152 — UI временного отключения правил (FR-036)**
+- [x] **PL-152 — UI временного отключения правил (FR-036)**
   - **Цель:** дать пользователю temporary disable `5 minutes`, `15 minutes`, `1 hour`,
     `Until browser restart`, как обещает FR-036.
   - **Требования:** FR-032, FR-036, FR-059.

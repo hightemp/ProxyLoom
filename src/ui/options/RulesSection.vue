@@ -14,7 +14,9 @@ import {
   type RuleTemplateId,
 } from '../../domain/rules/templates'
 import type { MatcherType, ProxyProfile, Rule } from '../../domain/types/entities'
-import { t } from '../../i18n/messages'
+import { t, type MessageKey } from '../../i18n/messages'
+import type { TemporaryDisableDuration } from '../../application/rules/rule-disable-service'
+import { isRuleTemporarilyDisabled } from '../../domain/rules/rule'
 import {
   decisionActionLabel,
   decisionSourceLabel,
@@ -156,6 +158,28 @@ const ruleProfile = (rule: Rule): ProxyProfile | null =>
         (candidate) => candidate.id === rule.action.targetProxyProfileId,
       ) ?? null)
     : null
+
+const TEMPORARY_DISABLE_CHOICES: readonly {
+  readonly duration: TemporaryDisableDuration
+  readonly label: MessageKey
+}[] = [
+  { duration: 'MINUTES_5', label: 'disableFor5Minutes' },
+  { duration: 'MINUTES_15', label: 'disableFor15Minutes' },
+  { duration: 'HOUR_1', label: 'disableFor1Hour' },
+  { duration: 'UNTIL_RESTART', label: 'disableUntilRestart' },
+]
+
+/** Badge text while a session temporary disable is in effect, otherwise null. */
+const temporaryDisableText = (rule: Rule): string | null => {
+  if (!isRuleTemporarilyDisabled(rule, new Date())) return null
+  const until = rule.temporaryDisable?.until ?? null
+  return until === null
+    ? t('disabledUntilRestart')
+    : t(
+        'disabledUntilTime',
+        new Date(until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      )
+}
 
 const moreFiltersOpen = shallowRef(false)
 const expandedPatterns = shallowRef<ReadonlySet<string>>(new Set())
@@ -521,6 +545,9 @@ watch(() => props.busy, restoreFocus)
             <span v-if="rule.matcherType === 'FULL_URL'" class="status-pill warning">
               {{ t('firefoxOnly') }}
             </span>
+            <span v-if="temporaryDisableText(rule)" class="status-pill warning temp-disabled">
+              {{ temporaryDisableText(rule) }}
+            </span>
             <span v-if="rule.validity !== 'VALID'" class="status-pill danger">
               {{ ruleValidityLabel(rule.validity) }}
             </span>
@@ -592,6 +619,33 @@ watch(() => props.busy, restoreFocus)
               @click="emit('command', { ruleId: rule.id, type: 'DUPLICATE_RULE' })"
             >
               {{ t('duplicate') }}
+            </button>
+            <template v-if="temporaryDisableText(rule) === null">
+              <button
+                v-for="choice in TEMPORARY_DISABLE_CHOICES"
+                :key="choice.duration"
+                role="menuitem"
+                type="button"
+                :disabled="busy"
+                @click="
+                  emit('command', {
+                    duration: choice.duration,
+                    ruleId: rule.id,
+                    type: 'SET_RULE_TEMPORARY_DISABLE',
+                  })
+                "
+              >
+                {{ t(choice.label) }}
+              </button>
+            </template>
+            <button
+              v-else
+              role="menuitem"
+              type="button"
+              :disabled="busy"
+              @click="emit('command', { ruleId: rule.id, type: 'CLEAR_RULE_TEMPORARY_DISABLE' })"
+            >
+              {{ t('reenableNow') }}
             </button>
             <button
               role="menuitem"

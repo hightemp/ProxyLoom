@@ -26,8 +26,10 @@ import type {
   RuntimeRequest,
   RuntimeResponse,
 } from '../../application/runtime/contracts'
+import { RuleDisableService } from '../../application/rules/rule-disable-service'
 import { RuleApplicationService } from '../../application/rules/rule-service'
 import { buildRoutingSnapshot } from '../../domain/routing/snapshot'
+import { applyRuleDisables } from '../../domain/rules/temporary-disable'
 import {
   asIsoTimestamp,
   asProxyProfileId,
@@ -64,6 +66,8 @@ type ConfigTransform = (config: AppConfig) =>
       readonly ok: true
       readonly value: { readonly config: AppConfig }
     }
+
+export const RULE_DISABLE_EXPIRY_ALARM = 'proxyloom-rule-disable-expiry'
 
 /** The part of `runtime.MessageSender` used to tell normal and private callers apart. */
 interface RuntimeSender {
@@ -104,6 +108,7 @@ export class RuntimeController {
   readonly #profiles = new ProfileApplicationService(this.#ids, this.#clock)
   readonly #rules = new RuleApplicationService(this.#ids, this.#clock)
   readonly #lineImport = new ProxyLineImportService(this.#ids, this.#clock)
+  readonly #ruleDisables: RuleDisableService
   readonly #general = new GeneralSettingsService()
   readonly #nativeImport = new NativeImportService(this.#ids)
   readonly #foxyImporter = new FoxyProxyImporter(this.#ids, this.#clock)
@@ -117,6 +122,7 @@ export class RuntimeController {
       this.#clock,
     )
     this.#proxyCheck = new ProxyCheckService(options.proxyCheckRequest, this.#clock)
+    this.#ruleDisables = new RuleDisableService(options.sessionRepository, this.#clock)
   }
 
   register(): () => void {
@@ -223,6 +229,31 @@ export class RuntimeController {
           return this.mutate((config) => this.#rules.duplicate(config, asRuleId(request.ruleId)))
         case 'DELETE_RULE':
           return this.mutate((config) => this.#rules.delete(config, asRuleId(request.ruleId)))
+        case 'SET_RULE_TEMPORARY_DISABLE': {
+          const config = await this.options.configRepository.initialize()
+          if (!config.ok) return commandError(config.error)
+          const disabled = await this.#ruleDisables.set(
+            config.value,
+            asRuleId(request.ruleId),
+            request.duration,
+          )
+          if (!disabled.ok) return commandError(disabled.error)
+          if (disabled.value.until !== null) {
+            // Re-apply as soon as the disable ends instead of waiting for the periodic reconcile.
+            await browser.alarms.create(RULE_DISABLE_EXPIRY_ALARM, {
+              when: Date.parse(disabled.value.until),
+            })
+          }
+          await this.options.applyConfiguration()
+          return { ok: true, value: await this.state() }
+        }
+        case 'CLEAR_RULE_TEMPORARY_DISABLE': {
+          const config = await this.options.configRepository.initialize()
+          if (!config.ok) return commandError(config.error)
+          await this.#ruleDisables.clear(config.value, asRuleId(request.ruleId))
+          await this.options.applyConfiguration()
+          return { ok: true, value: await this.state() }
+        }
         case 'DELETE_RULES':
           return this.mutate((config) =>
             this.#rules.deleteMany(config, request.ruleIds.map(asRuleId)),
@@ -611,9 +642,9 @@ export class RuntimeController {
     if (!configResult.ok) {
       throw new Error(configResult.error.code)
     }
-    const config = configResult.value
-    const [overrides, controlStatus, tab, logs, incognitoStatus] = await Promise.all([
+    const [overrides, disables, controlStatus, tab, logs, incognitoStatus] = await Promise.all([
       this.options.sessionRepository.getOverrides(),
+      this.options.sessionRepository.getRuleDisables(),
       this.options.adapter.getControlStatus(),
       this.targetTab(tabId),
       this.options.logs.page(logQuery),
@@ -621,6 +652,8 @@ export class RuntimeController {
         this.options.adapter.capabilities.platform,
       ),
     ])
+    // Temporary disables are session state overlaid on the persisted rules (FR-059).
+    const config = applyRuleDisables(configResult.value, disables)
     const snapshot = buildRoutingSnapshot(config, overrides, new Date())
     const inspection = snapshot.ok
       ? inspectTab(

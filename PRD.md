@@ -209,7 +209,7 @@ Resolver — чистая синхронная domain-функция без brow
 - `FR-033`: reorder выполняется атомарно и перенумеровывает глобальные позиции детерминированно.
 - `FR-034`: при search/filter drag-and-drop отключён; UI показывает `Clear filters to reorder rules`.
 - `FR-035`: удаление используемого profile не удаляет rules; после подтверждения они становятся invalid и видимыми.
-- `FR-036`: temporary disable предлагает `5 minutes`, `15 minutes`, `1 hour`, `Until browser restart`; permanent `enabled` не меняется.
+- `FR-036`: temporary disable предлагает `5 minutes`, `15 minutes`, `1 hour`, `Until browser restart`; permanent `enabled` не меняется. Состояние хранится только в `session.rule-disables` и накладывается на правила при сборке routing snapshot; значение `temporaryDisable` в persisted config/import игнорируется, поэтому отключение не переживает сессию и не попадает в export. По истечении срока one-shot alarm (и ежеминутная reconciliation) переприменяют PAC/snapshot.
 - `FR-037`: routing tester показывает trace проверенных rules, первое совпадение, итоговое действие/profile и mode fallback. Он входит в v1, поскольку повторно использует resolver.
 
 Regex policy:

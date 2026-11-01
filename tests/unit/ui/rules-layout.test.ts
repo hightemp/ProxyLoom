@@ -62,7 +62,7 @@ describe('rule rows', () => {
     expect(toggle.attributes('aria-expanded')).toBe('true')
   })
 
-  it('keeps edit, duplicate and delete in a menu next to the move buttons', async () => {
+  it('keeps edit, duplicate, temporary disable and delete in a menu next to the move buttons', async () => {
     const wrapper = mountRules()
     const work = row(wrapper, 'Work')
     expect(work.find(`button[aria-label="${message('moveRuleDown', 'Work')}"]`).exists()).toBe(true)
@@ -71,6 +71,10 @@ describe('rule rows', () => {
     expect(work.findAll('[role="menuitem"]').map((item) => item.text())).toEqual([
       message('edit'),
       message('duplicate'),
+      message('disableFor5Minutes'),
+      message('disableFor15Minutes'),
+      message('disableFor1Hour'),
+      message('disableUntilRestart'),
       message('delete'),
     ])
   })

@@ -10,6 +10,7 @@ import { BatchedLogStore } from '../src/application/logging/batched-log-store'
 import type { ProxyPlatformAdapter } from '../src/application/ports/proxy-platform'
 import { SessionLifecycleService } from '../src/application/session-lifecycle/session-lifecycle-service'
 import { buildRoutingSnapshot, type RoutingSnapshot } from '../src/domain/routing/snapshot'
+import { applyRuleDisables } from '../src/domain/rules/temporary-disable'
 import type { AppConfig } from '../src/domain/types/entities'
 import { ChromiumProxyAdapter } from '../src/platform/chromium/adapter'
 import { FirefoxProxyAdapter } from '../src/platform/firefox/adapter'
@@ -20,7 +21,10 @@ import { DownloadFailureController } from '../src/platform/runtime/download-fail
 import { registerErrorNavigation } from '../src/platform/runtime/error-navigation'
 import { registerLoggingEventBridge } from '../src/platform/runtime/logging-event-bridge'
 import { PrivateSessionController } from '../src/platform/runtime/private-session-controller'
-import { RuntimeController } from '../src/platform/runtime/runtime-controller'
+import {
+  RULE_DISABLE_EXPIRY_ALARM,
+  RuntimeController,
+} from '../src/platform/runtime/runtime-controller'
 import { TargetedProxyCheckRequest } from '../src/platform/runtime/targeted-proxy-check'
 import { BrowserTabInventory } from '../src/platform/runtime/tab-inventory'
 import { CONFIG_KEY, ConfigRepository } from '../src/storage/config/config-repository'
@@ -85,17 +89,21 @@ export default defineBackground(() => {
     }
     // A deleted proxy profile must not leave a Once override that fails every request (PRD §20).
     invalidOverridesRemoved += (await overrideCleanup.removeInvalid(config.value)).removed
-    const overrides = await sessionRepository.getOverrides()
+    const [overrides, disables] = await Promise.all([
+      sessionRepository.getOverrides(),
+      sessionRepository.getRuleDisables(),
+    ])
+    const effective = applyRuleDisables(config.value, disables)
     const now = new Date()
-    const result = await applicationService.apply(config.value, overrides, now)
+    const result = await applicationService.apply(effective, overrides, now)
     if (!result.ok) {
       lastApplyError = `${result.error.code}: ${result.error.message}`
       return
     }
-    const snapshot = buildRoutingSnapshot(config.value, overrides, now)
+    const snapshot = buildRoutingSnapshot(effective, overrides, now)
     if (snapshot.ok) {
       currentSnapshot = snapshot.value
-      currentConfig = config.value
+      currentConfig = effective
       appliedRevision = result.value.appliedRevision
       appliedSnapshotHash = result.value.snapshotHash
       lastApplyError = null
@@ -127,7 +135,7 @@ export default defineBackground(() => {
     readConfig: async () => {
       const config = await configRepository.initialize()
       if (!config.ok) throw new Error(config.error.code)
-      return config.value
+      return applyRuleDisables(config.value, await sessionRepository.getRuleDisables())
     },
     readOverrides: () => sessionRepository.getOverrides(),
     restore: async () => {
@@ -223,7 +231,7 @@ export default defineBackground(() => {
     windows: browser.windows,
   }).register()
   browser.alarms.onAlarm.addListener((alarm) => {
-    if (alarm.name === 'proxyloom-session-reconcile') {
+    if (alarm.name === 'proxyloom-session-reconcile' || alarm.name === RULE_DISABLE_EXPIRY_ALARM) {
       void sessionLifecycle.alarm().then(scheduleApply)
     }
   })

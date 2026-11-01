@@ -1881,5 +1881,31 @@
         "content": "$1"
       }
     }
+  },
+  "disableFor5Minutes": {
+    "message": "Disable for 5 minutes"
+  },
+  "disableFor15Minutes": {
+    "message": "Disable for 15 minutes"
+  },
+  "disableFor1Hour": {
+    "message": "Disable for 1 hour"
+  },
+  "disableUntilRestart": {
+    "message": "Disable until browser restart"
+  },
+  "reenableNow": {
+    "message": "Re-enable now"
+  },
+  "disabledUntilRestart": {
+    "message": "Disabled until browser restart"
+  },
+  "disabledUntilTime": {
+    "message": "Disabled until $TIME$",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
   }
 }
