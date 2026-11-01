@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { mkdtemp, readFile, rm, stat } from 'node:fs/promises'
@@ -122,6 +123,7 @@ const parseRelease = (result, tag, expectedAssets) => {
 export const publishGitHubRelease = async ({
   tag,
   assetPaths,
+  notesPath = null,
   runner = defaultRunner,
   output = process.stdout,
 }) => {
@@ -137,7 +139,8 @@ export const publishGitHubRelease = async ({
     tag,
     ...resolvedAssets,
     '--verify-tag',
-    '--generate-notes',
+    // Curated notes for the tag when present; otherwise GitHub's generated changelog.
+    ...(notesPath === null ? ['--generate-notes'] : ['--notes-file', notesPath]),
   ])
 
   if (createResult.status === 0) {
@@ -188,7 +191,9 @@ export const publishGitHubRelease = async ({
 const isMain = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)
 if (isMain) {
   const [tag = '', ...assetPaths] = process.argv.slice(2)
-  publishGitHubRelease({ tag, assetPaths }).catch((error) => {
+  const candidateNotes = resolve('docs/release-notes', `${tag}.md`)
+  const notesPath = existsSync(candidateNotes) ? candidateNotes : null
+  publishGitHubRelease({ tag, assetPaths, notesPath }).catch((error) => {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
     process.exitCode = 1
   })

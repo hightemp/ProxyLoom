@@ -252,7 +252,9 @@ const launchPreparedFirefox = async ({
             browserName: 'firefox',
             webSocketUrl: true,
             'moz:firefoxOptions': {
-              args: ['-headless', '-remote-allow-system-access'],
+              // geckodriver --allow-system-access passes -remote-allow-system-access itself; Firefox
+              // 153+ rejects it when also requested through capabilities.
+              args: ['-headless'],
               binary: FIREFOX_BINARY,
               prefs,
             },

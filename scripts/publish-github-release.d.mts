@@ -17,6 +17,8 @@ export function verifyReleaseAssets(assetPaths: readonly string[]): Promise<read
 export function publishGitHubRelease(options: {
   readonly tag: string
   readonly assetPaths: readonly string[]
+  /** Curated Markdown notes; when null or absent GitHub generates them. */
+  readonly notesPath?: string | null
   readonly runner?: GitHubRunner
   readonly output?: ReleaseOutput
 }): Promise<void>

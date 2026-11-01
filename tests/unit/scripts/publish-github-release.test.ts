@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto'
 import { copyFileSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { basename, join } from 'node:path'
+import { basename, dirname, join } from 'node:path'
 
 import { afterEach, describe, expect, it } from 'vitest'
 
@@ -114,6 +114,44 @@ describe('GitHub Release publisher', () => {
     ])
     expect(output).toContain('Created GitHub Release v0.1.0')
     expect(output).toContain('passed SHA-256 verification')
+  })
+
+  it('uses curated notes for the tag when a notes file is given', async () => {
+    const fixture = makeFixture()
+    const calls: string[][] = []
+    const runner = (args: readonly string[]): CommandResult => {
+      calls.push([...args])
+      if (args[1] === 'view') {
+        return success(
+          JSON.stringify({
+            assets: fixture.assetPaths.map((path) => ({ name: basename(path) })),
+            isDraft: false,
+            isPrerelease: false,
+            tagName: 'v0.1.0',
+          }),
+        )
+      }
+      if (args[1] === 'download') {
+        const destination = args[args.indexOf('--dir') + 1]!
+        for (const path of fixture.assetPaths) copyFileSync(path, join(destination, basename(path)))
+      }
+      return success()
+    }
+    const notesPath = join(dirname(fixture.assetPaths[0]!), 'v0.1.0.md')
+    writeFileSync(notesPath, '## Highlights\n')
+
+    await publishGitHubRelease({
+      assetPaths: fixture.assetPaths,
+      notesPath,
+      output: { write: () => true },
+      runner,
+      tag: 'v0.1.0',
+    })
+
+    const create = calls.find((args) => args[1] === 'create')!
+    expect(create).toContain('--notes-file')
+    expect(create[create.indexOf('--notes-file') + 1]).toBe(notesPath)
+    expect(create).not.toContain('--generate-notes')
   })
 
   it('refreshes the same release on an idempotent retry', async () => {

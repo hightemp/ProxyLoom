@@ -1884,6 +1884,17 @@ rules`, compact check pill; `Use globally`/`Check` + «⋯» (Edit, Duplicate, C
   - **Готово, когда:** скриншоты пересняты `pnpm capture:readme-screenshots`, docs validation
     зелёная, version 0.1.33.
 
+- [x] **PL-167 — Готовность к релизу: зависимости, CI и release notes**
+  - **Цель:** вернуть зелёный CI и выпустить релиз по тегу.
+  - **Требования:** REL-001–REL-003.
+  - **Действия:** `pnpm audit --audit-level high` падал с 2026-09: обновлены `zod` 4.6.7, `vue`
+    3.5.44, `vitest` 4.1.12 и pnpm overrides транзитивных dev-зависимостей (node-forge, adm-zip,
+    fast-uri, js-yaml, shell-quote, undici, vite и др.), high/critical не осталось; Firefox
+    integration больше не дублирует `-remote-allow-system-access` в capabilities (geckodriver
+    `--allow-system-access` передаёт его сам, Firefox 153+ отклонял дубль); release workflow
+    использует `docs/release-notes/<tag>.md`, если файл есть, иначе `--generate-notes`.
+  - **Готово, когда:** локально проходят все шаги release workflow, version 0.1.34.
+
 ---
 
 # Release checklist
