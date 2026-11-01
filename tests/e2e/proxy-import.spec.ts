@@ -93,3 +93,20 @@ test('imports proxies from pasted lines with a preview and updates on repeat', a
     'Imported: 0 created, 1 updated, 0 skipped.',
   )
 })
+
+test('fills the profile editor from a pasted proxy string', async ({ extensionPage }) => {
+  await extensionPage.evaluate(async () => {
+    const api = (globalThis as unknown as { chrome: ExtensionApi }).chrome
+    await api.storage.session.clear()
+    await api.storage.local.clear()
+  })
+  await extensionPage.reload()
+  await extensionPage.getByRole('button', { name: /^Proxies/ }).click()
+  await extensionPage.getByRole('button', { name: 'Add profile' }).click()
+  await extensionPage.getByLabel('Paste proxy string').fill('https://carol:pw@192.0.2.20:8443')
+  await extensionPage.getByLabel('Paste proxy string').press('Enter')
+  await expect(extensionPage.getByLabel('Host', { exact: true })).toHaveValue('192.0.2.20')
+  await expect(extensionPage.getByLabel('Paste proxy string')).toHaveValue('')
+  await extensionPage.getByRole('button', { name: 'Save profile' }).click()
+  await expect(extensionPage.getByRole('heading', { name: '192.0.2.20:8443' })).toBeVisible()
+})

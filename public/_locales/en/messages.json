@@ -1589,5 +1589,20 @@
   },
   "errorNothingToImport": {
     "message": "There are no new or changed proxies to import."
+  },
+  "pasteProxyString": {
+    "message": "Paste proxy string"
+  },
+  "pasteProxyStringDescription": {
+    "message": "For example http://user:pass@host:port or host:port:user:pass. Fills the endpoint below; nothing is sent anywhere."
+  },
+  "fillFromString": {
+    "message": "Fill"
+  },
+  "chooseReading": {
+    "message": "This string can be read two ways. Choose one:"
+  },
+  "useReading": {
+    "message": "Use this reading"
   }
 }

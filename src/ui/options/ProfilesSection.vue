@@ -5,7 +5,8 @@ import type { AppRuntimeState, RuntimeRequest } from '../../application/runtime/
 import type { ProxyEndpoint, ProxyProfile, ProxyTransport } from '../../domain/types/entities'
 import { t } from '../../i18n/messages'
 import { confirmController } from '../confirm/confirm-controller'
-import { checkErrorLabel } from '../labels'
+import { parseProxyString, type ParsedProxyString } from '../../domain/profiles/proxy-string'
+import { checkErrorLabel, proxyStringErrorLabel } from '../labels'
 import ProxyLineImportPanel from './ProxyLineImportPanel.vue'
 
 const props = defineProps<{
@@ -19,6 +20,10 @@ const emit = defineEmits<{
 }>()
 
 const importOpen = shallowRef(false)
+const pasteText = shallowRef('')
+const pasteError = shallowRef('')
+const pasteChoices = shallowRef<readonly [ParsedProxyString, ParsedProxyString] | null>(null)
+const pasteChoice = shallowRef<0 | 1>(0)
 
 interface EndpointDraft {
   transport: ProxyTransport
@@ -104,7 +109,49 @@ const closeEditor = (): void => {
   restoreFocus()
 }
 
+const applyParsed = (proxy: ParsedProxyString): void => {
+  const endpoint: EndpointDraft = {
+    host: proxy.host,
+    password: proxy.password ?? '',
+    port: proxy.port,
+    transport: proxy.transport ?? draft.httpEndpoint.transport,
+    username: proxy.username ?? '',
+  }
+  draft.useSameProxy = true
+  draft.httpEndpoint = { ...endpoint }
+  draft.httpsEndpoint = { ...endpoint }
+  if (draft.name.trim() === '') draft.name = `${proxy.host}:${proxy.port}`
+  pasteText.value = ''
+  pasteChoices.value = null
+}
+
+const fillFromString = (): void => {
+  pasteError.value = ''
+  pasteChoices.value = null
+  const parsed = parseProxyString(pasteText.value)
+  if (parsed.kind === 'FAILURE') {
+    pasteError.value = proxyStringErrorLabel(parsed.code)
+    return
+  }
+  if (parsed.kind === 'AMBIGUOUS') {
+    pasteChoice.value = 0
+    pasteChoices.value = [parsed.hostFirst, parsed.credentialsFirst]
+    return
+  }
+  applyParsed(parsed.proxy)
+}
+
+const readingLabel = (proxy: ParsedProxyString): string =>
+  [proxy.transport, `${proxy.host}:${proxy.port}`, proxy.username].filter(Boolean).join(' ')
+
+const resetPaste = (): void => {
+  pasteText.value = ''
+  pasteError.value = ''
+  pasteChoices.value = null
+}
+
 const create = (event: MouseEvent): void => {
+  resetPaste()
   editorActivator = event.currentTarget as HTMLElement
   editingId.value = null
   replaceDraft(blankProfile())
@@ -113,6 +160,7 @@ const create = (event: MouseEvent): void => {
 }
 
 const edit = (profile: ProxyProfile, event: MouseEvent): void => {
+  resetPaste()
   editorActivator = event.currentTarget as HTMLElement
   editingId.value = profile.id
   replaceDraft(copyProfile(profile))
@@ -330,6 +378,38 @@ watch(() => props.busy, restoreFocus)
           {{ t('close') }}
         </button>
       </div>
+      <div class="paste-row">
+        <label>
+          {{ t('pasteProxyString') }}
+          <input
+            v-model="pasteText"
+            name="proxy-string"
+            autocomplete="off"
+            spellcheck="false"
+            :aria-describedby="'proxy-string-help'"
+            @keydown.enter.prevent="fillFromString"
+          />
+        </label>
+        <button type="button" @click="fillFromString">
+          {{ t('fillFromString') }}
+        </button>
+      </div>
+      <small id="proxy-string-help" class="muted">{{ t('pasteProxyStringDescription') }}</small>
+      <p v-if="pasteError" class="notice danger" role="alert">
+        {{ pasteError }}
+      </p>
+      <fieldset v-if="pasteChoices" class="paste-choices">
+        <legend>{{ t('chooseReading') }}</legend>
+        <label v-for="(choice, index) in pasteChoices" :key="index" class="check-row compact">
+          <input v-model="pasteChoice" type="radio" name="paste-order" :value="index" />
+          <span>
+            <code>{{ readingLabel(choice) }}</code>
+          </span>
+        </label>
+        <button type="button" @click="applyParsed(pasteChoices[pasteChoice])">
+          {{ t('useReading') }}
+        </button>
+      </fieldset>
       <div class="form-grid">
         <label>
           {{ t('name') }}
@@ -456,3 +536,12 @@ watch(() => props.busy, restoreFocus)
     </form>
   </div>
 </template>
+
+<style scoped>
+.paste-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: end;
+}
+</style>

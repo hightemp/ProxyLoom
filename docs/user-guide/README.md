@@ -6,6 +6,12 @@ Open **Settings → Proxies → Add profile**. Enter a name and the HTTP/WS endp
 **Use the HTTP endpoint for all supported schemes** only when HTTPS/WSS targets require a
 different endpoint. HTTP and HTTPS in the endpoint editor describe the browser-to-proxy transport.
 
+**Paste proxy string** at the top of the editor accepts one proxy in any of the formats listed in
+[Proxies from text](#proxies-from-text) and fills the protocol, host, port, username and password,
+switches to one endpoint for all schemes and suggests `host:port` as the name when it is empty.
+For `a:b:c:d` strings that are valid both ways, choose the reading. The pasted text is cleared
+after filling.
+
 Usernames and passwords are optional. They remain in browser-managed extension local storage and
 are not protected by a ProxyLoom master password.
 
