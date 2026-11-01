@@ -480,13 +480,13 @@
     "message": "Include proxy credentials"
   },
   "includeProxyCredentialsDescription": {
-    "message": "Off by default. Enabling it writes plaintext credentials into the JSON file."
+    "message": "On by default so the file restores working profiles. Clear it to share a file without passwords."
   },
   "downloadJsonExport": {
     "message": "Download JSON export"
   },
   "credentialExportWarning": {
-    "message": "This export will contain proxy usernames and passwords in plaintext. Continue?"
+    "message": "The file will contain proxy usernames and passwords in plaintext."
   },
   "exported": {
     "message": "Exported"
@@ -1091,12 +1091,6 @@
   "replaceImportTitle": {
     "message": "Replace configuration?"
   },
-  "credentialExportTitle": {
-    "message": "Export with credentials?"
-  },
-  "exportFile": {
-    "message": "Export"
-  },
   "fullUrlSaveTitle": {
     "message": "Save Firefox-only rule?"
   },
@@ -1604,5 +1598,52 @@
   },
   "useReading": {
     "message": "Use this reading"
+  },
+  "copyAs": {
+    "message": "Copy as"
+  },
+  "copyAsUrl": {
+    "message": "URL"
+  },
+  "copyAsCurl": {
+    "message": "curl"
+  },
+  "copyAsCompact": {
+    "message": "host:port:user:pass"
+  },
+  "copyAllAsUrls": {
+    "message": "Copy all as URLs"
+  },
+  "copied": {
+    "message": "Copied."
+  },
+  "copiedWithPassword": {
+    "message": "Copied. The text contains the proxy password."
+  },
+  "copyFailed": {
+    "message": "Could not copy to the clipboard. Focus the page and try again."
+  },
+  "copyUrl": {
+    "message": "Copy URL"
+  },
+  "textExport": {
+    "message": "Proxy list as text"
+  },
+  "textExportDescription": {
+    "message": "One proxy per line, readable by Import from text. Passwords are included."
+  },
+  "textExportFormat": {
+    "message": "Format"
+  },
+  "exportProxiesAsText": {
+    "message": "Export proxies as text"
+  },
+  "copyProfileAs": {
+    "message": "Copy $NAME$ as",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
   }
 }

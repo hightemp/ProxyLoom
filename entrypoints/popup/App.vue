@@ -9,6 +9,8 @@ import type { OverridePreview } from '../../src/application/overrides/override-s
 import { overridesForSite } from '../../src/application/overrides/site-overrides'
 import ConfirmDialog from '../../src/ui/components/ConfirmDialog.vue'
 import SiteOverrides from '../../src/ui/popup/SiteOverrides.vue'
+import { copyText } from '../../src/ui/clipboard'
+import { formatProfile } from '../../src/domain/profiles/proxy-format'
 import { confirmController } from '../../src/ui/confirm/confirm-controller'
 import {
   decisionActionLabel,
@@ -22,6 +24,7 @@ import { runtimeClient } from '../../src/ui/runtime/client'
 const state = shallowRef<AppRuntimeState | null>(null)
 const busy = shallowRef(false)
 const error = shallowRef('')
+const info = shallowRef('')
 const scope = shallowRef<OverrideScope>('EXACT_HOSTNAME')
 const actionType = shallowRef<'DIRECT' | 'PROXY'>('DIRECT')
 const profileId = shallowRef('')
@@ -55,6 +58,25 @@ const matchedRuleName = computed(() => {
     t('missingRule')
   )
 })
+
+const activeProfile = computed(() =>
+  state.value?.config.profiles.find(
+    (profile) => profile.id === state.value?.config.general.activeProxyProfileId,
+  ),
+)
+
+const copyActiveUrl = async (): Promise<void> => {
+  const profile = activeProfile.value
+  if (profile === undefined) return
+  error.value = ''
+  info.value = ''
+  if (!(await copyText(formatProfile(profile, 'URL')))) {
+    error.value = t('copyFailed')
+    return
+  }
+  const withPassword = profile.httpEndpoint.username !== '' || profile.httpEndpoint.password !== ''
+  info.value = withPassword ? t('copiedWithPassword') : t('copied')
+}
 
 const hasOwnOverride = computed(() => {
   const current = inspection.value
@@ -188,6 +210,14 @@ onMounted(() => {
           </option>
         </select>
       </label>
+      <button
+        type="button"
+        class="link-button"
+        :disabled="activeProfile === undefined"
+        @click="void copyActiveUrl()"
+      >
+        {{ t('copyUrl') }}
+      </button>
 
       <section class="surface current-site">
         <span class="eyebrow">{{ t('currentSite') }}</span>
@@ -279,6 +309,9 @@ onMounted(() => {
           {{ t('retryApply') }}
         </button>
       </div>
+      <p v-if="info" class="notice" role="status">
+        {{ info }}
+      </p>
       <p v-if="error" class="notice danger" role="alert">
         {{ error }}
       </p>

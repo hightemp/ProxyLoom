@@ -5,7 +5,13 @@ import type { AppRuntimeState, RuntimeRequest } from '../../application/runtime/
 import type { ProxyEndpoint, ProxyProfile, ProxyTransport } from '../../domain/types/entities'
 import { t } from '../../i18n/messages'
 import { confirmController } from '../confirm/confirm-controller'
+import {
+  formatProfile,
+  formatProxyList,
+  type ProxyTextFormat,
+} from '../../domain/profiles/proxy-format'
 import { parseProxyString, type ParsedProxyString } from '../../domain/profiles/proxy-string'
+import { copyText } from '../clipboard'
 import { checkErrorLabel, proxyStringErrorLabel } from '../labels'
 import ProxyLineImportPanel from './ProxyLineImportPanel.vue'
 
@@ -233,6 +239,28 @@ const check = async (profile: ProxyProfile): Promise<void> => {
   emit('command', { profileId: profile.id, type: 'CHECK_PROFILE' })
 }
 
+const hasCredentials = (profile: ProxyProfile): boolean =>
+  [profile.httpEndpoint, ...(profile.useSameProxy ? [] : [profile.httpsEndpoint])].some(
+    (endpoint) => endpoint.username !== '' || endpoint.password !== '',
+  )
+
+const copy = async (text: string, withPassword: boolean): Promise<void> => {
+  if (await copyText(text)) {
+    emit('status', withPassword ? t('copiedWithPassword') : t('copied'))
+  } else {
+    emit('status', t('copyFailed'), true)
+  }
+}
+
+const copyProfileText = (profile: ProxyProfile, format: ProxyTextFormat): Promise<void> =>
+  copy(formatProfile(profile, format), hasCredentials(profile))
+
+const copyAll = (): Promise<void> =>
+  copy(
+    formatProxyList(props.state.config.profiles, 'URL'),
+    props.state.config.profiles.some(hasCredentials),
+  )
+
 const cancelCheck = (): void => {
   checkingId.value = null
   emit('command', { type: 'CANCEL_PROXY_CHECK' })
@@ -252,6 +280,13 @@ watch(() => props.busy, restoreFocus)
         <p>{{ t('proxyProfilesDescription') }}</p>
       </div>
       <div class="button-row">
+        <button
+          type="button"
+          :disabled="state.config.profiles.length === 0"
+          @click="void copyAll()"
+        >
+          {{ t('copyAllAsUrls') }}
+        </button>
         <button type="button" :aria-expanded="importOpen" @click="importOpen = !importOpen">
           {{ t('importFromText') }}
         </button>
@@ -364,6 +399,20 @@ watch(() => props.busy, restoreFocus)
           >
             {{ checkingId === profile.id && busy ? t('cancelCheck') : t('check') }}
           </button>
+          <details class="copy-menu">
+            <summary>{{ t('copyAs') }}</summary>
+            <div class="button-row" role="group" :aria-label="t('copyProfileAs', profile.name)">
+              <button type="button" @click="void copyProfileText(profile, 'URL')">
+                {{ t('copyAsUrl') }}
+              </button>
+              <button type="button" @click="void copyProfileText(profile, 'CURL')">
+                {{ t('copyAsCurl') }}
+              </button>
+              <button type="button" @click="void copyProfileText(profile, 'COMPACT')">
+                {{ t('copyAsCompact') }}
+              </button>
+            </div>
+          </details>
           <button class="danger-text" type="button" :disabled="busy" @click="void remove(profile)">
             {{ t('delete') }}
           </button>

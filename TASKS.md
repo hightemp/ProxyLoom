@@ -1584,11 +1584,11 @@
   - **Тесты:** component test, E2E.
   - **Готово, когда:** E2E/typecheck/lint/dual builds зелёные, version 0.1.10/docs обновлены.
 
-- [ ] **PL-141 — Экспорт с паролями, копирование в URL/curl и `.txt`**
+- [x] **PL-141 — Экспорт с паролями, копирование в URL/curl и `.txt`**
   - **Цель:** скопировать профиль(и) в `scheme://user:pass@host:port`, curl-команду и
     `host:port:user:pass`, сохранить список в `.txt` и экспортировать native JSON с паролями по
     умолчанию — credentials не скрываются.
-  - **Требования:** FR-041, FR-067, PRIV-010, SEC-003.
+  - **Требования:** FR-041, FR-067, FR-083, PRIV-010, SEC-003.
   - **Действия:** сначала PRD: переформулировать FR-067 (`Include proxy credentials` включён по
     умолчанию, видимое предупреждение вместо confirm) и новый FR о copy/text export; privacy-док и
     store disclosure; pure formatter (percent-encoding userinfo, shell quoting curl, раздельные

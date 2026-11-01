@@ -103,7 +103,7 @@ decisions](docs/adr/README.md).
 ## Privacy and browser limits
 
 Credentials are stored in ordinary extension local storage; this is not an encrypted vault.
-Default exports omit credential keys. Persistent logs contain hostname and scheme, never path,
+Exports and copied proxy URLs include credentials in plaintext unless you opt out. Persistent logs contain hostname and scheme, never path,
 query, headers, bodies, cookies, or credentials. Private logs remain in memory.
 
 Chromium Once overrides are origin-scoped and may affect other tabs on the same site until the

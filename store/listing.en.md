@@ -15,8 +15,8 @@ API cannot provide portable full-URL behavior.
 
 Everything stays local except normal traffic through proxies you configure and a manual IP/country
 check you explicitly start. There are no analytics, ads, accounts, remote configuration, or remote
-code. Credentials are stored in ordinary browser extension storage and omitted from exports by
-default.
+code. Credentials are stored in ordinary browser extension storage. Exports and copied proxy URLs include
+them in plaintext so they restore working profiles; you can export without them.
 
 ## Single purpose
 

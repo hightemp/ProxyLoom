@@ -44,8 +44,11 @@ and every release must recheck its documentation and observed behavior.
 
 ## Import and export
 
-Native exports omit username/password keys by default. An opt-in export displays a warning and
-writes credentials as plaintext JSON. Imports are treated as hostile, size/depth/schema validated,
+Native exports include username/password keys by default, with a permanent plaintext warning next
+to the option; clearing **Include proxy credentials** omits them. **Copy as** (URL, curl,
+`host:port:user:pass`), **Copy all as URLs** and **Export proxies as text** also include
+credentials in plaintext. They act only on an explicit click, use the clipboard or a local file
+download, add no permission, and the copied or exported text is never logged or sent anywhere. Imports are treated as hostile, size/depth/schema validated,
 previewed, and applied atomically. FoxyProxy imports copy only selected supported profiles.
 
 ## Permissions

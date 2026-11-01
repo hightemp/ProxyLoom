@@ -512,7 +512,7 @@ metadata и неизменённые встроенные demo rules, сохра
 
 Workflow: size limit → parse as inert data → schema validation → migration in memory → duplicate analysis → preview → `Merge` или confirmed `Replace` → transactional write/rollback → report.
 
-- `FR-067`: credentials не экспортируются по умолчанию; checkbox `Include proxy credentials` сопровождается explicit warning.
+- `FR-067`: checkbox `Include proxy credentials` включён по умолчанию (экспорт без паролей мало полезен для переноса); рядом постоянно видно предупреждение, что файл содержит usernames/passwords в plaintext. Снятие checkbox исключает credential keys из файла. Блокирующего confirm нет.
 - `FR-068`: import credentials только если они присутствуют и schema-valid.
 - `FR-069`: merge не перезаписывает сущности молча; IDs remap, references update, duplicate decisions показываются в preview.
 - `FR-070`: replace требует отдельного confirmation и backup; partial application запрещена.
@@ -528,6 +528,8 @@ Adapter parsers распознают только документированн
 - `FR-072`: обещание поддержки всех исторических форматов отсутствует.
 
 ### 23.3 Proxy lines
+
+- `FR-083`: по явному действию пользователя профиль копируется в clipboard как URL (`scheme://user:pass@host:port`, userinfo percent-encoded), curl-команда (`curl -x '<proxy URL>' '<check URL>'`, POSIX shell quoting) или `host:port:user:pass` (если представимо), а список профилей — как `Copy all as URLs` и файл `.txt` (URL или compact). Credentials не скрываются; UI сообщает `contains password`. Скопированный/экспортированный текст не попадает в logs/diagnostics/errors. Профиль с раздельными endpoints даёт две строки с комментариями `# HTTP/WS targets` и `# HTTPS/WSS targets`. Новых permissions нет: clipboard по user gesture, файл через Blob download.
 
 - `FR-082`: пользователь импортирует proxy profiles из текста (вставка или `.txt`/`.csv` ≤ 1 MiB, ≤ 1000 записей) в форматах proxy_switcher_vpn: URI, `host:port`, `user:pass@host:port`, `host:port:user:pass`/`user:pass:host:port` с выбором порядка при неоднозначности, protocol word, whitespace и CSV/TSV/`;`, IPv6 в скобках. Строки без протокола получают выбранный HTTP/HTTPS — сетевого автоопределения нет. Preview показывает статус New/Update/Unchanged/Duplicate/Error без паролей; совпадение по host+port+username обновляет только password/transport; apply атомарен. SOCKS-строки — typed error до решения по SOCKS5.
 

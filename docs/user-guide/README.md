@@ -138,10 +138,25 @@ that are valid both ways, choose the field order. New profiles are named `host:p
 endpoint for all schemes; an update changes only the password and protocol of the matching
 profile. Import applies all lines at once or nothing.
 
+### Copy and export as text
+
+Each profile card has **Copy as** with three forms, all including the username and password:
+
+- **URL** — `http://user:pass@host:port` (special characters in credentials are percent-encoded);
+- **curl** — `curl -x 'http://user:pass@host:port' '<check URL>'`, quoted for POSIX shells;
+- **host:port:user:pass** — when the credentials contain no `:`, `@`, `,`, `;` or spaces;
+  otherwise the URL form is used.
+
+A profile with separate HTTP and HTTPS endpoints produces two lines labelled `# HTTP/WS targets` and
+`# HTTPS/WSS targets`. **Proxies → Copy all as URLs** copies every profile, the popup's **Copy URL**
+copies the active global profile, and **Import & Export → Export proxies as text** saves a `.txt`
+file in URL or `host:port:user:pass` form that **Import from text** reads back.
+
 ### Native backup
 
-Native export includes profiles, rules, general settings, and appearance. Credentials are
-absent by default; including them requires an explicit plaintext warning. Import validates hostile
+Native export includes profiles, rules, general settings, and appearance. **Include proxy
+credentials** is on by default, so the file restores working profiles; a permanent warning says the
+file contains passwords in plaintext. Clear it to share a file without credentials. Import validates hostile
 JSON before preview, then supports merge or confirmed replace with a local recovery backup.
 Older schema v1/v2 backups remain importable. Obsolete group metadata and non-useful untouched
 demos are discarded. Legacy `russian.example` and `social.example` placeholders are upgraded to

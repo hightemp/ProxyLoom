@@ -108,18 +108,29 @@ test('previews and imports supported FoxyProxy profiles only', async ({ extensio
   await expect(extensionPage.getByText('Unsupported SOCKS')).toHaveCount(0)
 })
 
-test('exports without credential keys by default', async ({ extensionPage }) => {
+test('exports credentials by default and omits credential keys when unchecked', async ({
+  extensionPage,
+}) => {
   await extensionPage.getByRole('button', { name: /Import & Export/ }).click()
-  const downloadPromise = extensionPage.waitForEvent('download')
-  await extensionPage.getByRole('button', { name: 'Download JSON export' }).click()
-  const download = await downloadPromise
-  const path = await download.path()
-  if (path === null) throw new Error('The export download has no local path.')
-  const text = await readFile(path, 'utf8')
-  expect(text).not.toContain('"username"')
-  expect(text).not.toContain('"password"')
-  expect(text).not.toContain('"logs"')
-  expect(text).not.toContain('"overrides"')
+  const exportText = async (): Promise<string> => {
+    const downloadPromise = extensionPage.waitForEvent('download')
+    await extensionPage.getByRole('button', { name: 'Download JSON export' }).click()
+    const path = await (await downloadPromise).path()
+    if (path === null) throw new Error('The export download has no local path.')
+    return readFile(path, 'utf8')
+  }
+
+  await expect(extensionPage.getByText(/passwords in plaintext/)).toBeVisible()
+  const withCredentials = await exportText()
+  expect(withCredentials).toContain('"includesCredentials": true')
+  expect(withCredentials).not.toContain('"logs"')
+  expect(withCredentials).not.toContain('"overrides"')
+
+  await extensionPage.getByLabel(/Include proxy credentials/).uncheck()
+  await expect(extensionPage.getByText(/passwords in plaintext/)).toHaveCount(0)
+  const withoutCredentials = await exportText()
+  expect(withoutCredentials).not.toContain('"username"')
+  expect(withoutCredentials).not.toContain('"password"')
 })
 
 test('previews and atomically replaces configuration through the native import UI', async ({
@@ -150,7 +161,7 @@ test('previews and atomically replaces configuration through the native import U
   })
   await extensionPage.getByRole('button', { name: 'Validate and preview' }).click()
   await expect(extensionPage.getByText(/1 profiles/)).toBeVisible()
-  await expect(extensionPage.getByText(/Credentials:.*not present/)).toBeVisible()
+  await expect(extensionPage.getByText(/Credentials:.*present in file/)).toBeVisible()
   await extensionPage.getByRole('button', { name: 'Replace', exact: true }).click()
   await extensionPage.getByRole('button', { name: 'Apply Replace' }).click()
   await acceptConfirm(extensionPage)

@@ -110,3 +110,43 @@ test('fills the profile editor from a pasted proxy string', async ({ extensionPa
   await extensionPage.getByRole('button', { name: 'Save profile' }).click()
   await expect(extensionPage.getByRole('heading', { name: '192.0.2.20:8443' })).toBeVisible()
 })
+
+test('copies a profile as URL and curl to the clipboard', async ({ extensionPage }) => {
+  await extensionPage.evaluate(async () => {
+    const api = (globalThis as unknown as { chrome: ExtensionApi }).chrome
+    await api.storage.session.clear()
+    await api.storage.local.clear()
+  })
+  await extensionPage.reload()
+  await extensionPage.getByRole('button', { name: /^Proxies/ }).click()
+  await extensionPage.getByRole('button', { name: 'Add profile' }).click()
+  await extensionPage.getByLabel('Paste proxy string').fill("http://dave:it's@192.0.2.30:3128")
+  await extensionPage.getByRole('button', { name: 'Fill' }).click()
+  await extensionPage.getByRole('button', { name: 'Save profile' }).click()
+
+  // Record what reaches the real clipboard API; success is reported only when the write resolves.
+  await extensionPage.evaluate(() => {
+    const clipboard = navigator.clipboard
+    const write = clipboard.writeText.bind(clipboard)
+    const target = globalThis as unknown as { copied: string[] }
+    target.copied = []
+    clipboard.writeText = async (text: string) => {
+      target.copied.push(text)
+      await write(text)
+    }
+  })
+  const copied = () =>
+    extensionPage.evaluate(() => (globalThis as unknown as { copied: string[] }).copied)
+  const card = extensionPage.locator('.profile-card').filter({ hasText: '192.0.2.30:3128' })
+  await card.getByText('Copy as').click()
+  await card.getByRole('button', { name: 'URL', exact: true }).click()
+  await expect(extensionPage.getByRole('status')).toContainText('contains the proxy password')
+  await card.getByRole('button', { name: 'curl', exact: true }).click()
+  await expect
+    .poll(copied)
+    .toEqual([
+      "http://dave:it's@192.0.2.30:3128",
+      `curl -x 'http://dave:it'\\''s@192.0.2.30:3128' 'https://api.country.is/'`,
+    ])
+  await expect(extensionPage.getByRole('status')).not.toContainText('Could not copy')
+})

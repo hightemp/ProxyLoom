@@ -6,6 +6,8 @@ import type {
   FoxyProxyPreviewView,
   NativeImportPreviewView,
 } from '../../application/runtime/contracts'
+import { PRODUCT } from '../../config/product'
+import { formatProxyList } from '../../domain/profiles/proxy-format'
 import { t } from '../../i18n/messages'
 import { errorText, foxyProxySkipLabel } from '../labels'
 import { confirmController } from '../confirm/confirm-controller'
@@ -21,7 +23,8 @@ const emit = defineEmits<{
   status: [message: string, error?: boolean]
 }>()
 
-const includeCredentials = shallowRef(false)
+const includeCredentials = shallowRef(true)
+const textFormat = shallowRef<'URL' | 'COMPACT'>('URL')
 const nativeText = shallowRef('')
 const nativePreview = shallowRef<NativeImportPreviewView | null>(null)
 const nativeMode = shallowRef<'MERGE' | 'REPLACE'>('MERGE')
@@ -44,16 +47,6 @@ const readFile = async (event: Event, target: 'NATIVE' | 'FOXY'): Promise<void> 
 }
 
 const downloadExport = async (): Promise<void> => {
-  if (
-    includeCredentials.value &&
-    !(await confirmController.request({
-      confirmLabel: t('exportFile'),
-      message: t('credentialExportWarning'),
-      title: t('credentialExportTitle'),
-    }))
-  ) {
-    return
-  }
   working.value = true
   const result = await runtimeClient.exportNative(includeCredentials.value)
   working.value = false
@@ -61,14 +54,23 @@ const downloadExport = async (): Promise<void> => {
     emit('status', errorText(result.error), true)
     return
   }
-  const blob = new Blob([result.value.text], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
+  saveFile(result.value.text, result.value.filename, 'application/json')
+  emit('status', `${t('exported')} ${result.value.filename}.`)
+}
+
+const saveFile = (text: string, filename: string, type: string): void => {
+  const url = URL.createObjectURL(new Blob([text], { type }))
   const anchor = document.createElement('a')
   anchor.href = url
-  anchor.download = result.value.filename
+  anchor.download = filename
   anchor.click()
   URL.revokeObjectURL(url)
-  emit('status', `${t('exported')} ${result.value.filename}.`)
+}
+
+const exportText = (): void => {
+  const filename = `${PRODUCT.slug}-proxies-${new Date().toISOString().slice(0, 10)}.txt`
+  saveFile(formatProxyList(props.state.config.profiles, textFormat.value), filename, 'text/plain')
+  emit('status', `${t('exported')} ${filename}.`)
 }
 
 const previewNative = async (): Promise<void> => {
@@ -166,8 +168,28 @@ const applyFoxy = async (): Promise<void> => {
           <small>{{ t('includeProxyCredentialsDescription') }}</small>
         </span>
       </label>
+      <p v-if="includeCredentials" class="notice warning">
+        {{ t('credentialExportWarning') }}
+      </p>
       <button class="primary" type="button" :disabled="busy || working" @click="downloadExport">
         {{ t('downloadJsonExport') }}
+      </button>
+    </article>
+
+    <article class="surface card stack">
+      <div>
+        <h2>{{ t('textExport') }}</h2>
+        <p>{{ t('textExportDescription') }}</p>
+      </div>
+      <label>
+        {{ t('textExportFormat') }}
+        <select v-model="textFormat" name="text-export-format">
+          <option value="URL">{{ t('copyAsUrl') }}</option>
+          <option value="COMPACT">{{ t('copyAsCompact') }}</option>
+        </select>
+      </label>
+      <button type="button" :disabled="state.config.profiles.length === 0" @click="exportText">
+        {{ t('exportProxiesAsText') }}
       </button>
     </article>
 

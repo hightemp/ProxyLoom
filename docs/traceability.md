@@ -57,7 +57,8 @@ complete acceptance evidence exists.
 | PL-138        | A      | Table tests ported from ProxyStringParserTest.kt plus IPv6, IDN, ambiguity, injection and no-echo cases                           | Round-trip property test lands with the PL-141 formatter           |
 | PL-139        | A      | Line-import planner/apply unit tests, panel component tests and Chromium E2E paste → preview → import → update                    | Firefox smoke in PL-122 matrix                                     |
 | PL-140        | A      | Profile editor paste component tests (fill, keep name, ambiguity, no-echo error) and Chromium paste → save E2E                    | None beyond aggregate release gates                                |
-| PL-141…PL-145 | P      | Planned in `docs/IMPROVEMENT_PLAN.md`; no implementation evidence yet                                                             | Full task acceptance                                               |
+| PL-141        | A      | Formatter round-trip and real-bash quoting tests, copy/export/popup component tests, Chromium clipboard and export E2E            | None beyond aggregate release gates                                |
+| PL-142…PL-145 | P      | Planned in `docs/IMPROVEMENT_PLAN.md`; no implementation evidence yet                                                             | Full task acceptance                                               |
 | PL-146        | A      | Brand asset unit test, Chromium-rendered icons, dual build manifest validation and accessibility/foundation E2E                   | Visual toolbar check on signed packages in release matrices        |
 | PL-147…PL-150 | P      | Planned in `docs/IMPROVEMENT_PLAN.md`; no implementation evidence yet                                                             | Full task acceptance                                               |
 | PL-151        | A      | about:blank completion regression unit test and repeated full Chromium E2E runs without proxy-check failures                      | None beyond aggregate release gates                                |
@@ -73,6 +74,7 @@ complete acceptance evidence exists.
 | FR-054…FR-059         | Popup inspection, Once/Always/Edit/Retry and isolated session overrides                                      |
 | FR-060…FR-072         | Logs, proxy check, native import/export and fixture-backed FoxyProxy import                                  |
 | FR-073…FR-080         | Incognito model, help/status, privacy, docs and release artifacts                                            |
+| FR-083                | Formatter table/round-trip/bash-quoting tests, copy/export component tests and Chromium clipboard/export E2E |
 | FR-082                | Pure parser and line-import planner tests, import panel component tests and Chromium paste/import/update E2E |
 | FR-081                | Override service update/promote/clear/cleanup, caller-session scoping and background override E2E            |
 | NFR-001…NFR-017       | Strict builds, performance budgets, accessibility, local infrastructure, diagnostics and CI                  |
