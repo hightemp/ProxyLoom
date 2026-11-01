@@ -191,3 +191,10 @@ global order.
 
 FoxyProxy import accepts supported HTTP/HTTPS profiles from known 6–9 JSON variants. Patterns,
 rules, subscriptions, PAC, direct, and SOCKS entries are reported but not imported.
+
+## Appearance
+
+Settings → **Appearance** offers the System, Light and Dark themes with previews and six accent
+colors (Indigo, Teal, Violet, Rose, Amber, Slate) for buttons, links, selection and focus. Every
+combination keeps text at WCAG AA contrast. The choice applies to settings, the popup and the
+error page and is part of the native backup; older backups import with the Indigo accent.

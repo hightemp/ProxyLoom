@@ -5,6 +5,7 @@ import { onMounted, shallowRef } from 'vue'
 import type { ErrorPageContext } from '../../src/application/errors/error-correlation-store'
 import { t } from '../../src/i18n/messages'
 import { errorText } from '../../src/ui/labels'
+import { applyAppearance } from '../../src/ui/theme/accents'
 import { runtimeClient } from '../../src/ui/runtime/client'
 
 const context = shallowRef<ErrorPageContext | null>(null)
@@ -21,8 +22,7 @@ const load = async (): Promise<void> => {
   ])
   loading.value = false
   if (stateResult.ok) {
-    document.documentElement.dataset.theme =
-      stateResult.value.config.appearance.theme.toLocaleLowerCase('en-US')
+    applyAppearance(document.documentElement, stateResult.value.config.appearance)
   }
   if (!contextResult.ok) {
     error.value =

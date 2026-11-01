@@ -22,7 +22,7 @@ describe('default configuration', () => {
     const value = createDefaultConfig()
     expect(value.rules).toEqual([])
     expect(value).not.toHaveProperty('groups')
-    expect(value.schemaVersion).toBe(3)
+    expect(value.schemaVersion).toBe(4)
     expect(value.general.mode).toBe('DIRECT')
   })
 })
@@ -43,7 +43,7 @@ describe('configuration repository', () => {
     const repository = new ConfigRepository(storage, () => now)
     const result = await repository.update(0, (current) => ({
       ...current,
-      appearance: { theme: 'DARK' },
+      appearance: { accent: 'INDIGO', theme: 'DARK' },
     }))
     expect(result.ok).toBe(true)
     expect(result.ok && result.value.revision).toBe(1)
@@ -115,11 +115,11 @@ describe('configuration repository', () => {
     const [first, second] = await Promise.all([
       repository.update(0, (current) => ({
         ...current,
-        appearance: { theme: 'DARK' },
+        appearance: { accent: 'INDIGO', theme: 'DARK' },
       })),
       repository.update(0, (current) => ({
         ...current,
-        appearance: { theme: 'LIGHT' },
+        appearance: { accent: 'INDIGO', theme: 'LIGHT' },
       })),
     ])
 
@@ -130,7 +130,7 @@ describe('configuration repository', () => {
     })
     expect(await repository.read()).toMatchObject({
       ok: true,
-      value: { appearance: { theme: 'DARK' }, revision: 1 },
+      value: { appearance: { accent: 'INDIGO', theme: 'DARK' }, revision: 1 },
     })
   })
 
@@ -165,7 +165,7 @@ describe('configuration migrations', () => {
     const result = migrateConfig(legacy)
     expect(result.ok).toBe(true)
     if (result.ok) {
-      expect(result.value.schemaVersion).toBe(3)
+      expect(result.value.schemaVersion).toBe(4)
       expect(result.value.revision).toBe(4)
       expect(result.value.appearance.theme).toBe('SYSTEM')
       expect(result.value.general.loggingEnabled).toBe(true)
@@ -246,7 +246,7 @@ describe('configuration migrations', () => {
 
     expect(result.ok).toBe(true)
     if (!result.ok) return
-    expect(result.value.schemaVersion).toBe(3)
+    expect(result.value.schemaVersion).toBe(4)
     expect(result.value.rules[0]?.pattern).toContain('instagram\\.com')
     expect(result.value.rules[0]?.action).toEqual(placeholder.action)
     expect(result.value.rules[1]?.pattern).toBe('^https://social\\.example/$')

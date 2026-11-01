@@ -1,7 +1,7 @@
 import type { AppConfig } from '../../domain/types/entities'
 
 export const createDefaultConfig = (): AppConfig => ({
-  appearance: { theme: 'SYSTEM' },
+  appearance: { accent: 'INDIGO', theme: 'SYSTEM' },
   general: {
     activeProxyProfileId: null,
     confirmDangerousActions: true,
@@ -18,5 +18,5 @@ export const createDefaultConfig = (): AppConfig => ({
   profiles: [],
   revision: 0,
   rules: [],
-  schemaVersion: 3,
+  schemaVersion: 4,
 })

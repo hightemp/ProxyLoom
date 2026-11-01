@@ -11,6 +11,7 @@ import type { GlobalMode, OverrideScope, RuleAction } from '../../src/domain/typ
 import { t, type MessageKey } from '../../src/i18n/messages'
 import { copyText } from '../../src/ui/clipboard'
 import ConfirmDialog from '../../src/ui/components/ConfirmDialog.vue'
+import { applyAppearance } from '../../src/ui/theme/accents'
 import ProfileChip from '../../src/ui/components/ProfileChip.vue'
 import { confirmController } from '../../src/ui/confirm/confirm-controller'
 import {
@@ -104,8 +105,7 @@ const load = async (): Promise<void> => {
     return
   }
   state.value = result.value
-  document.documentElement.dataset.theme =
-    result.value.config.appearance.theme.toLocaleLowerCase('en-US')
+  applyAppearance(document.documentElement, result.value.config.appearance)
 }
 
 const execute = async (request: RuntimeRequest): Promise<void> => {

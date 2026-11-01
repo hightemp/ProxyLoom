@@ -234,3 +234,26 @@ test('shows redacted local logs and applies filters and clear through visible UI
   await expect(extensionPage.getByText('No log entries', { exact: true })).toBeVisible()
   await target.close()
 })
+
+test('applies the chosen accent color across options and popup', async ({
+  extensionContext,
+  extensionId,
+  extensionPage,
+}) => {
+  await extensionPage.getByRole('button', { name: /Appearance/ }).click()
+  await extensionPage.getByRole('button', { name: 'Light', exact: true }).click()
+  await extensionPage.getByRole('button', { name: 'Teal', exact: true }).click()
+  await expect(extensionPage.locator('html')).toHaveAttribute('data-accent', 'teal')
+  const primary = () =>
+    getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim()
+  await expect.poll(() => extensionPage.evaluate(primary)).toBe('#0f766e')
+
+  const popup = await extensionContext.newPage()
+  await popup.goto(`chrome-extension://${extensionId}/popup.html`)
+  await expect(popup.locator('html')).toHaveAttribute('data-accent', 'teal')
+  await expect.poll(() => popup.evaluate(primary)).toBe('#0f766e')
+  await popup.close()
+
+  await extensionPage.getByRole('button', { name: 'Indigo', exact: true }).click()
+  await extensionPage.getByRole('button', { name: 'System', exact: true }).click()
+})

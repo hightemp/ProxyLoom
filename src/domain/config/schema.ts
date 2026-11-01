@@ -83,6 +83,7 @@ export const appConfigSchema = z
   .object({
     appearance: z
       .object({
+        accent: z.enum(['INDIGO', 'TEAL', 'VIOLET', 'ROSE', 'AMBER', 'SLATE']),
         theme: z.enum(['SYSTEM', 'LIGHT', 'DARK']),
       })
       .strict(),
@@ -104,7 +105,7 @@ export const appConfigSchema = z
     profiles: z.array(profileSchema).max(10_000),
     revision: z.number().int().nonnegative(),
     rules: z.array(ruleSchema).max(10_000),
-    schemaVersion: z.literal(3),
+    schemaVersion: z.literal(4),
   })
   .strict()
 

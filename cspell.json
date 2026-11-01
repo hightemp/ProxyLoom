@@ -5,17 +5,18 @@
   "ignorePaths": ["store/assets/*.svg"],
   "words": [
     "Chromium",
+    "failover",
     "FoxyProxy",
     "GeoIP",
-    "ProxyLoom",
-    "WebSocket",
-    "failover",
     "hostname",
     "hostnames",
     "localhost",
     "loopback",
     "pnpm",
+    "ProxyLoom",
     "sideload",
-    "sideloaded"
+    "sideloaded",
+    "WCAG",
+    "WebSocket"
   ]
 }

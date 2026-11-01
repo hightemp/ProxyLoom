@@ -76,7 +76,7 @@ export const override = (options: Partial<TemporaryOverride> = {}): TemporaryOve
 })
 
 export const config = (options: Partial<AppConfig> = {}): AppConfig => ({
-  appearance: { theme: 'SYSTEM' },
+  appearance: { accent: 'INDIGO', theme: 'SYSTEM' },
   general: {
     activeProxyProfileId: null,
     confirmDangerousActions: true,
@@ -93,6 +93,6 @@ export const config = (options: Partial<AppConfig> = {}): AppConfig => ({
   profiles: [],
   revision: 1,
   rules: [],
-  schemaVersion: 3,
+  schemaVersion: 4,
   ...options,
 })

@@ -2047,5 +2047,29 @@
   },
   "profileEditorTabs": {
     "message": "Profile editor sections"
+  },
+  "accentColor": {
+    "message": "Accent color"
+  },
+  "accentDescription": {
+    "message": "Used for buttons, links, selection and focus. Every accent keeps text readable in light and dark themes."
+  },
+  "accentIndigo": {
+    "message": "Indigo"
+  },
+  "accentTeal": {
+    "message": "Teal"
+  },
+  "accentViolet": {
+    "message": "Violet"
+  },
+  "accentRose": {
+    "message": "Rose"
+  },
+  "accentAmber": {
+    "message": "Amber"
+  },
+  "accentSlate": {
+    "message": "Slate"
   }
 }

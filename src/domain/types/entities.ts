@@ -7,6 +7,7 @@ export type MatcherType = 'ORIGIN' | 'FULL_URL'
 export type RuleActionType = 'DIRECT' | 'PROXY'
 export type BrowserPlatform = 'CHROMIUM' | 'FIREFOX'
 export type AppearanceTheme = 'SYSTEM' | 'LIGHT' | 'DARK'
+export type AppearanceAccent = 'INDIGO' | 'TEAL' | 'VIOLET' | 'ROSE' | 'AMBER' | 'SLATE'
 export type LoggingMode = 'NAVIGATIONS_AND_FAILURES' | 'ALL_SUPPORTED_REQUESTS'
 export type LogLevel = 'ERROR' | 'INFO' | 'DEBUG'
 export type ControlStatus =
@@ -113,6 +114,7 @@ export interface GeneralSettings {
 
 export interface AppearanceSettings {
   readonly theme: AppearanceTheme
+  readonly accent: AppearanceAccent
 }
 
 export interface AppConfig {

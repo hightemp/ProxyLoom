@@ -38,10 +38,10 @@
   --color-muted: #5b6475;
   --color-border: #e1e5ec;
   --color-border-strong: #c9cfda;
-  --color-primary: #3a52e0;
-  --color-primary-fill: #3a52e0;
+  --color-primary: var(--accent-l-primary, #3a52e0);
+  --color-primary-fill: var(--accent-l-fill, #3a52e0);
   --color-on-primary: #ffffff;
-  --color-primary-soft: #eef1ff;
+  --color-primary-soft: var(--accent-l-soft, #eef1ff);
   --color-danger: #c42f48;
   --color-danger-soft: #fff0f2;
   --color-danger-fill: #c42f48;
@@ -52,7 +52,7 @@
   --color-warning-soft: #fff6e4;
   --shadow-sm: 0 1px 2px rgb(16 24 40 / 6%);
   --shadow-lg: 0 20px 48px rgb(16 24 40 / 18%);
-  --focus-ring: 0 0 0 3px rgb(58 82 224 / 32%);
+  --focus-ring: 0 0 0 3px var(--accent-l-ring, rgb(58 82 224 / 32%));
   --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%235b6475' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   --check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
 }
@@ -66,9 +66,9 @@
     --color-muted: #a2abbd;
     --color-border: #2a303c;
     --color-border-strong: #3a4252;
-    --color-primary: #8c9cff;
-    --color-primary-fill: #3a52e0;
-    --color-primary-soft: #232a4c;
+    --color-primary: var(--accent-d-primary, #8c9cff);
+    --color-primary-fill: var(--accent-d-fill, #3a52e0);
+    --color-primary-soft: var(--accent-d-soft, #232a4c);
     --color-danger: #ff8597;
     --color-danger-soft: #3a1f27;
     --color-success: #5fd4a0;
@@ -78,7 +78,7 @@
     --color-warning-soft: #3a2f1d;
     --shadow-sm: 0 1px 2px rgb(0 0 0 / 30%);
     --shadow-lg: 0 24px 56px rgb(0 0 0 / 50%);
-    --focus-ring: 0 0 0 3px rgb(140 156 255 / 40%);
+    --focus-ring: 0 0 0 3px var(--accent-d-ring, rgb(140 156 255 / 40%));
     --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23a2abbd' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   }
 }
@@ -96,9 +96,9 @@
   --color-muted: #a2abbd;
   --color-border: #2a303c;
   --color-border-strong: #3a4252;
-  --color-primary: #8c9cff;
-  --color-primary-fill: #3a52e0;
-  --color-primary-soft: #232a4c;
+  --color-primary: var(--accent-d-primary, #8c9cff);
+  --color-primary-fill: var(--accent-d-fill, #3a52e0);
+  --color-primary-soft: var(--accent-d-soft, #232a4c);
   --color-danger: #ff8597;
   --color-danger-soft: #3a1f27;
   --color-success: #5fd4a0;
@@ -108,7 +108,7 @@
   --color-warning-soft: #3a2f1d;
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 30%);
   --shadow-lg: 0 24px 56px rgb(0 0 0 / 50%);
-  --focus-ring: 0 0 0 3px rgb(140 156 255 / 40%);
+  --focus-ring: 0 0 0 3px var(--accent-d-ring, rgb(140 156 255 / 40%));
   --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23a2abbd' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
 }
 

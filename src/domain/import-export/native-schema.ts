@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import type { AppConfig } from '../types/entities'
 import { err, ok, type Result } from '../types/result'
+import { addAppearanceAccentFromVersionThree } from '../config/accent-migration'
 import { parseAppConfig } from '../config/schema'
 import {
   removeGroupsFromVersionOne,
@@ -130,7 +131,11 @@ export const parseNativeExportText = (
     configCandidate.schemaVersion === 1 || configCandidate.schemaVersion === 2
       ? upgradeLegacyExamplesFromVersionTwo(versionTwoCandidate)
       : versionTwoCandidate
-  const config = parseAppConfig(migratedCandidate)
+  const versionFourCandidate =
+    typeof configCandidate.schemaVersion === 'number' && configCandidate.schemaVersion <= 3
+      ? addAppearanceAccentFromVersionThree(migratedCandidate)
+      : migratedCandidate
+  const config = parseAppConfig(versionFourCandidate)
   if (!config.ok) {
     return err({
       code: 'CONFIG_INVALID',

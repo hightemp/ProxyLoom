@@ -264,6 +264,7 @@ describe('general settings application service', () => {
     })
     expect(
       service.updateAppearance(configured, {
+        accent: 'INDIGO',
         theme: 'DARK',
       }),
     ).toMatchObject({ appearance: { theme: 'DARK' } })

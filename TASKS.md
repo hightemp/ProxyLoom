@@ -1818,7 +1818,7 @@ rules`, compact check pill; `Use globally`/`Check` + «⋯» (Edit, Duplicate, C
   - **Требования:** NFR-007–NFR-009.
   - **Готово, когда:** в UI нет `<details>`, клавиатурная навигация по вкладкам по WAI-ARIA, version 0.1.26.
 
-- [ ] **PL-160 — Акцентные цвета и экран Appearance**
+- [x] **PL-160 — Акцентные цвета и экран Appearance**
   - **Цель:** выбор акцента (Indigo, Teal, Violet, Rose, Amber, Slate) поверх System/Light/Dark.
   - **Требования:** FR-013, NFR-010–NFR-011, FR-076–FR-078.
   - **Действия:** `appearance.accent` в config — schema v4, идемпотентная миграция, backward fixture,

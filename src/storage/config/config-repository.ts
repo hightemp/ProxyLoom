@@ -197,7 +197,9 @@ export class ConfigRepository {
       }
     }
 
-    const backup = parseAppConfig(values[CONFIG_BACKUP_KEY])
+    // The backup is the document from before an interrupted migration, so it may use an older
+    // schema; migrate it instead of requiring the current version.
+    const backup = migrateConfig(values[CONFIG_BACKUP_KEY])
     if (!backup.ok) {
       return backup
     }

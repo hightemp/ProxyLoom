@@ -115,7 +115,7 @@ ProxyLoom решает проблему через:
 
 - `FR-011`: product name, support links, store IDs и defaults находятся в централизованной build/runtime-конфигурации.
 - `FR-012`: UI сразу использует `_locales/en/messages.json` или эквивалент WXT i18n; literal user-facing strings запрещены вне каталога локализации.
-- `FR-013`: global settings включают mode, active proxy, logging, log level, check timeout, IP/GeoIP provider, error-page behavior, confirmations, appearance.
+- `FR-013`: global settings включают mode, active proxy, logging, log level, check timeout, IP/GeoIP provider, error-page behavior, confirmations, appearance. Appearance включает theme (`SYSTEM`/`LIGHT`/`DARK`) и accent (`INDIGO`, `TEAL`, `VIOLET`, `ROSE`, `AMBER`, `SLATE`); каждая комбинация обязана проходить WCAG AA. Config schema v4 добавляет `appearance.accent` (миграция v3 → v4 подставляет `INDIGO`).
 - `FR-014`: при startup service worker восстанавливает конфигурацию из persistent storage, очищает истёкшее session state и повторно применяет effective configuration.
 
 ### 10.2 Маршрутизация

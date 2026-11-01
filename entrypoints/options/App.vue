@@ -20,6 +20,7 @@ import type { AppRuntimeState, RuntimeRequest } from '../../src/application/runt
 import type { LogQuery } from '../../src/application/logging/log-types'
 import { t } from '../../src/i18n/messages'
 import ConfirmDialog from '../../src/ui/components/ConfirmDialog.vue'
+import { applyAppearance } from '../../src/ui/theme/accents'
 import ToastHost from '../../src/ui/components/ToastHost.vue'
 import { toastController } from '../../src/ui/toast/toast-controller'
 import { applyStateLabel, errorText, modeLabel } from '../../src/ui/labels'
@@ -84,7 +85,7 @@ const selectedMeta = computed(
 )
 
 const applyTheme = (next: AppRuntimeState): void => {
-  document.documentElement.dataset.theme = next.config.appearance.theme.toLocaleLowerCase('en-US')
+  applyAppearance(document.documentElement, next.config.appearance)
 }
 
 const setStatus = (value: string, error = false): void => {
