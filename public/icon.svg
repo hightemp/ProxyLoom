@@ -1,4 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="ProxyLoom">
-  <rect width="128" height="128" rx="28" fill="#405cf5"/>
-  <path d="M31 89V39h30c20 0 31 9 31 25S81 89 61 89H49v18H31zm18-34v19h12c9 0 14-3 14-10s-5-9-14-9H49z" fill="#fff"/>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#405cf5"/>
+      <stop offset="1" stop-color="#7a5af8"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#bg)"/>
+  <g fill="none" stroke="#fff" stroke-linecap="round" stroke-width="9">
+    <path d="M22 36c20 0 24 28 40 28" stroke-opacity="0.7"/>
+    <path d="M22 64h40"/>
+    <path d="M22 92c20 0 24-28 40-28" stroke-opacity="0.7"/>
+    <path d="M66 64c14 0 16-22 32-22"/>
+    <path d="M66 64c14 0 16 22 32 22"/>
+  </g>
+  <g fill="#fff">
+    <circle cx="64" cy="64" r="12"/>
+    <path d="M96 31l14 11-14 11z"/>
+    <path d="M96 75l14 11-14 11z"/>
+  </g>
+  <circle cx="64" cy="64" r="5" fill="#5a5bf6"/>
 </svg>

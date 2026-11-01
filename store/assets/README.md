@@ -1,9 +1,10 @@
 # Store assets
 
-`public/icon.svg` is the editable vector source. Deterministic 16, 32, 48 and 128 pixel PNG
-derivatives are committed under `public/` and declared for the extension and toolbar action in
-both manifests. Regenerate them with ImageMagick from the SVG source, then validate exact
-dimensions with `identify`.
+The mark shows threads entering a single knot and leaving as separate routes. `public/icon.svg`
+is the editable full-detail vector source; `store/assets/icon-small.svg` is a simplified,
+pixel-fitted variant used only for the 16 pixel toolbar icon, where the full mark becomes noisy.
+The 16, 32, 48 and 128 pixel PNG derivatives are committed under `public/` and declared for the
+extension and toolbar action in both manifests.
 
 The committed store candidates are:
 
@@ -17,11 +18,11 @@ These dimensions were rechecked on 2026-07-26 against the official
 The packaged 128×128 extension icon is the Chrome listing icon.
 
 Regenerate the screenshot from a built release candidate with `pnpm capture:store-assets`.
-Regenerate the vector-derived PNGs with:
+Regenerate every vector-derived PNG (extension icons, store logo and promo tile) with Chromium,
+which renders the SVG gradients exactly as the browser does:
 
 ```bash
-convert public/icon.svg -resize 300x300 store/assets/logo-300.png
-convert store/assets/promo-small-440x280.svg store/assets/promo-small-440x280.png
+pnpm render:icons
 pnpm validate:store-assets
 ```
 

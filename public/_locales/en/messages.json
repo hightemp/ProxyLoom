@@ -278,7 +278,6 @@
   "incognitoHelpFirefox": {
     "message": "To change access, open Manage Extension in Firefox, choose the Details tab, and change “Run in Private Windows”, then reopen ProxyLoom."
   },
-  "extensionAbbreviation": { "message": "PL" },
   "deterministicRouting": { "message": "Deterministic routing" },
   "settings": { "message": "Settings" },
   "sectionGeneral": { "message": "General" },

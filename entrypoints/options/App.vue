@@ -126,7 +126,7 @@ onBeforeUnmount(() => {
   <div class="settings-shell">
     <aside class="sidebar">
       <div class="brand">
-        <span class="brand-mark" aria-hidden="true">{{ t('extensionAbbreviation') }}</span>
+        <img class="brand-mark" src="/icon.svg" alt="" width="38" height="38" />
         <div>
           <strong>{{ t('extensionName') }}</strong>
           <small>{{ t('deterministicRouting') }}</small>
@@ -263,15 +263,10 @@ onBeforeUnmount(() => {
 }
 
 .brand-mark {
-  display: grid;
+  display: block;
   width: 38px;
   height: 38px;
-  border-radius: 11px;
-  color: white;
-  background: linear-gradient(135deg, var(--color-primary), #7a5af8);
-  font-size: 12px;
-  font-weight: 800;
-  place-items: center;
+  flex: none;
 }
 
 .brand div,
