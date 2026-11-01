@@ -390,6 +390,75 @@ label > textarea {
   font-weight: 400;
 }
 
+/* ---------- List toolbars (Proxies, Rules, Help) ---------- */
+.search-field {
+  position: relative;
+  display: block;
+  flex: 1 1 260px;
+  min-width: 0;
+  color: var(--color-muted);
+}
+
+.search-field svg {
+  position: absolute;
+  top: 50%;
+  left: 11px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.search-field input {
+  padding-left: 34px;
+}
+
+.list-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.list-toolbar select {
+  width: auto;
+}
+
+.toolbar-count {
+  padding: 0 var(--space-2);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.selection-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  min-height: 36px;
+  padding: 3px var(--space-2);
+  border-radius: var(--radius);
+}
+
+.selection-bar.active {
+  background: var(--color-primary-soft);
+}
+
+.selection-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+.filter-notice {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.filter-notice button {
+  margin-left: auto;
+}
+
 .title-with-tip {
   display: inline-flex;
   gap: 4px;
@@ -812,22 +881,6 @@ tbody tr:last-child th {
 
 tbody tr:hover {
   background: var(--color-surface-2);
-}
-
-.test-results {
-  display: grid;
-  gap: 4px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.test-results li {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-3);
-  font-family: var(--font-mono);
-  font-size: 12.5px;
 }
 
 .color-dot {

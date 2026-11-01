@@ -5,6 +5,7 @@ import {
   Gauge,
   ListOrdered,
   Palette,
+  Regex,
   ScrollText,
   Server,
   ShieldCheck,
@@ -20,18 +21,40 @@ export type HelpArticleId =
   | 'import'
   | 'check'
   | 'rules'
+  | 'regex'
   | 'once'
   | 'logs'
   | 'limits'
   | 'troubleshooting'
   | 'appearance'
 
+export interface CheatSheetEntry {
+  /** Regular-expression syntax; a protocol literal, not translated. */
+  readonly token: string
+  readonly meaning: MessageKey
+}
+
 export interface HelpArticle {
   readonly id: HelpArticleId
   readonly icon: Component
   readonly title: MessageKey
   readonly body: readonly MessageKey[]
+  readonly cheatSheet?: readonly CheatSheetEntry[]
 }
+
+export const REGEX_CHEAT_SHEET: readonly CheatSheetEntry[] = [
+  { meaning: 'regexStart', token: '^' },
+  { meaning: 'regexEnd', token: '$' },
+  { meaning: 'regexAnyChar', token: '.' },
+  { meaning: 'regexLiteralDot', token: '\\.' },
+  { meaning: 'regexZeroOrMore', token: '*' },
+  { meaning: 'regexOneOrMore', token: '+' },
+  { meaning: 'regexOptional', token: '?' },
+  { meaning: 'regexClass', token: '[a-z0-9-]' },
+  { meaning: 'regexDigit', token: '\\d' },
+  { meaning: 'regexAlternatives', token: '(a|b)' },
+  { meaning: 'regexGroup', token: '( … )' },
+]
 
 /** Help content; every string is a locale message so the guide stays translatable. */
 export const HELP_ARTICLES: readonly HelpArticle[] = [
@@ -64,6 +87,13 @@ export const HELP_ARTICLES: readonly HelpArticle[] = [
     icon: ListOrdered,
     id: 'rules',
     title: 'helpRulesTitle',
+  },
+  {
+    body: ['helpRegexBody1', 'helpRegexBody2', 'helpRegexBody3'],
+    cheatSheet: REGEX_CHEAT_SHEET,
+    icon: Regex,
+    id: 'regex',
+    title: 'helpRegexTitle',
   },
   {
     body: ['helpOnceBody1', 'helpOnceBody2', 'helpOnceBody3'],

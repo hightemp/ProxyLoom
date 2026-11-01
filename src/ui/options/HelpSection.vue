@@ -4,6 +4,8 @@ import { computed, onMounted, shallowRef, watch } from 'vue'
 
 import { t } from '../../i18n/messages'
 import { HELP_ARTICLES, type HelpArticleId } from '../help/articles'
+import RegexCheatSheet from '../help/RegexCheatSheet.vue'
+import RegexExamples from '../help/RegexExamples.vue'
 
 const props = defineProps<{ article: HelpArticleId | null }>()
 
@@ -13,7 +15,7 @@ const expanded = shallowRef<ReadonlySet<HelpArticleId>>(
 )
 
 const articleText = (article: (typeof HELP_ARTICLES)[number]): string =>
-  [article.title, ...article.body]
+  [article.title, ...article.body, ...(article.cheatSheet ?? []).map(({ meaning }) => meaning)]
     .map((key) => t(key))
     .join(' ')
     .toLocaleLowerCase()
@@ -93,6 +95,8 @@ onMounted(() => reveal(props.article))
           <p v-for="key in entry.body" :key="key">
             {{ t(key) }}
           </p>
+          <RegexCheatSheet v-if="entry.cheatSheet" class="article-cheat-sheet" />
+          <RegexExamples v-if="entry.cheatSheet" class="article-cheat-sheet" />
         </div>
       </li>
     </ul>
@@ -100,23 +104,6 @@ onMounted(() => reveal(props.article))
 </template>
 
 <style scoped>
-.search-field {
-  position: relative;
-  display: block;
-  color: var(--color-muted);
-}
-
-.search-field svg {
-  position: absolute;
-  top: 50%;
-  left: 11px;
-  transform: translateY(-50%);
-}
-
-.search-field input {
-  padding-left: 34px;
-}
-
 .help-list {
   display: grid;
   gap: var(--space-2);
@@ -162,6 +149,11 @@ onMounted(() => reveal(props.article))
 
 .article-toggle[aria-expanded='true'] .chevron {
   transform: rotate(90deg);
+}
+
+.article-cheat-sheet {
+  max-width: 640px;
+  color: var(--color-text);
 }
 
 .article-body {

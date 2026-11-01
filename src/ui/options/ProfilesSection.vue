@@ -471,7 +471,7 @@ watch(() => props.busy, restoreFocus)
     </div>
 
     <template v-else>
-      <div class="proxy-toolbar">
+      <div class="list-toolbar">
         <label class="search-field">
           <span class="sr-only">{{ t('searchProfiles') }}</span>
           <Search :size="16" aria-hidden="true" />
@@ -936,59 +936,6 @@ watch(() => props.busy, restoreFocus)
 </template>
 
 <style scoped>
-.proxy-toolbar {
-  display: grid;
-  grid-template-columns: minmax(200px, 1fr) auto auto auto;
-  gap: var(--space-2);
-  align-items: center;
-}
-
-.search-field {
-  position: relative;
-  display: block;
-  color: var(--color-muted);
-}
-
-.search-field svg {
-  position: absolute;
-  top: 50%;
-  left: 11px;
-  transform: translateY(-50%);
-}
-
-.search-field input {
-  padding-left: 34px;
-}
-
-.proxy-toolbar select {
-  width: auto;
-}
-
-.toolbar-count {
-  padding: 0 var(--space-2);
-  white-space: nowrap;
-}
-
-.selection-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  align-items: center;
-  min-height: 36px;
-}
-
-.selection-bar.active {
-  padding: 3px var(--space-2);
-  border-radius: var(--radius);
-  background: var(--color-primary-soft);
-}
-
-.selection-actions {
-  display: flex;
-  gap: var(--space-2);
-  margin-left: auto;
-}
-
 .proxy-list {
   margin: 0;
   padding: 0;
@@ -1266,14 +1213,6 @@ watch(() => props.busy, restoreFocus)
   .proxy-user,
   .proxy-status {
     grid-column: 2 / 3;
-  }
-
-  .proxy-toolbar {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .search-field {
-    grid-column: 1 / -1;
   }
 }
 

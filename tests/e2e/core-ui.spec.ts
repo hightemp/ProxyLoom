@@ -139,9 +139,9 @@ test('runs local pattern and global routing testers and supports duplicate, disa
     .getByLabel('URLs, one per line')
     .fill('https://example.com/\nhttps://other.example/')
   await extensionPage.getByRole('button', { name: 'Test pattern' }).click()
-  await expect(extensionPage.locator('.test-results')).toContainText('MATCH')
-  await expect(extensionPage.locator('.test-results')).toContainText('NO MATCH')
-  await expect(extensionPage.getByText(/No network request/)).toBeVisible()
+  await expect(extensionPage.locator('.test-results')).toContainText('Match')
+  await expect(extensionPage.locator('.test-results')).toContainText('No match')
+  await expect(extensionPage.getByText(/without network requests/)).toBeVisible()
   await extensionPage.getByRole('button', { name: 'Save rule' }).click()
 
   const original = extensionPage.getByRole('listitem').filter({ hasText: 'Tester route' }).first()

@@ -13,7 +13,7 @@ test('a help tip explains a field and opens the matching guide article', async (
     .getByRole('button', { name: 'More information' })
   await tip.click()
   const popover = extensionPage.getByRole('dialog', { name: 'More information' })
-  await expect(popover).toContainText('subdomains and any port')
+  await expect(popover).toContainText('its subdomains, any port')
   await extensionPage.keyboard.press('Escape')
   await expect(popover).toHaveCount(0)
   await expect(tip).toBeFocused()
@@ -23,7 +23,7 @@ test('a help tip explains a field and opens the matching guide article', async (
   await extensionPage.keyboard.press('Escape')
   await expect(extensionPage.getByRole('heading', { name: 'Help', level: 1 })).toBeVisible()
   await expect(
-    extensionPage.getByRole('button', { name: 'Rules and regular expressions' }),
+    extensionPage.getByRole('button', { name: 'Regular expression basics' }),
   ).toHaveAttribute('aria-expanded', 'true')
 
   await extensionPage.getByLabel('Search help').fill('Chromium')

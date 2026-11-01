@@ -12,10 +12,15 @@ export const placeFloating = (
 ): Record<string, string> => {
   const below = anchor.bottom + GAP
   const above = anchor.top - GAP - size.height
-  const top =
+  const preferred =
     below + size.height > window.innerHeight - VIEWPORT_MARGIN && above >= VIEWPORT_MARGIN
       ? above
       : below
+  // When neither side has room, keep the whole box on screen instead of overflowing the viewport.
+  const top = Math.max(
+    VIEWPORT_MARGIN,
+    Math.min(preferred, window.innerHeight - size.height - VIEWPORT_MARGIN),
+  )
   const horizontal =
     align === 'end'
       ? { right: `${Math.max(VIEWPORT_MARGIN, window.innerWidth - anchor.right)}px` }

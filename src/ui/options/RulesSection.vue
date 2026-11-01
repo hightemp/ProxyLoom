@@ -5,6 +5,7 @@ import {
   CopyPlus,
   FlaskConical,
   GripVertical,
+  ListChecks,
   Info,
   NotebookText,
   Pencil,
@@ -16,6 +17,8 @@ import {
   SquarePen,
   TimerOff,
   TimerReset,
+  ToggleLeft,
+  ToggleRight,
   Trash2,
   WandSparkles,
 } from '@lucide/vue'
@@ -52,6 +55,10 @@ import Tabs from '../components/Tabs.vue'
 import OverflowMenu from '../components/OverflowMenu.vue'
 import ProfileChip from '../components/ProfileChip.vue'
 import HelpTip from '../components/HelpTip.vue'
+import RegexCheatSheet from '../help/RegexCheatSheet.vue'
+import RegexExamples from '../help/RegexExamples.vue'
+import RegexFlagsField from './RegexFlagsField.vue'
+import RegexTestResults from './RegexTestResults.vue'
 
 const props = defineProps<{
   state: AppRuntimeState
@@ -128,6 +135,7 @@ const testRows = shallowRef<
   }[]
 >([])
 const testerStatus = shallowRef('')
+const testElapsedMs = shallowRef(0)
 const routeUrl = shallowRef('https://example.com/path?query=1')
 const routingResult = shallowRef<RoutingTestResult | null>(null)
 const tester = new RegexBatchTester(createRegexWorker)
@@ -383,7 +391,8 @@ const runRegexTest = async (): Promise<void> => {
     return
   }
   testRows.value = result.value.rows
-  testerStatus.value = `${result.value.rows.length} ${t('linesLabel')}, ${result.value.elapsedMs.toFixed(1)} ${t('millisecondsShort')}. ${t('noNetworkRequest')}`
+  testElapsedMs.value = result.value.elapsedMs
+  testerStatus.value = ''
 }
 
 const runRoutingTest = (): void => {
@@ -450,96 +459,110 @@ watch(() => props.busy, restoreFocus)
       </button>
     </div>
 
-    <div class="stack rule-toolbar">
-      <div class="rule-filter-row">
-        <label class="search-field">
-          <span class="sr-only">{{ t('search') }}</span>
-          <Search :size="16" aria-hidden="true" />
-          <input
-            v-model="search"
-            type="search"
-            :placeholder="t('nameOrPattern')"
-            :aria-label="t('search')"
-          />
-        </label>
-        <button
-          type="button"
-          :aria-expanded="moreFiltersOpen ? 'true' : 'false'"
-          @click="moreFiltersOpen = !moreFiltersOpen"
+    <div class="list-toolbar">
+      <label class="search-field">
+        <span class="sr-only">{{ t('search') }}</span>
+        <Search :size="16" aria-hidden="true" />
+        <input
+          v-model="search"
+          type="search"
+          :placeholder="t('nameOrPattern')"
+          :aria-label="t('search')"
+        />
+      </label>
+      <button
+        type="button"
+        :aria-expanded="moreFiltersOpen ? 'true' : 'false'"
+        @click="moreFiltersOpen = !moreFiltersOpen"
+      >
+        <SlidersHorizontal :size="16" aria-hidden="true" />
+        {{ moreFiltersOpen ? t('fewerFilters') : t('moreFilters') }}
+      </button>
+      <span class="muted toolbar-count" aria-live="polite">
+        {{ t('showingCount', [String(filteredRules.length), String(state.config.rules.length)]) }}
+      </span>
+    </div>
+    <div v-if="moreFiltersOpen" class="filter-grid">
+      <label>
+        {{ t('action') }}
+        <select v-model="actionFilter" name="rule-action-filter" :aria-label="t('action')">
+          <option value="">{{ t('allActions') }}</option>
+          <option value="DIRECT">{{ t('directLabel') }}</option>
+          <option value="PROXY">{{ t('proxyLabel') }}</option>
+        </select>
+      </label>
+      <label>
+        {{ t('proxyProfile') }}
+        <select v-model="profileFilter" name="rule-profile-filter" :aria-label="t('proxyProfile')">
+          <option value="">{{ t('allProxyProfiles') }}</option>
+          <option v-for="profile in state.config.profiles" :key="profile.id" :value="profile.id">
+            {{ profile.name }}
+          </option>
+        </select>
+      </label>
+      <label>
+        {{ t('enabled') }}
+        <select v-model="enabledFilter" name="rule-enabled-filter" :aria-label="t('enabled')">
+          <option value="">{{ t('anyState') }}</option>
+          <option value="true">{{ t('enabled') }}</option>
+          <option value="false">{{ t('disabled') }}</option>
+        </select>
+      </label>
+      <label>
+        {{ t('compatibility') }}
+        <select
+          v-model="compatibilityFilter"
+          name="rule-compatibility-filter"
+          :aria-label="t('compatibility')"
         >
-          <SlidersHorizontal :size="16" aria-hidden="true" />
-          {{ moreFiltersOpen ? t('fewerFilters') : t('moreFilters') }}
+          <option value="">{{ t('all') }}</option>
+          <option value="PORTABLE">{{ t('chromeFirefox') }}</option>
+          <option value="FIREFOX_ONLY">{{ t('firefoxOnly') }}</option>
+        </select>
+      </label>
+    </div>
+    <p v-if="filtersActive" class="notice filter-notice">
+      <Info :size="16" aria-hidden="true" />
+      <span>{{ t('clearFiltersToReorder') }}</span>
+      <button type="button" class="small" @click="clearFilters">
+        {{ t('clearFilters') }}
+      </button>
+    </p>
+
+    <div class="selection-bar" :class="{ active: selectedRuleIds.size > 0 }">
+      <button
+        type="button"
+        class="ghost small"
+        :disabled="filteredRules.length === 0"
+        @click="selectAllShown"
+      >
+        <ListChecks :size="16" aria-hidden="true" />
+        {{ t('selectAllShown') }}
+      </button>
+      <template v-if="selectedRuleIds.size > 0">
+        <button type="button" class="ghost small" @click="selectedRuleIds = new Set()">
+          {{ t('clearSelection') }}
         </button>
-      </div>
-      <div v-if="moreFiltersOpen" class="filter-grid">
-        <label>
-          {{ t('action') }}
-          <select v-model="actionFilter" name="rule-action-filter" :aria-label="t('action')">
-            <option value="">{{ t('allActions') }}</option>
-            <option value="DIRECT">{{ t('directLabel') }}</option>
-            <option value="PROXY">{{ t('proxyLabel') }}</option>
-          </select>
-        </label>
-        <label>
-          {{ t('proxyProfile') }}
-          <select
-            v-model="profileFilter"
-            name="rule-profile-filter"
-            :aria-label="t('proxyProfile')"
-          >
-            <option value="">{{ t('allProxyProfiles') }}</option>
-            <option v-for="profile in state.config.profiles" :key="profile.id" :value="profile.id">
-              {{ profile.name }}
-            </option>
-          </select>
-        </label>
-        <label>
-          {{ t('enabled') }}
-          <select v-model="enabledFilter" name="rule-enabled-filter" :aria-label="t('enabled')">
-            <option value="">{{ t('anyState') }}</option>
-            <option value="true">{{ t('enabled') }}</option>
-            <option value="false">{{ t('disabled') }}</option>
-          </select>
-        </label>
-        <label>
-          {{ t('compatibility') }}
-          <select
-            v-model="compatibilityFilter"
-            name="rule-compatibility-filter"
-            :aria-label="t('compatibility')"
-          >
-            <option value="">{{ t('all') }}</option>
-            <option value="PORTABLE">{{ t('chromeFirefox') }}</option>
-            <option value="FIREFOX_ONLY">{{ t('firefoxOnly') }}</option>
-          </select>
-        </label>
-      </div>
-      <div class="button-row">
-        <span aria-live="polite">
-          {{ t('showingCount', [String(filteredRules.length), String(state.config.rules.length)]) }}
-        </span>
-        <button v-if="filtersActive" type="button" @click="clearFilters">
-          {{ t('clearFilters') }}
-        </button>
-        <span v-if="filtersActive" class="notice"> {{ t('clearFiltersToReorder') }} </span>
-        <button type="button" :disabled="filteredRules.length === 0" @click="selectAllShown">
-          {{ t('selectAllShown') }}
-        </button>
-        <template v-if="selectedRuleIds.size > 0">
-          <button type="button" @click="selectedRuleIds = new Set()">
-            {{ t('clearSelection') }}
-          </button>
-          <button type="button" :disabled="busy" @click="setSelectedEnabled(true)">
+        <span class="selection-actions">
+          <button type="button" class="small" :disabled="busy" @click="setSelectedEnabled(true)">
+            <ToggleRight :size="16" aria-hidden="true" />
             {{ t('enableSelected', String(selectedRuleIds.size)) }}
           </button>
-          <button type="button" :disabled="busy" @click="setSelectedEnabled(false)">
+          <button type="button" class="small" :disabled="busy" @click="setSelectedEnabled(false)">
+            <ToggleLeft :size="16" aria-hidden="true" />
             {{ t('disableSelected', String(selectedRuleIds.size)) }}
           </button>
-          <button class="danger-text" type="button" :disabled="busy" @click="void deleteSelected()">
+          <button
+            class="small danger-text"
+            type="button"
+            :disabled="busy"
+            @click="void deleteSelected()"
+          >
+            <Trash2 :size="16" aria-hidden="true" />
             {{ t('deleteSelected', String(selectedRuleIds.size)) }}
           </button>
-        </template>
-      </div>
+        </span>
+      </template>
     </div>
 
     <div v-if="filteredRules.length === 0" class="surface empty-state">
@@ -747,15 +770,17 @@ watch(() => props.busy, restoreFocus)
                       </option>
                     </select>
                   </div>
-                  <label>
-                    {{ t('flags') }}
-                    <input v-model="draft.flags" maxlength="2" pattern="[im]*" />
-                  </label>
+                  <RegexFlagsField v-model="draft.flags" />
                 </div>
                 <div class="field">
                   <span class="field-label">
                     <label for="rule-pattern">{{ t('regularExpression') }}</label>
-                    <HelpTip :text="t('tipRegex')" article="rules" />
+                    <HelpTip article="regex">
+                      <span>{{ t('tipRegexBasics') }}</span>
+                      <RegexCheatSheet />
+                      <strong>{{ t('regexExamplesTitle') }}</strong>
+                      <RegexExamples />
+                    </HelpTip>
                   </span>
                   <textarea
                     id="rule-pattern"
@@ -863,20 +888,11 @@ watch(() => props.busy, restoreFocus)
                   {{ testerStatus }}
                 </span>
               </div>
-              <ul class="test-results">
-                <li v-for="row in testRows" :key="row.input">
-                  <strong>
-                    {{
-                      row.errorCode === null
-                        ? row.matched
-                          ? t('match')
-                          : t('noMatch')
-                        : errorText({ code: row.errorCode })
-                    }}
-                  </strong>
-                  <code>{{ row.normalizedTarget ?? row.input }}</code>
-                </li>
-              </ul>
+              <RegexTestResults
+                v-if="testRows.length > 0"
+                :rows="testRows"
+                :elapsed-ms="testElapsedMs"
+              />
             </div>
           </template>
           <template #notes>
@@ -938,27 +954,6 @@ watch(() => props.busy, restoreFocus)
 </template>
 
 <style scoped>
-.rule-toolbar {
-  gap: var(--space-3);
-}
-
-.search-field {
-  position: relative;
-  display: block;
-  color: var(--color-muted);
-}
-
-.search-field svg {
-  position: absolute;
-  top: 50%;
-  left: 11px;
-  transform: translateY(-50%);
-}
-
-.search-field input {
-  padding-left: 34px;
-}
-
 .card-heading {
   display: flex;
   gap: var(--space-3);
@@ -994,7 +989,8 @@ watch(() => props.busy, restoreFocus)
 
 .match-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 120px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
   gap: var(--space-3);
 }
 

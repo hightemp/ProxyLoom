@@ -976,10 +976,10 @@
     "message": "Test pattern"
   },
   "match": {
-    "message": "MATCH"
+    "message": "Match"
   },
   "noMatch": {
-    "message": "NO MATCH"
+    "message": "No match"
   },
   "saveRule": {
     "message": "Save rule"
@@ -2210,9 +2210,6 @@
   "tipOneEndpoint": {
     "message": "On: one endpoint for HTTP, HTTPS, WS and WSS. Off: HTTPS and WSS targets use a separate endpoint."
   },
-  "tipRegex": {
-    "message": "Examples: ^https://example\\.com/$ matches one site; ^https://([a-z0-9-]+\\.)*example\\.com(?::\\d+)?/$ also matches its subdomains and any port."
-  },
   "tipMatcher": {
     "message": "Origin matches scheme, host and port in every browser. Full URL also sees path and query but works only in Firefox."
   },
@@ -2224,5 +2221,111 @@
   },
   "tipImportFormats": {
     "message": "One proxy per line in URL, host:port:user:pass, user:pass@host:port, CSV or space-separated form. Lines with # or // are ignored."
+  },
+  "testSummary": {
+    "message": "$TESTED$ tested · $MATCHED$ match · $MISSED$ no match",
+    "placeholders": {
+      "tested": {
+        "content": "$1"
+      },
+      "matched": {
+        "content": "$2"
+      },
+      "missed": {
+        "content": "$3"
+      }
+    }
+  },
+  "testElapsedLocal": {
+    "message": "$MS$ ms, checked locally without network requests",
+    "placeholders": {
+      "ms": {
+        "content": "$1"
+      }
+    }
+  },
+  "testedAs": {
+    "message": "Tested as"
+  },
+  "testError": {
+    "message": "Error"
+  },
+  "flagIgnoreCase": {
+    "message": "Ignore case (i)"
+  },
+  "flagIgnoreCaseHint": {
+    "message": "Example.COM and example.com match the same pattern."
+  },
+  "flagMultiline": {
+    "message": "Multiline (m)"
+  },
+  "flagMultilineHint": {
+    "message": "^ and $ also match at line breaks. URLs have none, so it is rarely needed."
+  },
+  "tipFlags": {
+    "message": "Flags change how the pattern is applied. Ignore case is on by default because hostnames are case-insensitive. Multiline only matters for text with line breaks, which URLs never contain."
+  },
+  "tipRegexBasics": {
+    "message": "A regular expression describes which URLs match. The most useful building blocks:"
+  },
+  "regexToken": {
+    "message": "Pattern"
+  },
+  "regexMeaning": {
+    "message": "Meaning"
+  },
+  "regexStart": {
+    "message": "Start of the URL"
+  },
+  "regexEnd": {
+    "message": "End of the URL"
+  },
+  "regexAnyChar": {
+    "message": "Any single character"
+  },
+  "regexLiteralDot": {
+    "message": "A literal dot, as in example\\.com"
+  },
+  "regexZeroOrMore": {
+    "message": "Repeat the previous item zero or more times"
+  },
+  "regexOneOrMore": {
+    "message": "Repeat the previous item one or more times"
+  },
+  "regexOptional": {
+    "message": "Make the previous item optional"
+  },
+  "regexClass": {
+    "message": "One character from the set: a letter, digit or hyphen"
+  },
+  "regexDigit": {
+    "message": "One digit"
+  },
+  "regexAlternatives": {
+    "message": "Either alternative"
+  },
+  "regexGroup": {
+    "message": "Group items, e.g. an optional subdomain ([a-z0-9-]+\\.)?"
+  },
+  "regexExamplesTitle": {
+    "message": "Examples"
+  },
+  "helpRegexTitle": {
+    "message": "Regular expression basics"
+  },
+  "helpRegexBody1": {
+    "message": "A rule pattern is a regular expression that is matched against the normalized URL: scheme, host, port and a trailing / for Origin rules, and the full URL without fragment for Full URL rules."
+  },
+  "helpRegexBody2": {
+    "message": "Most characters match themselves. Characters with a special meaning, such as . ? + * ( ) [ ] and /, need a backslash when you mean them literally; a dot in a hostname is written \\."
+  },
+  "helpRegexBody3": {
+    "message": "Example: ^https://([a-z0-9-]+\\.)*example\\.com(?::\\d+)?/$ matches example.com and all its subdomains over HTTPS on any port. Use the Test tab to try a pattern on sample URLs before saving."
+  },
+  "regexExampleSite": {
+    "message": "Only example.com over HTTPS"
+  },
+  "regexExampleSubdomains": {
+    "message": "example.com and its subdomains, any port"
   }
 }

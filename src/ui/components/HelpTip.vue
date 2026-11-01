@@ -7,8 +7,8 @@ import type { HelpArticleId } from '../help/articles'
 import { placeFloating } from './floating'
 
 const props = defineProps<{
-  /** Short explanation shown in the popover. */
-  text: string
+  /** Short explanation shown in the popover; the default slot can add richer content. */
+  text?: string
   /** Help article opened by Learn more. */
   article: HelpArticleId
   /** Open the guide in a new tab, e.g. from the popup. */
@@ -27,7 +27,12 @@ const onDocumentPointer = (event: PointerEvent): void => {
     close(false)
   }
 }
-const onViewportChange = (): void => close(false)
+const onViewportChange = (event: Event): void => {
+  // Scrolling the tip's own content must not close it.
+  const target = event.target
+  if (target instanceof Node && popover.value?.contains(target) === true) return
+  close(false)
+}
 // Capture phase so Escape closes only the tip, not an enclosing editor dialog.
 const onDocumentKeydown = (event: KeyboardEvent): void => {
   if (event.key !== 'Escape') return
@@ -93,7 +98,8 @@ const href = `options.html#help/${props.article}`
       :aria-label="t('helpMoreInfo')"
       :style="placement"
     >
-      <span class="help-text">{{ text }}</span>
+      <span v-if="text" class="help-text">{{ text }}</span>
+      <slot />
       <a :href="href" :target="external ? '_blank' : undefined" @click="close(false)">
         {{ t('helpLearnMore') }}
       </a>
@@ -118,7 +124,9 @@ const href = `options.html#help/${props.article}`
   z-index: 40;
   display: grid;
   gap: var(--space-2);
-  width: min(320px, calc(100vw - 16px));
+  width: min(400px, calc(100vw - 16px));
+  max-height: min(70vh, 520px);
+  overflow: auto;
   padding: var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);

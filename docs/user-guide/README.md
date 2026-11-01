@@ -207,3 +207,12 @@ troubleshooting and appearance, with a search box. Fields that often raise quest
 button: it opens a short explanation that closes with Escape and links to the matching guide
 (`options.html#help/<article>`). The help is bundled with the extension and makes no network
 requests.
+
+### Writing patterns
+
+The **?** next to **Regular expression** in the rule editor shows a cheat sheet of the most useful
+building blocks with examples, and Help → **Regular expression basics** explains them in more
+detail. **Flags** are two switches: **Ignore case (i)** (on by default, because hostnames are
+case-insensitive) and **Multiline (m)**, which URLs never need. The **Test** tab lists every sample
+URL with a Match, No match or Error badge next to it and, when the URL was normalized first, the
+exact text that was tested.
