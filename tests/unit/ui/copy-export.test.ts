@@ -2,6 +2,7 @@ import { message, runtimeMessages, runtimeState, setRuntimeResponder } from './s
 
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { nextTick } from 'vue'
 
 import { confirmController } from '../../../src/ui/confirm/confirm-controller'
 import ImportExportSection from '../../../src/ui/options/ImportExportSection.vue'
@@ -45,6 +46,15 @@ afterEach(() => {
   if (confirmController.pending.value !== null) confirmController.answer(false)
 })
 
+const menuItem = async (wrapper: VueWrapper, cardIndex: number, text: string) => {
+  const card = wrapper.findAll('article.profile-card')[cardIndex]!
+  await card.get('button[aria-haspopup="menu"]').trigger('click')
+  await nextTick()
+  const item = card.findAll('[role="menuitem"]').find((candidate) => candidate.text() === text)
+  if (item === undefined) throw new Error(`Menu item not found: ${text}`)
+  return item
+}
+
 const button = (wrapper: VueWrapper, text: string, index = 0) => {
   const found = wrapper.findAll('button').filter((candidate) => candidate.text() === text)[index]
   if (found === undefined) throw new Error(`Button not found: ${text}`)
@@ -59,7 +69,7 @@ describe('copy profile as text', () => {
 
   it('copies a URL with credentials and says that it contains a password', async () => {
     const wrapper = mountProfiles()
-    await button(wrapper, message('copyAsUrl')).trigger('click')
+    await (await menuItem(wrapper, 0, message('copyUrl'))).trigger('click')
     await flushPromises()
     expect(writeText).toHaveBeenCalledWith('http://bob:pw@192.0.2.1:8080')
     expect(wrapper.emitted('status')?.[0]).toEqual([message('copiedWithPassword')])
@@ -67,8 +77,8 @@ describe('copy profile as text', () => {
 
   it('copies curl and compact forms', async () => {
     const wrapper = mountProfiles()
-    await button(wrapper, message('copyAsCurl')).trigger('click')
-    await button(wrapper, message('copyAsCompact')).trigger('click')
+    await (await menuItem(wrapper, 0, message('copyCurl'))).trigger('click')
+    await (await menuItem(wrapper, 0, message('copyCompact'))).trigger('click')
     await flushPromises()
     expect(writeText.mock.calls.map(([text]) => text)).toEqual([
       `curl -x 'http://bob:pw@192.0.2.1:8080' '${office.checkUrl}'`,
@@ -78,7 +88,7 @@ describe('copy profile as text', () => {
 
   it('reports plain Copied for a profile without credentials and copies all as URLs', async () => {
     const wrapper = mountProfiles()
-    await button(wrapper, message('copyAsUrl'), 1).trigger('click')
+    await (await menuItem(wrapper, 1, message('copyUrl'))).trigger('click')
     await flushPromises()
     expect(wrapper.emitted('status')?.[0]).toEqual([message('copied')])
 
@@ -92,7 +102,7 @@ describe('copy profile as text', () => {
   it('reports a failed clipboard write as an error', async () => {
     writeText.mockRejectedValueOnce(new Error('denied'))
     const wrapper = mountProfiles()
-    await button(wrapper, message('copyAsUrl')).trigger('click')
+    await (await menuItem(wrapper, 0, message('copyUrl'))).trigger('click')
     await flushPromises()
     expect(wrapper.emitted('status')?.[0]).toEqual([message('copyFailed'), true])
   })

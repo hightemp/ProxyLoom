@@ -185,10 +185,12 @@ test('duplicates a profile and safely invalidates referring routes when deleting
     .locator('.profile-card')
     .filter({ hasText: 'Impact proxy' })
     .first()
-  await original.getByRole('button', { name: 'Duplicate' }).click()
+  await original.getByRole('button', { name: 'More actions for Impact proxy' }).click()
+  await original.getByRole('menuitem', { name: 'Duplicate' }).click()
   await expect(extensionPage.getByRole('heading', { name: 'Impact proxy copy' })).toBeVisible()
 
-  await original.getByRole('button', { name: 'Delete' }).click()
+  await original.getByRole('button', { name: 'More actions for Impact proxy' }).click()
+  await original.getByRole('menuitem', { name: 'Delete' }).click()
   await acceptConfirm(extensionPage)
   await expect(
     extensionPage.getByRole('heading', { name: 'Impact proxy', exact: true }),

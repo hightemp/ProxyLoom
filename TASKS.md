@@ -1702,7 +1702,7 @@
   - **Тесты:** popup component tests, E2E core-ui/accessibility.
   - **Готово, когда:** unit/E2E/typecheck/lint/dual builds зелёные, version 0.1.14/docs обновлены.
 
-- [ ] **PL-149 — Редизайн раздела Proxies**
+- [x] **PL-149 — Редизайн раздела Proxies**
   - **Цель:** компактные карточки профилей и редактор в drawer.
   - **Требования:** FR-002, FR-041–FR-045, NFR-007–NFR-010.
   - **Действия:** `ProfileChip`, transport badge, выровненные endpoints без пароля, `Used by N

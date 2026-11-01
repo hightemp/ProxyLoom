@@ -5,6 +5,7 @@ import { join } from 'node:path'
 
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import { afterEach, describe, expect, it } from 'vitest'
+import { nextTick } from 'vue'
 
 import { confirmController } from '../../../src/ui/confirm/confirm-controller'
 import GeneralSection from '../../../src/ui/options/GeneralSection.vue'
@@ -19,6 +20,15 @@ const sourceFiles = (directory: string): string[] =>
     if (statSync(path).isDirectory()) return sourceFiles(path)
     return /\.(?:vue|ts)$/u.test(name) ? [path] : []
   })
+
+const profileMenuItem = async (wrapper: VueWrapper, text: string) => {
+  const card = wrapper.get('article.profile-card')
+  await card.get('button[aria-haspopup="menu"]').trigger('click')
+  await nextTick()
+  const item = card.findAll('[role="menuitem"]').find((candidate) => candidate.text() === text)
+  if (item === undefined) throw new Error(`Menu item not found: ${text}`)
+  return item
+}
 
 const buttonByText = (wrapper: VueWrapper, text: string) => {
   const button = wrapper.findAll('button').find((candidate) => candidate.text() === text)
@@ -50,7 +60,7 @@ describe('confirmation call sites', () => {
       },
     })
 
-    await buttonByText(wrapper, message('delete')).trigger('click')
+    await (await profileMenuItem(wrapper, message('delete'))).trigger('click')
     expect(confirmController.pending.value?.tone).toBe('danger')
     expect(confirmController.pending.value?.message).toContain('Office')
     expect(wrapper.emitted('command')).toBeUndefined()
@@ -82,7 +92,7 @@ describe('confirmation call sites', () => {
       },
     })
 
-    await buttonByText(wrapper, message('delete')).trigger('click')
+    await (await profileMenuItem(wrapper, message('delete'))).trigger('click')
     await flushPromises()
     expect(confirmController.pending.value).toBeNull()
     expect(wrapper.emitted('command')?.[0]?.[0]).toMatchObject({ type: 'DELETE_PROFILE' })

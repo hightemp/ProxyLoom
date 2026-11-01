@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, shallowRef, useId, watch } from 'vue'
+import { onMounted, shallowRef, useId, watch } from 'vue'
 
 import { t } from '../../i18n/messages'
 
@@ -12,17 +12,17 @@ const emit = defineEmits<{ close: [] }>()
 const dialog = shallowRef<HTMLDialogElement | null>(null)
 const titleId = useId()
 
-watch(
-  () => props.open,
-  async (open) => {
-    await nextTick()
-    const element = dialog.value
-    if (!open || element === null || element.open) return
-    if (typeof element.showModal === 'function') element.showModal()
-    else element.setAttribute('open', '')
-  },
-  { immediate: true },
-)
+// Open right after the DOM patch so a later nextTick focus by the parent (e.g. the first field)
+// is not overridden by the dialog's own initial focus.
+const openDialog = (): void => {
+  const element = dialog.value
+  if (!props.open || element === null || element.open) return
+  if (typeof element.showModal === 'function') element.showModal()
+  else element.setAttribute('open', '')
+}
+
+onMounted(openDialog)
+watch(() => props.open, openDialog, { flush: 'post' })
 
 const onKeydown = (event: KeyboardEvent): void => {
   if (event.key === 'Escape') {

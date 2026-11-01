@@ -138,10 +138,12 @@ test('copies a profile as URL and curl to the clipboard', async ({ extensionPage
   const copied = () =>
     extensionPage.evaluate(() => (globalThis as unknown as { copied: string[] }).copied)
   const card = extensionPage.locator('.profile-card').filter({ hasText: '192.0.2.30:3128' })
-  await card.getByText('Copy as').click()
-  await card.getByRole('button', { name: 'URL', exact: true }).click()
+  const menu = card.getByRole('button', { name: /^More actions for/ })
+  await menu.click()
+  await card.getByRole('menuitem', { name: 'Copy URL' }).click()
   await expect(extensionPage.getByRole('status')).toContainText('contains the proxy password')
-  await card.getByRole('button', { name: 'curl', exact: true }).click()
+  await menu.click()
+  await card.getByRole('menuitem', { name: 'Copy curl command' }).click()
   await expect
     .poll(copied)
     .toEqual([

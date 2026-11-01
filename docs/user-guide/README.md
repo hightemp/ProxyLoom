@@ -15,6 +15,11 @@ after filling.
 Usernames and passwords are optional. They remain in browser-managed extension local storage and
 are not protected by a ProxyLoom master password.
 
+Each profile card shows its color, name and short name, the endpoint(s) with protocol and
+username (never the password), how many rules use it and the last check result. **Use globally**
+and **Check** are on the card; **⋯** holds Edit, Duplicate, the copy actions and Delete. The
+editor opens in a side panel; closing it returns focus to where you started.
+
 Above the profile cards, search by name or host and filter by protocol or last check result; the
 list shows how many profiles match. Select profiles with their checkboxes or **Select all shown**,
 then **Check selected** runs manual checks one at a time (with **Stop**), and **Delete selected**

@@ -110,7 +110,7 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onDocumentPoin
   right: 0;
   z-index: 10;
   display: grid;
-  min-width: 190px;
+  min-width: 240px;
   padding: 6px;
   border: 1px solid var(--color-border);
   border-radius: 10px;

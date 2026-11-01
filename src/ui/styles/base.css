@@ -403,22 +403,6 @@ small,
   gap: 14px;
 }
 
-.profile-title {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.profile-title div {
-  display: grid;
-  flex: 1;
-}
-
-.profile-title h3,
-.profile-title small {
-  margin: 0;
-}
-
 .color-dot {
   width: 14px;
   height: 14px;
@@ -427,32 +411,27 @@ small,
   box-shadow: 0 0 0 1px var(--color-border);
 }
 
-.compact-dl,
 .diagnostics-grid {
   display: grid;
   gap: 8px;
   margin: 0;
 }
 
-.compact-dl div,
 .diagnostics-grid div {
   display: flex;
   justify-content: space-between;
   gap: 18px;
 }
 
-.compact-dl dt,
 .diagnostics-grid dt {
   color: var(--color-muted);
 }
 
-.compact-dl dd,
 .diagnostics-grid dd {
   margin: 0;
   text-align: right;
 }
 
-.check-result,
 .route-result,
 .preview-box {
   display: grid;
@@ -461,10 +440,6 @@ small,
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-bg);
-}
-
-.check-result.success {
-  border-color: var(--color-success);
 }
 
 .endpoint-fieldset,
