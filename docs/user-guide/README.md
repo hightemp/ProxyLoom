@@ -76,6 +76,10 @@ you can:
   removes the override;
 - **Remove** it.
 
+The popup also shows the Once overrides that cover the current site, including ones created in
+another tab (Chromium), with a route selector, **Make permanent** and **Remove**. When the current
+tab already has a Once override, the **Once** button reads **Update Once** and replaces it.
+
 **Clear all** removes every override of the session. Overrides created in a private window are not
 shown on the normal settings page; manage them from the popup of a private window. When a proxy
 profile is deleted, Once overrides that used it are removed and counted in About / Diagnostics.

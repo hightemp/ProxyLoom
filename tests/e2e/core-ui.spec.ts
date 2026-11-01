@@ -368,6 +368,9 @@ test('creates Once and Always routes from the real action popup and opens the ma
   await popup.getByRole('button', { name: 'Once' }).click()
   await acceptConfirm(popup)
   await expect(popup.locator('.current-site small')).toContainText('Direct · Once override')
+  const siteOverrides = popup.getByRole('region', { name: 'Once overrides for this site' })
+  await expect(siteOverrides).toContainText('popup.proxyloom.test')
+  await expect(popup.getByRole('button', { name: 'Update Once' })).toBeVisible()
 
   const sessionState = await extensionPage.evaluate(async () => {
     const extensionApi = (
@@ -391,6 +394,11 @@ test('creates Once and Always routes from the real action popup and opens the ma
       sourceTabId: expect.any(Number),
     },
   ])
+
+  await siteOverrides.getByRole('button', { name: 'Remove' }).click()
+  await expect(siteOverrides).toHaveCount(0)
+  await expect(popup.locator('.current-site small')).toContainText('Direct · No rule matched')
+  await expect(popup.getByRole('button', { name: 'Once', exact: true })).toBeVisible()
 
   await popup.close()
   await extensionPage.evaluate(() =>

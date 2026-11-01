@@ -1408,5 +1408,25 @@
         "content": "$1"
       }
     }
+  },
+  "activeForThisSite": {
+    "message": "Once overrides for this site"
+  },
+  "fromAnotherTab": {
+    "message": "from another tab"
+  },
+  "manageAllOverrides": {
+    "message": "Manage all"
+  },
+  "updateOnce": {
+    "message": "Update Once"
+  },
+  "routeFor": {
+    "message": "Route for $SITE$",
+    "placeholders": {
+      "site": {
+        "content": "$1"
+      }
+    }
   }
 }

@@ -1534,7 +1534,7 @@
   - **Тесты:** component tests, Chromium E2E create Once → edit → promote → remove.
   - **Готово, когда:** E2E/typecheck/lint/dual builds зелёные, version 0.1.8/docs обновлены.
 
-- [ ] **PL-137 — Оверрайды текущего сайта в popup**
+- [x] **PL-137 — Оверрайды текущего сайта в popup**
   - **Цель:** видеть и менять Once прямо из popup.
   - **Требования:** FR-004, FR-005, FR-050–FR-052, COMPAT-009, NFR-012.
   - **Действия:** блок «Active for this site» (вкл. Chromium оверрайды из других вкладок того же

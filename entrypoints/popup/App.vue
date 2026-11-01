@@ -6,7 +6,9 @@ import { asProxyProfileId } from '../../src/domain/types/brand'
 import type { OverrideScope, RuleAction } from '../../src/domain/types/entities'
 import { t } from '../../src/i18n/messages'
 import type { OverridePreview } from '../../src/application/overrides/override-service'
+import { overridesForSite } from '../../src/application/overrides/site-overrides'
 import ConfirmDialog from '../../src/ui/components/ConfirmDialog.vue'
+import SiteOverrides from '../../src/ui/popup/SiteOverrides.vue'
 import { confirmController } from '../../src/ui/confirm/confirm-controller'
 import {
   decisionActionLabel,
@@ -51,6 +53,14 @@ const matchedRuleName = computed(() => {
   return (
     state.value?.config.rules.find((rule) => rule.id === current.decision.matchedRuleId)?.name ??
     t('missingRule')
+  )
+})
+
+const hasOwnOverride = computed(() => {
+  const current = inspection.value
+  if (state.value === null || current === null || !current.supported) return false
+  return overridesForSite(state.value.overrides, current.hostname).some(
+    (override) => override.sourceTabId === state.value?.activeTabId,
   )
 })
 
@@ -200,6 +210,17 @@ onMounted(() => {
         </template>
       </section>
 
+      <SiteOverrides
+        v-if="inspection?.supported"
+        :overrides="state.overrides"
+        :hostname="inspection.hostname"
+        :active-tab-id="state.activeTabId"
+        :profiles="state.config.profiles"
+        :busy="busy"
+        :tab-id="requestedTabId"
+        @command="execute"
+      />
+
       <section class="site-actions" :aria-disabled="!inspection?.supported">
         <div class="form-grid">
           <label>
@@ -232,7 +253,7 @@ onMounted(() => {
             :disabled="busy || !inspection?.supported"
             @click="siteAction(false)"
           >
-            {{ t('once') }}
+            {{ hasOwnOverride ? t('updateOnce') : t('once') }}
           </button>
           <button
             type="button"
