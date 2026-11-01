@@ -1609,7 +1609,7 @@
   - **Готово, когда:** unit/integration/E2E/typecheck/lint/dual builds зелёные, version 0.1.11/docs
     обновлены.
 
-- [ ] **PL-142 — Поиск, фильтр и групповые действия профилей**
+- [x] **PL-142 — Поиск, фильтр и групповые действия профилей**
   - **Цель:** управлять сотнями профилей после bulk import.
   - **Требования:** FR-002, FR-035, FR-045, NFR-007.
   - **Действия:** поиск name/host, фильтр transport/last check, multi-select `Delete selected` с

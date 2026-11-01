@@ -15,6 +15,11 @@ after filling.
 Usernames and passwords are optional. They remain in browser-managed extension local storage and
 are not protected by a ProxyLoom master password.
 
+Above the profile cards, search by name or host and filter by protocol or last check result; the
+list shows how many profiles match. Select profiles with their checkboxes or **Select all shown**,
+then **Check selected** runs manual checks one at a time (with **Stop**), and **Delete selected**
+removes them in one step after an impact preview.
+
 **Check** sends one disclosed request to the profile's Check URL through that profile. ProxyLoom
 opens a temporary inactive tab, reads only the bounded JSON response, closes it, and restores the
 previous route. The check endpoint receives the proxy egress IP. Cancel is available while the

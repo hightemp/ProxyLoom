@@ -1645,5 +1645,91 @@
         "content": "$1"
       }
     }
+  },
+  "searchProfiles": {
+    "message": "Search name or host"
+  },
+  "filterLastCheck": {
+    "message": "Last check"
+  },
+  "neverChecked": {
+    "message": "Never checked"
+  },
+  "showingCount": {
+    "message": "Showing $SHOWN$ of $TOTAL$",
+    "placeholders": {
+      "shown": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "selectAllShown": {
+    "message": "Select all shown"
+  },
+  "clearSelection": {
+    "message": "Clear selection"
+  },
+  "deleteSelected": {
+    "message": "Delete selected ($COUNT$)",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "checkSelected": {
+    "message": "Check selected ($COUNT$)",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "checkingProgress": {
+    "message": "Checking $DONE$ of $TOTAL$…",
+    "placeholders": {
+      "done": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "stopChecks": {
+    "message": "Stop"
+  },
+  "deleteProfilesTitle": {
+    "message": "Delete $COUNT$ proxy profiles?",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteProfilesMessage": {
+    "message": "The selected profiles are removed. This cannot be undone."
+  },
+  "bulkCheckMessage": {
+    "message": "Check $COUNT$ selected profiles one at a time? Each sends one request to its check URL through that profile.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "selectProfileNamed": {
+    "message": "Select $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "noMatchingProfiles": {
+    "message": "No profiles match the search and filters."
   }
 }

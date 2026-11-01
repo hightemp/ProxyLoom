@@ -100,6 +100,7 @@ export type RuntimeRequest =
       readonly profileId: string
       readonly confirmed: boolean
     }
+  | { readonly type: 'DELETE_PROFILES'; readonly profileIds: readonly string[] }
   | {
       readonly type: 'SAVE_RULE'
       readonly ruleId: string | null

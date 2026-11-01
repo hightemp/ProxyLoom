@@ -1,4 +1,4 @@
-import { expect, test } from './fixtures/extension'
+import { acceptConfirm, expect, test } from './fixtures/extension'
 
 interface ExtensionApi {
   readonly storage: {
@@ -149,4 +149,36 @@ test('copies a profile as URL and curl to the clipboard', async ({ extensionPage
       `curl -x 'http://dave:it'\\''s@192.0.2.30:3128' 'https://api.country.is/'`,
     ])
   await expect(extensionPage.getByRole('status')).not.toContainText('Could not copy')
+})
+
+test('handles 500 profiles with search, select all shown and bulk delete', async ({
+  extensionPage,
+}) => {
+  await extensionPage.evaluate(async () => {
+    const api = (globalThis as unknown as { chrome: ExtensionApi }).chrome
+    await api.storage.session.clear()
+    await api.storage.local.clear()
+  })
+  await extensionPage.reload()
+  await extensionPage.getByRole('button', { name: /^Proxies/ }).click()
+  await extensionPage.getByRole('button', { name: 'Import from text' }).click()
+  const lines = Array.from(
+    { length: 500 },
+    (_, index) => `10.1.${Math.floor(index / 100)}.${(index % 100) + 1}:8080`,
+  ).join('\n')
+  const panel = extensionPage.getByRole('region', { name: 'Import from text' })
+  await panel.getByLabel('Proxy lines').fill(lines)
+  const started = Date.now()
+  await panel.getByRole('button', { name: 'Import (500)' }).click()
+  await expect(extensionPage.getByText('Showing 500 of 500')).toBeVisible()
+  expect(Date.now() - started).toBeLessThan(5_000)
+
+  await extensionPage.getByLabel('Search name or host').fill('10.1.4.')
+  await expect(extensionPage.getByText('Showing 100 of 500')).toBeVisible()
+  await extensionPage.getByRole('button', { name: 'Select all shown' }).click()
+  await extensionPage.getByRole('button', { name: 'Delete selected (100)' }).click()
+  await acceptConfirm(extensionPage)
+  await expect(extensionPage.getByText('Showing 0 of 400')).toBeVisible()
+  await extensionPage.getByLabel('Search name or host').fill('')
+  await expect(extensionPage.getByText('Showing 400 of 400')).toBeVisible()
 })

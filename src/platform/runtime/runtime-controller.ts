@@ -209,6 +209,10 @@ export class RuntimeController {
           return this.mutate((config) =>
             this.#profiles.delete(config, asProxyProfileId(request.profileId), request.confirmed),
           )
+        case 'DELETE_PROFILES':
+          return this.mutate((config) =>
+            this.#profiles.deleteMany(config, request.profileIds.map(asProxyProfileId)),
+          )
         case 'SAVE_RULE':
           return this.mutate((config) =>
             request.ruleId === null

@@ -137,6 +137,20 @@ export class ProfileApplicationService {
     }
   }
 
+  /** Deletes every selected profile in one config change, or none if any is missing. */
+  deleteMany(
+    config: AppConfig,
+    profileIds: readonly ProxyProfileId[],
+  ): Result<{ config: AppConfig; deleted: number }, ProfileCommandError> {
+    let current = config
+    for (const profileId of new Set(profileIds)) {
+      const deleted = this.delete(current, profileId, true)
+      if (!deleted.ok) return deleted
+      current = deleted.value.config
+    }
+    return ok({ config: current, deleted: config.profiles.length - current.profiles.length })
+  }
+
   delete(
     config: AppConfig,
     profileId: ProxyProfileId,

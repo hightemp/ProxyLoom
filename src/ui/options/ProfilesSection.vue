@@ -12,6 +12,8 @@ import {
 } from '../../domain/profiles/proxy-format'
 import { parseProxyString, type ParsedProxyString } from '../../domain/profiles/proxy-string'
 import { copyText } from '../clipboard'
+import { runtimeClient } from '../runtime/client'
+import { filterProfiles, type ProfileFilter } from '../../application/profiles/profile-filter'
 import { checkErrorLabel, proxyStringErrorLabel } from '../labels'
 import ProxyLineImportPanel from './ProxyLineImportPanel.vue'
 
@@ -26,6 +28,84 @@ const emit = defineEmits<{
 }>()
 
 const importOpen = shallowRef(false)
+const filter = reactive<ProfileFilter>({ check: 'ALL', query: '', transport: 'ALL' })
+const selectedIds = shallowRef<ReadonlySet<string>>(new Set())
+const bulkProgress = shallowRef<{ readonly done: number; readonly total: number } | null>(null)
+let stopRequested = false
+
+const shownProfiles = computed(() => filterProfiles(props.state.config.profiles, filter))
+const selectedProfiles = computed(() =>
+  props.state.config.profiles.filter((profile) => selectedIds.value.has(profile.id)),
+)
+
+watch(
+  () => props.state.config.profiles,
+  (profiles) => {
+    const existing = new Set<string>(profiles.map((profile) => profile.id))
+    selectedIds.value = new Set([...selectedIds.value].filter((id) => existing.has(id)))
+  },
+)
+
+const toggleSelected = (profileId: string, selected: boolean): void => {
+  const next = new Set(selectedIds.value)
+  if (selected) next.add(profileId)
+  else next.delete(profileId)
+  selectedIds.value = next
+}
+
+const selectAllShown = (): void => {
+  selectedIds.value = new Set([
+    ...selectedIds.value,
+    ...shownProfiles.value.map((profile) => profile.id),
+  ])
+}
+
+const deleteSelected = async (): Promise<void> => {
+  const ids = new Set(selectedProfiles.value.map((profile) => profile.id))
+  const affectedRules = props.state.config.rules.filter(
+    (rule) =>
+      rule.action.targetProxyProfileId !== null && ids.has(rule.action.targetProxyProfileId),
+  ).length
+  const activeId = props.state.config.general.activeProxyProfileId
+  const details = [
+    activeId !== null && ids.has(activeId) ? t('deleteProfileImpactGlobal') : '',
+    affectedRules > 0 ? t('deleteProfileImpactRules', String(affectedRules)) : '',
+  ].filter(Boolean)
+  const confirmed = await confirmController.destructive(
+    {
+      confirmLabel: t('delete'),
+      details,
+      message: t('deleteProfilesMessage'),
+      title: t('deleteProfilesTitle', String(ids.size)),
+    },
+    props.state.config.general.confirmDangerousActions,
+  )
+  if (confirmed) emit('command', { profileIds: [...ids], type: 'DELETE_PROFILES' })
+}
+
+const checkSelected = async (): Promise<void> => {
+  const profiles = selectedProfiles.value
+  const confirmed = await confirmController.request({
+    confirmLabel: t('runCheck'),
+    details: [t('manualCheckDisclosure')],
+    message: t('bulkCheckMessage', String(profiles.length)),
+    title: t('manualCheckTitle'),
+  })
+  if (!confirmed) return
+  stopRequested = false
+  for (const [index, profile] of profiles.entries()) {
+    if (stopRequested) break
+    bulkProgress.value = { done: index + 1, total: profiles.length }
+    await runtimeClient.command({ profileId: profile.id, type: 'CHECK_PROFILE' })
+  }
+  bulkProgress.value = null
+  emit('refresh')
+}
+
+const stopChecks = (): void => {
+  stopRequested = true
+  void runtimeClient.command({ type: 'CANCEL_PROXY_CHECK' })
+}
 const pasteText = shallowRef('')
 const pasteError = shallowRef('')
 const pasteChoices = shallowRef<readonly [ParsedProxyString, ParsedProxyString] | null>(null)
@@ -313,13 +393,85 @@ watch(() => props.busy, restoreFocus)
       <p>{{ t('noProxyProfilesDescription') }}</p>
     </div>
 
-    <div v-else class="card-grid">
-      <article
-        v-for="profile in state.config.profiles"
-        :key="profile.id"
-        class="surface card profile-card"
-      >
+    <div v-else class="surface card stack profile-toolbar">
+      <div class="filter-grid">
+        <label>
+          {{ t('searchProfiles') }}
+          <input v-model="filter.query" type="search" autocomplete="off" />
+        </label>
+        <label>
+          {{ t('transport') }}
+          <select v-model="filter.transport" name="profile-transport-filter">
+            <option value="ALL">{{ t('all') }}</option>
+            <option value="HTTP">{{ t('proxyInfoHttp') }}</option>
+            <option value="HTTPS">{{ t('proxyInfoHttps') }}</option>
+          </select>
+        </label>
+        <label>
+          {{ t('filterLastCheck') }}
+          <select v-model="filter.check" name="profile-check-filter">
+            <option value="ALL">{{ t('all') }}</option>
+            <option value="AVAILABLE">{{ t('available') }}</option>
+            <option value="UNAVAILABLE">{{ t('unavailable') }}</option>
+            <option value="NEVER">{{ t('neverChecked') }}</option>
+          </select>
+        </label>
+      </div>
+      <div class="button-row">
+        <span aria-live="polite">
+          {{
+            t('showingCount', [String(shownProfiles.length), String(state.config.profiles.length)])
+          }}
+        </span>
+        <button type="button" :disabled="shownProfiles.length === 0" @click="selectAllShown">
+          {{ t('selectAllShown') }}
+        </button>
+        <template v-if="selectedIds.size > 0">
+          <button type="button" @click="selectedIds = new Set()">
+            {{ t('clearSelection') }}
+          </button>
+          <button
+            type="button"
+            :disabled="busy || bulkProgress !== null"
+            @click="void checkSelected()"
+          >
+            {{ t('checkSelected', String(selectedIds.size)) }}
+          </button>
+          <button
+            class="danger-text"
+            type="button"
+            :disabled="busy || bulkProgress !== null"
+            @click="void deleteSelected()"
+          >
+            {{ t('deleteSelected', String(selectedIds.size)) }}
+          </button>
+        </template>
+      </div>
+      <p v-if="bulkProgress" class="notice" role="status">
+        {{ t('checkingProgress', [String(bulkProgress.done), String(bulkProgress.total)]) }}
+        <button type="button" @click="stopChecks">
+          {{ t('stopChecks') }}
+        </button>
+      </p>
+    </div>
+
+    <div
+      v-if="state.config.profiles.length > 0 && shownProfiles.length === 0"
+      class="surface empty-state"
+    >
+      <p>{{ t('noMatchingProfiles') }}</p>
+    </div>
+
+    <div v-if="shownProfiles.length > 0" class="card-grid">
+      <article v-for="profile in shownProfiles" :key="profile.id" class="surface card profile-card">
         <div class="profile-title">
+          <input
+            type="checkbox"
+            name="profile-select"
+            :checked="selectedIds.has(profile.id)"
+            :aria-label="t('selectProfileNamed', profile.name)"
+            @change="toggleSelected(profile.id, ($event.target as HTMLInputElement).checked)"
+          />
           <span class="color-dot" :style="{ backgroundColor: profile.color }" aria-hidden="true" />
           <div>
             <h3>{{ profile.name }}</h3>
@@ -587,6 +739,14 @@ watch(() => props.busy, restoreFocus)
 </template>
 
 <style scoped>
+.profile-title input[type='checkbox'] {
+  width: 18px;
+  min-height: 18px;
+  height: 18px;
+  flex: none;
+  margin: 0;
+}
+
 .paste-row {
   display: grid;
   grid-template-columns: 1fr auto;
