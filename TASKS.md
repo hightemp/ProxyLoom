@@ -1908,6 +1908,21 @@ rules`, compact check pill; `Use globally`/`Check` + «⋯» (Edit, Duplicate, C
     использует `docs/release-notes/<tag>.md`, если файл есть, иначе `--generate-notes`.
   - **Готово, когда:** локально проходят все шаги release workflow, version 0.1.34.
 
+- [x] **PL-168 — Небезопасный host прокси не попадает в routing**
+  - **Цель:** закрыть найденный в PL-144 путь к скрытому `DIRECT`: native import принимал любой
+    host (`127.0.0.1:1; DIRECT`, `user:pass@host`, пробелы), а UI сохранял host с пробелами по
+    краям; такая строка попадала в PAC directive, которую Chromium отбрасывает и идёт `DIRECT`.
+  - **Требования:** FR-006, FR-075, SEC-004.
+  - **Действия:** `isRoutableEndpoint` в domain; `buildRoutingSnapshot` возвращает
+    `PROFILE_INVALID` для профиля с небезопасным effective endpoint (оба адаптера, apply
+    fail-closed, последняя применённая конфигурация остаётся); native import schema проверяет host
+    общим `isValidProxyHost`; profile create/update сохраняют trimmed host.
+  - **Тесты:** `tests/unit/domain/unsafe-endpoint.test.ts` (15 красных до изменения: import,
+    snapshot, trim), unit/parity.
+  - **Миграции/permissions/privacy:** нет; ранее сохранённый небезопасный профиль больше не
+    применяется и показывает ошибку профиля.
+  - **Готово, когда:** unit/parity/dual builds зелёные, version 0.1.36.
+
 ---
 
 # Release checklist

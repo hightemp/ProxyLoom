@@ -1,4 +1,8 @@
-import { generateShortName, validateProxyProfile } from '../../domain/profiles/profile'
+import {
+  generateShortName,
+  normalizeProfileEndpoints,
+  validateProxyProfile,
+} from '../../domain/profiles/profile'
 import {
   asIsoTimestamp,
   asProxyProfileId,
@@ -49,7 +53,7 @@ export class ProfileApplicationService {
   ): Result<{ config: AppConfig; profile: ProxyProfile }, ProfileCommandError> {
     const timestamp = asIsoTimestamp(this.clock.now().toISOString())
     const draft: ProxyProfile = {
-      ...input,
+      ...normalizeProfileEndpoints(input),
       createdAt: timestamp,
       generatedShortName: generateShortName(input.name, generatedNames(config)),
       id: asProxyProfileId('pending-profile'),
@@ -85,7 +89,7 @@ export class ProfileApplicationService {
     }
     const candidate: ProxyProfile = {
       ...current,
-      ...input,
+      ...normalizeProfileEndpoints(input),
       generatedShortName: generateShortName(input.name, generatedNames(config, profileId)),
       updatedAt: asIsoTimestamp(this.clock.now().toISOString()),
     }

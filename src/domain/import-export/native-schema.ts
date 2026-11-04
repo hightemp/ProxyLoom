@@ -5,6 +5,7 @@ import { err, ok, type Result } from '../types/result'
 import { addAppearanceAccentFromVersionThree } from '../config/accent-migration'
 import { addSpeedTestFromVersionFour } from '../config/speed-migration'
 import { parseAppConfig } from '../config/schema'
+import { isValidProxyHost } from '../profiles/profile'
 import {
   removeGroupsFromVersionOne,
   upgradeLegacyExamplesFromVersionTwo,
@@ -17,7 +18,7 @@ export { MAX_IMPORT_BYTES, MAX_IMPORT_DEPTH } from './safe-json'
 
 const endpointSchema = z
   .object({
-    host: z.string().min(1).max(253),
+    host: z.string().min(1).max(253).refine(isValidProxyHost),
     password: z.string().max(4_096).optional(),
     port: z.number().int().min(1).max(65_535),
     transport: z.enum(['HTTP', 'HTTPS']),

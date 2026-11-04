@@ -7,6 +7,7 @@ import type {
 } from '../types/entities'
 import type { ProxyProfileId } from '../types/brand'
 import { err, ok, type Result } from '../types/result'
+import { isRoutableEndpoint } from '../profiles/profile'
 import { sortRules } from '../rules/order'
 
 export interface RoutingSnapshot {
@@ -20,7 +21,7 @@ export interface RoutingSnapshot {
 }
 
 export interface SnapshotBuildError {
-  readonly code: 'ACTIVE_PROFILE_REQUIRED' | 'ACTIVE_PROFILE_NOT_FOUND'
+  readonly code: 'ACTIVE_PROFILE_REQUIRED' | 'ACTIVE_PROFILE_NOT_FOUND' | 'PROFILE_INVALID'
   readonly profileId: ProxyProfileId | null
 }
 
@@ -64,6 +65,17 @@ export const buildRoutingSnapshot = (
       code: 'ACTIVE_PROFILE_NOT_FOUND',
       profileId: activeProfileId,
     })
+  }
+
+  // Only validated hosts may reach a PAC directive or ProxyInfo: a stored value such as
+  // `host:1; DIRECT` or `user:pass@host` would otherwise create a hidden DIRECT fallback.
+  const unsafeProfile = config.profiles.find(
+    (profile) =>
+      !isRoutableEndpoint(profile.httpEndpoint) ||
+      (!profile.useSameProxy && !isRoutableEndpoint(profile.httpsEndpoint)),
+  )
+  if (unsafeProfile !== undefined) {
+    return err({ code: 'PROFILE_INVALID', profileId: unsafeProfile.id })
   }
 
   const rules = sortRules(config.rules).map((rule) => {

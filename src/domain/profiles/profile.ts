@@ -6,6 +6,27 @@ const HOST_PATTERN =
 /** The one host validation shared by profile validation and proxy-string parsing. */
 export const isValidProxyHost = (host: string): boolean => HOST_PATTERN.test(host)
 
+/**
+ * True when the endpoint can be emitted into a PAC directive or a Firefox ProxyInfo as is: a bare
+ * host (no padding, port, userinfo or separators) and a TCP port.
+ */
+export const isRoutableEndpoint = (endpoint: Pick<ProxyEndpoint, 'host' | 'port'>): boolean =>
+  HOST_PATTERN.test(endpoint.host) &&
+  Number.isInteger(endpoint.port) &&
+  endpoint.port >= 1 &&
+  endpoint.port <= 65_535
+
+/** Trims user-typed host padding so the stored host is exactly what routing emits. */
+export const normalizeProfileEndpoints = <
+  T extends Pick<ProxyProfile, 'httpEndpoint' | 'httpsEndpoint'>,
+>(
+  profile: T,
+): T => ({
+  ...profile,
+  httpEndpoint: { ...profile.httpEndpoint, host: profile.httpEndpoint.host.trim() },
+  httpsEndpoint: { ...profile.httpsEndpoint, host: profile.httpsEndpoint.host.trim() },
+})
+
 const COLOR_PATTERN = /^#[0-9a-f]{6}$/i
 const SHORT_NAME_PATTERN = /^[a-z0-9]{1,3}$/i
 
@@ -26,11 +47,10 @@ const validateEndpoint = (
   endpoint: ProxyEndpoint,
   fieldPrefix: string,
 ): ProfileValidationError | null => {
-  const host = endpoint.host.trim()
-  if (!HOST_PATTERN.test(host)) {
+  if (!HOST_PATTERN.test(endpoint.host.trim())) {
     return { code: 'HOST_INVALID', field: `${fieldPrefix}.host` }
   }
-  if (!Number.isInteger(endpoint.port) || endpoint.port < 1 || endpoint.port > 65_535) {
+  if (!isRoutableEndpoint({ host: endpoint.host.trim(), port: endpoint.port })) {
     return { code: 'PORT_INVALID', field: `${fieldPrefix}.port` }
   }
   return null
