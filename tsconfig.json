@@ -18,6 +18,7 @@
     "src/**/*.ts",
     "src/**/*.vue",
     "tests/**/*.ts",
+    "spikes/**/*.ts",
     "wxt.config.ts",
     "vitest.config.ts",
     "vitest.integration.config.ts",

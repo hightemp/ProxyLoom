@@ -1,0 +1,170 @@
+{
+  "api": "chrome.proxy.settings pac_script (mandatory) + webRequest.onAuthRequired asyncBlocking",
+  "browser": "Chromium-family: brave",
+  "observations": [
+    {
+      "expectation": "extension controls proxy settings with a SOCKS5 PAC",
+      "observed": {
+        "levelOfControl": "controlled_by_this_extension"
+      },
+      "pass": true,
+      "scenario": "apply-pac"
+    },
+    {
+      "expectation": "HTTP target loads through SOCKS5; host name sent unresolved (ATYP DOMAIN)",
+      "observed": {
+        "error": null,
+        "ok": true,
+        "connections": [
+          {
+            "addressType": "DOMAIN",
+            "authMethod": "NONE",
+            "authenticated": true,
+            "outcome": "TUNNELED",
+            "target": "remote.proxyloom.test:<http-origin-port>"
+          }
+        ]
+      },
+      "pass": true,
+      "scenario": "http-no-auth-remote-dns"
+    },
+    {
+      "expectation": "locally resolvable host is still sent as DOMAIN (no local DNS before SOCKS5)",
+      "observed": {
+        "error": null,
+        "ok": true,
+        "connections": [
+          {
+            "addressType": "DOMAIN",
+            "authMethod": "NONE",
+            "authenticated": true,
+            "outcome": "TUNNELED",
+            "target": "mapped.proxyloom.test:<http-origin-port>"
+          }
+        ]
+      },
+      "pass": true,
+      "scenario": "dns-mapped-host"
+    },
+    {
+      "expectation": "HTTPS target tunnels through SOCKS5",
+      "observed": {
+        "error": null,
+        "ok": true,
+        "connections": [
+          {
+            "addressType": "DOMAIN",
+            "authMethod": "NONE",
+            "authenticated": true,
+            "outcome": "TUNNELED",
+            "target": "remote.proxyloom.test:<https-origin-port>"
+          }
+        ]
+      },
+      "pass": true,
+      "scenario": "https-no-auth"
+    },
+    {
+      "expectation": "WS upgrade travels through SOCKS5",
+      "observed": {
+        "message": "origin-websocket",
+        "connections": [
+          {
+            "addressType": "DOMAIN",
+            "authMethod": "NONE",
+            "authenticated": true,
+            "outcome": "TUNNELED",
+            "target": "remote.proxyloom.test:<http-origin-port>"
+          }
+        ]
+      },
+      "pass": true,
+      "scenario": "ws"
+    },
+    {
+      "expectation": "WSS upgrade travels through SOCKS5",
+      "observed": {
+        "message": "secure-origin-websocket",
+        "connections": [
+          {
+            "addressType": "DOMAIN",
+            "authMethod": "NONE",
+            "authenticated": true,
+            "outcome": "TUNNELED",
+            "target": "remote.proxyloom.test:<https-origin-port>"
+          }
+        ]
+      },
+      "pass": true,
+      "scenario": "wss"
+    },
+    {
+      "expectation": "browser download on a fresh host goes through SOCKS5 with proxy-side DNS",
+      "observed": {
+        "body": "deterministic download",
+        "connections": [
+          {
+            "addressType": "DOMAIN",
+            "authMethod": "NONE",
+            "authenticated": true,
+            "outcome": "TUNNELED",
+            "target": "download.proxyloom.test:<http-origin-port>"
+          }
+        ]
+      },
+      "pass": true,
+      "scenario": "download"
+    },
+    {
+      "expectation": "Chromium offers only NO AUTH, never calls onAuthRequired, the request fails with no DIRECT fallback",
+      "observed": {
+        "error": "net::ERR_SOCKS_CONNECTION_FAILED",
+        "ok": false,
+        "challenges": [],
+        "connections": [
+          {
+            "addressType": null,
+            "authMethod": "NO_ACCEPTABLE",
+            "authenticated": false,
+            "outcome": "REJECTED",
+            "target": null
+          }
+        ],
+        "originReached": false
+      },
+      "pass": true,
+      "scenario": "auth-required"
+    },
+    {
+      "expectation": "NOT PORTABLE: userinfo in a PAC SOCKS5 directive is vendor-specific. Stock Chromium discards the directive and goes DIRECT even with mandatory PAC; Brave authenticates. The serializer must never emit userinfo; this scenario only records which variant ran.",
+      "observed": {
+        "error": null,
+        "ok": true,
+        "connections": [
+          {
+            "addressType": "DOMAIN",
+            "authMethod": "USERNAME_PASSWORD",
+            "authenticated": true,
+            "outcome": "TUNNELED",
+            "target": "mapped.proxyloom.test:<http-origin-port>"
+          }
+        ],
+        "originReached": true,
+        "variant": "AUTHENTICATED_THROUGH_PROXY"
+      },
+      "pass": true,
+      "scenario": "auth-inline-userinfo"
+    },
+    {
+      "expectation": "unreachable SOCKS5 endpoint fails the request without DIRECT fallback",
+      "observed": {
+        "error": "net::ERR_PROXY_CONNECTION_FAILED",
+        "ok": false,
+        "originReached": false
+      },
+      "pass": true,
+      "scenario": "unreachable-endpoint"
+    }
+  ],
+  "version": "155.0.0.0"
+}

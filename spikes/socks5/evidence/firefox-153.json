@@ -1,0 +1,236 @@
+{
+  "api": "proxy.onRequest ProxyInfo { type: 'socks', proxyDNS, username, password }",
+  "browser": "Firefox (Playwright build, WebDriver BiDi temporary install)",
+  "observations": [
+    {
+      "expectation": "HTTP target goes through SOCKS5 with proxyDNS: host sent as DOMAIN",
+      "observed": {
+        "report": {
+          "state": "loaded",
+          "error": null
+        },
+        "connections": [
+          {
+            "addressType": "DOMAIN",
+            "authMethod": "NONE",
+            "authenticated": true,
+            "outcome": "TUNNELED",
+            "target": "remote.proxyloom.test:<http-origin-port>"
+          },
+          {
+            "addressType": "DOMAIN",
+            "authMethod": "NONE",
+            "authenticated": true,
+            "outcome": "TUNNELED",
+            "target": "remote.proxyloom.test:<https-origin-port>"
+          }
+        ]
+      },
+      "pass": true,
+      "scenario": "http-proxy-dns"
+    },
+    {
+      "expectation": "proxyDNS: false resolves locally and sends ATYP IPV4",
+      "observed": {
+        "report": {
+          "state": "loaded",
+          "error": null
+        },
+        "ipv4Connections": [
+          {
+            "addressType": "IPV4",
+            "authMethod": "NONE",
+            "authenticated": true,
+            "outcome": "TUNNELED",
+            "target": "127.0.0.1:<http-origin-port>"
+          }
+        ]
+      },
+      "pass": true,
+      "scenario": "dns-proxydns-false"
+    },
+    {
+      "expectation": "HTTPS target tunnels through SOCKS5",
+      "observed": {
+        "report": {
+          "state": "loaded",
+          "error": null
+        },
+        "connections": [
+          {
+            "addressType": "DOMAIN",
+            "authMethod": "NONE",
+            "authenticated": true,
+            "outcome": "TUNNELED",
+            "target": "remote.proxyloom.test:<http-origin-port>"
+          },
+          {
+            "addressType": "DOMAIN",
+            "authMethod": "NONE",
+            "authenticated": true,
+            "outcome": "TUNNELED",
+            "target": "remote.proxyloom.test:<https-origin-port>"
+          }
+        ]
+      },
+      "pass": true,
+      "scenario": "https-proxy-dns"
+    },
+    {
+      "expectation": "ProxyInfo username/password authenticates with RFC 1929 without onAuthRequired",
+      "observed": {
+        "report": {
+          "state": "loaded",
+          "error": null
+        },
+        "connections": [
+          {
+            "addressType": "DOMAIN",
+            "authMethod": "USERNAME_PASSWORD",
+            "authenticated": true,
+            "outcome": "TUNNELED",
+            "target": "authok.proxyloom.test:<http-origin-port>"
+          }
+        ]
+      },
+      "pass": true,
+      "scenario": "auth-ok"
+    },
+    {
+      "expectation": "wrong password fails the request with no DIRECT fallback",
+      "observed": {
+        "report": {
+          "state": "loaded",
+          "error": "NS_ERROR_CONNECTION_REFUSED"
+        },
+        "rejectedHandshakes": [
+          "USERNAME_PASSWORD",
+          "NO_ACCEPTABLE"
+        ],
+        "originReached": false
+      },
+      "pass": true,
+      "scenario": "auth-wrong"
+    },
+    {
+      "expectation": "missing credentials for an auth-only SOCKS5 server fail with no DIRECT fallback",
+      "observed": {
+        "report": {
+          "state": "loaded",
+          "error": "NS_ERROR_CONNECTION_REFUSED"
+        },
+        "originReached": false
+      },
+      "pass": true,
+      "scenario": "auth-missing"
+    },
+    {
+      "expectation": "unreachable SOCKS5 endpoint fails with no DIRECT fallback (proxyType none)",
+      "observed": {
+        "report": {
+          "state": "loaded",
+          "error": "NS_ERROR_PROXY_CONNECTION_REFUSED"
+        },
+        "originReached": false
+      },
+      "pass": true,
+      "scenario": "unreachable-endpoint"
+    },
+    {
+      "expectation": "WS upgrade travels through SOCKS5",
+      "observed": {
+        "report": {
+          "message": "origin-websocket"
+        },
+        "connections": [
+          {
+            "addressType": "DOMAIN",
+            "authMethod": "NONE",
+            "authenticated": true,
+            "outcome": "TUNNELED",
+            "target": "ws.proxyloom.test:<http-origin-port>"
+          },
+          {
+            "addressType": "DOMAIN",
+            "authMethod": "NONE",
+            "authenticated": true,
+            "outcome": "TUNNELED",
+            "target": "ws.proxyloom.test:<http-origin-port>"
+          }
+        ]
+      },
+      "pass": true,
+      "scenario": "ws"
+    },
+    {
+      "expectation": "WSS upgrade travels through SOCKS5",
+      "observed": {
+        "report": {
+          "message": "secure-origin-websocket"
+        },
+        "connections": [
+          {
+            "addressType": "DOMAIN",
+            "authMethod": "NONE",
+            "authenticated": true,
+            "outcome": "TUNNELED",
+            "target": "wss.proxyloom.test:<https-origin-port>"
+          },
+          {
+            "addressType": "DOMAIN",
+            "authMethod": "NONE",
+            "authenticated": true,
+            "outcome": "TUNNELED",
+            "target": "wss.proxyloom.test:<https-origin-port>"
+          }
+        ]
+      },
+      "pass": true,
+      "scenario": "wss"
+    },
+    {
+      "expectation": "downloads.download goes through SOCKS5",
+      "observed": {
+        "report": {
+          "state": "complete"
+        },
+        "connections": [
+          {
+            "addressType": "DOMAIN",
+            "authMethod": "NONE",
+            "authenticated": true,
+            "outcome": "TUNNELED",
+            "target": "download.proxyloom.test:<http-origin-port>"
+          }
+        ]
+      },
+      "pass": true,
+      "scenario": "download"
+    },
+    {
+      "expectation": "private-window request reaches proxy.onRequest with incognito: true and goes through SOCKS5",
+      "observed": {
+        "report": {
+          "state": "loaded",
+          "error": null,
+          "incognitoSeen": [
+            false,
+            true
+          ]
+        },
+        "connections": [
+          {
+            "addressType": "DOMAIN",
+            "authMethod": "NONE",
+            "authenticated": true,
+            "outcome": "TUNNELED",
+            "target": "private.proxyloom.test:<http-origin-port>"
+          }
+        ]
+      },
+      "pass": true,
+      "scenario": "private-window"
+    }
+  ],
+  "version": "153.0"
+}

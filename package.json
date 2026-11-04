@@ -1,6 +1,6 @@
 {
   "name": "proxy-routing-extension",
-  "version": "0.1.34",
+  "version": "0.1.35",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.32.1",
@@ -46,6 +46,7 @@
     "pretest:soak": "pnpm build",
     "test:soak": "node tests/soak/memory-soak.mjs",
     "test:integration": "vitest run --config vitest.integration.config.ts",
+    "spike:socks5": "vitest run --config spikes/socks5/vitest.config.ts",
     "pretest:e2e": "pnpm build",
     "test:e2e": "playwright test",
     "test:coverage": "vitest run --coverage"

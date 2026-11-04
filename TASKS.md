@@ -1631,7 +1631,7 @@
   - **Тесты:** doc validators.
   - **Готово, когда:** validators зелёные, version 0.1.17.
 
-- [ ] **PL-144 — Spike: SOCKS5 в Chromium и Firefox MV3**
+- [x] **PL-144 — Spike: SOCKS5 в Chromium и Firefox MV3**
   - **Цель:** проверить SOCKS5 routing, auth, DNS и fail-closed в target browsers.
   - **Требования:** FR-006, FR-010, FR-075, COMPAT-001, SEC-003.
   - **Действия:** prototype Chromium PAC `SOCKS5` и Firefox `proxy.onRequest type: 'socks'` с
@@ -1642,22 +1642,35 @@
     `socks5Auth`, рекомендация.
   - **Тесты:** ручные/integration сценарии с sanitized traces.
   - **Готово, когда:** ADR-016 принят, зависимые задачи обновлены.
+  - **Результат:** ADR-016 (Accepted with manual release gate), рекомендация положительная:
+    Chromium — SOCKS5 без auth, DNS всегда на proxy, `socks5Auth = false`; Firefox — auth через
+    `ProxyInfo.username/password`, `proxyDNS: true`, `socks5Auth = true`. Fail-closed подтверждён
+    в обоих семействах. Найдено: userinfo в PAC directive в stock Chromium даёт `DIRECT`, в Brave
+    авторизуется — serializer не должен его выдавать. Fixture
+    `tests/integration/proxies/socks5-proxy.ts` (тест красный до реализации), `pnpm spike:socks5`
+    (Chromium 151, Brave 155, Firefox 153/157), traces в `spikes/socks5/evidence/`; ручные строки
+    Google Chrome/Edge/Яндекс/Chromium incognito перенесены в release gate PL-145. Version 0.1.35.
 
 - [ ] **PL-145 — Поддержка SOCKS5 transport**
   - **Цель:** SOCKS5 профили в рамках ADR-016.
-  - **Требования:** FR-006, FR-010, FR-015–FR-016, FR-075, FR-076–FR-078, COMPAT-001, SEC-003.
-  - **Действия:** PRD (non-goals, FR, limitations); `ProxyTransport` + `SOCKS5`, config schema v4
-    migration, native import/export v4; PAC directive `SOCKS5` с injection/golden/parity; Firefox
-    adapter `socks` + `proxyDNS`; UI transport; в Chromium SOCKS5-профиль с credentials
-    сохраняется с видимым статусом `Authentication unsupported in this browser`, routing не
-    меняется (fail-closed); parser/formatter `socks5`/`socks5h`.
+  - **Требования:** FR-006, FR-010, FR-015–FR-016, FR-075, FR-076–FR-078, FR-082, COMPAT-001, SEC-003.
+  - **Действия:** PRD (non-goals, FR, limitations); `ProxyTransport` + `SOCKS5`, config schema v6
+    migration, native import/export migration; PAC directive `SOCKS5 host:port` с
+    injection/golden/parity (userinfo, `@`, `;`, пробелы никогда не попадают в directive);
+    Firefox adapter `type: 'socks'` + `proxyDNS: true` + `username`/`password` в `ProxyInfo`;
+    capability `socks5Auth` (Chromium `false`, Firefox `true`); UI transport; в Chromium
+    SOCKS5-профиль с credentials сохраняется с видимым статусом `Authentication unsupported in
+this browser`, routing не меняется (fail-closed); parser/formatter `socks5`/`socks5h` → SOCKS5
+    с proxy-side DNS, `socks4` остаётся typed error; классификация SOCKS ошибок как proxy failure;
+    proxy check/speed test через SOCKS5.
   - **Модули:** domain, storage migrations, PAC compiler, Chromium/Firefox adapters, Proxies UI.
   - **Зависимости:** PL-144 с положительным ADR-016, PL-138, PL-141.
   - **Критерии приёмки:** fail-closed без fallback; Chromium хранит SOCKS5 credentials без потерь
     и явно показывает, что auth не поддержан, без skip/`DIRECT`; Firefox SOCKS5 auth работает.
   - **Тесты:** migration fixture/interruption, PAC golden/parity/injection, local SOCKS5 integration
-    обоих семейств, E2E.
-  - **Миграции/permissions/privacy:** config schema v4; permissions не меняются.
+    обоих семейств (fixture из PL-144), E2E; ручной gate ADR-016 (Google Chrome, Edge, Яндекс,
+    Chromium incognito, Firefox signed build).
+  - **Миграции/permissions/privacy:** config schema v6; permissions не меняются.
   - **Готово, когда:** все test suites/dual builds зелёные, version 0.2.0/docs обновлены.
 
 - [x] **PL-146 — Новая иконка расширения**
