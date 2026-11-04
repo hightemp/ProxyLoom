@@ -4,7 +4,13 @@
 
 Open **Settings → Proxies → Add profile**. Enter a name and the HTTP/WS endpoint. Clear
 **Use the HTTP endpoint for all supported schemes** only when HTTPS/WSS targets require a
-different endpoint. HTTP and HTTPS in the endpoint editor describe the browser-to-proxy transport.
+different endpoint. HTTP, HTTPS and SOCKS5 in the endpoint editor describe the browser-to-proxy
+transport.
+
+With **SOCKS5** the proxy always resolves host names, so DNS lookups do not leave through your
+local resolver. Firefox sends the SOCKS5 username and password. Chromium browsers (Chrome, Edge,
+Yandex Browser) cannot: the credentials stay saved, the profile shows **Authentication unsupported
+in this browser**, and requests through a proxy that requires them fail instead of going direct.
 
 **Paste proxy string** at the top of the editor accepts one proxy in any of the formats listed in
 [Proxies from text](#proxies-from-text) and fills the protocol, host, port, username and password,
@@ -156,7 +162,8 @@ are ignored. Supported forms include `http://user:pass@host:port`, `https://host
 `host:port`, `user:pass@host:port`, `host:port:user:pass`, `user:pass:host:port`, a protocol word
 before or after the record, space-separated fields and CSV/TSV/semicolon rows; IPv6 hosts go in
 brackets. Lines without a protocol use the selected default; nothing is probed over the network.
-SOCKS lines are reported as unsupported.
+`socks5://` and `socks5h://` lines become SOCKS5 profiles (names are always resolved by the proxy);
+SOCKS4 and a bare `socks` word are reported as unsupported.
 
 The preview shows each line as New, Update, Unchanged, Duplicate (a later line with the same host,
 port and username wins) or Error with the reason; passwords are never shown. For `a:b:c:d` lines

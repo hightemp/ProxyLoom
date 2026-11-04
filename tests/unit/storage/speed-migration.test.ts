@@ -44,8 +44,8 @@ const versionFour = () => {
 }
 
 describe('schema v5 speed test migration', () => {
-  it('is the current schema and defaults to the Cloudflare download endpoint', () => {
-    expect(CURRENT_SCHEMA_VERSION).toBe(5)
+  it('keeps the Cloudflare download endpoint as the default after later schema versions', () => {
+    expect(CURRENT_SCHEMA_VERSION).toBeGreaterThanOrEqual(5)
     expect(DEFAULT_SPEED_TEST_ENDPOINT).toBe('https://speed.cloudflare.com/__down?bytes=5000000')
     expect(createDefaultConfig().general.speedTestEndpoint).toBe(DEFAULT_SPEED_TEST_ENDPOINT)
   })
@@ -53,7 +53,7 @@ describe('schema v5 speed test migration', () => {
   it('adds the endpoint and empty speed fields to stored check results', () => {
     const result = migrateConfig(versionFour())
     if (!result.ok) throw new Error(result.error.code)
-    expect(result.value.schemaVersion).toBe(5)
+    expect(result.value.schemaVersion).toBe(CURRENT_SCHEMA_VERSION)
     expect(result.value.general.speedTestEndpoint).toBe(DEFAULT_SPEED_TEST_ENDPOINT)
     expect(result.value.profiles[0]?.lastCheck).toEqual({
       ...oldCheck,
@@ -89,7 +89,7 @@ describe('schema v5 speed test migration', () => {
     expect(result.ok).toBe(false)
   })
 
-  it('imports a v4 native export as v5', () => {
+  it('imports a v4 native export at the current schema', () => {
     const exported = JSON.parse(
       serializeNativeExport(config(), { includeCredentials: false, now: new Date() }),
     ) as { config: Record<string, unknown> }
@@ -101,7 +101,7 @@ describe('schema v5 speed test migration', () => {
       config(),
     )
     if (!preview.ok) throw new Error(preview.error.code)
-    expect(preview.value.document.config.schemaVersion).toBe(5)
+    expect(preview.value.document.config.schemaVersion).toBe(CURRENT_SCHEMA_VERSION)
     expect(preview.value.document.config.general.speedTestEndpoint).toBe(
       DEFAULT_SPEED_TEST_ENDPOINT,
     )
@@ -113,7 +113,7 @@ describe('schema v5 speed test migration', () => {
     const storage = new MemoryStorageArea({ [CONFIG_KEY]: stored })
     const result = await new ConfigRepository(storage, () => now).initialize()
     if (!result.ok) throw new Error(result.error.code)
-    expect(result.value.schemaVersion).toBe(5)
+    expect(result.value.schemaVersion).toBe(CURRENT_SCHEMA_VERSION)
     expect((await storage.get([CONFIG_BACKUP_KEY]))[CONFIG_BACKUP_KEY]).toEqual(stored)
 
     const interrupted = new MemoryStorageArea({

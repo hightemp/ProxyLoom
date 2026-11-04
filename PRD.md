@@ -48,7 +48,7 @@ ProxyLoom решает проблему через:
 
 ## 5. Non-goals
 
-В первую версию не входят: SOCKS4/5; proxy chains; fallback proxy; automatic rotation; cloud/browser-account sync; accounts; subscriptions; payments; analytics; telemetry; crash reporting на внешний сервер; remote management; team sharing; mobile browsers; Safari; автоматическая публикация в магазины; rule subscriptions; пользовательский remote PAC/PAC URL; automatic proxy health polling; encrypted master-password vault; URL-content filtering; ad blocking; request-header modification; traffic decryption; VPN; QUIC/MASQUE proxy.
+В первую версию не входят: SOCKS4 (SOCKS5 добавлен в 0.2.0 по ADR-016, FR-085); SOCKS5 authentication в Chromium-family (MV3 не даёт API, ADR-016); proxy chains; fallback proxy; automatic rotation; cloud/browser-account sync; accounts; subscriptions; payments; analytics; telemetry; crash reporting на внешний сервер; remote management; team sharing; mobile browsers; Safari; автоматическая публикация в магазины; rule subscriptions; пользовательский remote PAC/PAC URL; automatic proxy health polling; encrypted master-password vault; URL-content filtering; ad blocking; request-header modification; traffic decryption; VPN; QUIC/MASQUE proxy.
 
 - `FR-010`: приложение не предлагает и не имитирует перечисленные функции.
 - `REL-001`: release workflow создаёт артефакты, но не публикует их автоматически в browser stores.
@@ -80,7 +80,7 @@ ProxyLoom решает проблему через:
 | Термин             | Однозначное значение                                                                                      |
 | ------------------ | --------------------------------------------------------------------------------------------------------- |
 | Target scheme      | Протокол целевого URL: `http`, `https`, `ws` или `wss`.                                                   |
-| Proxy transport    | Протокол соединения браузера с proxy server: `HTTP` или `HTTPS`. Не равен target scheme.                  |
+| Proxy transport    | Протокол соединения браузера с proxy server: `HTTP`, `HTTPS` или `SOCKS5`. Не равен target scheme.        |
 | Proxy profile      | Именованная конфигурация endpoints, credentials и диагностических метаданных.                             |
 | Origin target      | Нормализованная строка `scheme://hostname[:port]/` без path/query/fragment/credentials.                   |
 | Full URL target    | URL сетевого запроса с scheme/host/port/path/query, но без fragment.                                      |
@@ -261,12 +261,13 @@ Matcher Firefox-only. Target включает scheme, hostname, explicit/non-def
 
 ## 15. Proxy profiles
 
-Профиль содержит два endpoint slots: `httpEndpoint` и `httpsEndpoint`. При `useSameProxy=true` HTTPS route ссылается на копию/эффективное значение HTTP endpoint, но storage сохраняет однозначную canonical model. Endpoint содержит proxy transport `HTTP|HTTPS`, host, port, username, password. В UI credentials могут вводиться на endpoint; domain model дедуплицирует одинаковые credentials только как implementation detail, не меняя UX.
+Профиль содержит два endpoint slots: `httpEndpoint` и `httpsEndpoint`. При `useSameProxy=true` HTTPS route ссылается на копию/эффективное значение HTTP endpoint, но storage сохраняет однозначную canonical model. Endpoint содержит proxy transport `HTTP|HTTPS|SOCKS5`, host, port, username, password. В UI credentials могут вводиться на endpoint; domain model дедуплицирует одинаковые credentials только как implementation detail, не меняя UX.
 
 - `FR-041`: profile CRUD, duplicate, color, note, check URL, short name и impact view.
 - `FR-042`: short name 1–3 отображаемых ASCII alphanumeric characters; если отсутствует, генерируется детерминированно из name с устранением коллизии в badge display.
 - `FR-043`: manual check result сохраняется только как последний result, не как периодическая история.
 - `FR-084`: отдельное действие `Test speed` по явному нажатию выполняет обычную проверку профиля и в той же одноразовой check-вкладке через тот же профиль скачивает тестовый файл с `general.speedTestEndpoint` (default `https://speed.cloudflare.com/__down?bytes=5000000`). Скачивание ограничено 15 s и 5 MB, скорость (Mbit/s) считается от получения заголовков ответа. Ошибка скачивания не делает профиль `Unavailable`: результат хранит `speedErrorCode`. Endpoint показан в confirm и General, заменяем; origin скачивания исключён из user routing logs/error page. Config schema v5 добавляет `general.speedTestEndpoint` и `ProxyCheckResult.downloadMbps/speedErrorCode` (миграция v4 → v5 подставляет default и `null`).
+- `FR-085`: endpoint может использовать transport `SOCKS5` (ADR-016). Chromium-family получает PAC directive `SOCKS5 host:port`, Firefox — один `ProxyInfo {type: 'socks', proxyDNS: true}`; имена хостов всегда разрешает proxy. Credentials SOCKS5 передаются только Firefox полями `username`/`password` `ProxyInfo` (capability `socks5Auth`); `onAuthRequired` для SOCKS5 не отвечает. В Chromium-family SOCKS5 profile с credentials сохраняется без потерь, routing не меняется и остаётся fail-closed (server отклоняет handshake, запрос завершается ошибкой), а UI показывает статус `Authentication unsupported in this browser`. PAC directive никогда не содержит userinfo. Config schema v6 добавляет значение `SOCKS5` (миграция v5 → v6 меняет только версию).
 - `FR-044`: check URL валидируется как public `http/https` URL; internal/local targets требуют отдельного предупреждения.
 - `FR-045`: удалить используемый profile можно только после impact preview и explicit confirmation.
 
@@ -532,7 +533,7 @@ Adapter parsers распознают только документированн
 
 - `FR-083`: по явному действию пользователя профиль копируется в clipboard как URL (`scheme://user:pass@host:port`, userinfo percent-encoded), curl-команда (`curl -x '<proxy URL>' '<check URL>'`, POSIX shell quoting) или `host:port:user:pass` (если представимо), а список профилей — как `Copy all as URLs` и файл `.txt` (URL или compact). Credentials не скрываются; UI сообщает `contains password`. Скопированный/экспортированный текст не попадает в logs/diagnostics/errors. Профиль с раздельными endpoints даёт две строки с комментариями `# HTTP/WS targets` и `# HTTPS/WSS targets`. Новых permissions нет: clipboard по user gesture, файл через Blob download.
 
-- `FR-082`: пользователь импортирует proxy profiles из текста (вставка или `.txt`/`.csv` ≤ 1 MiB, ≤ 1000 записей) в форматах proxy_switcher_vpn: URI, `host:port`, `user:pass@host:port`, `host:port:user:pass`/`user:pass:host:port` с выбором порядка при неоднозначности, protocol word, whitespace и CSV/TSV/`;`, IPv6 в скобках. Строки без протокола получают выбранный HTTP/HTTPS — сетевого автоопределения нет. Preview показывает статус New/Update/Unchanged/Duplicate/Error без паролей; совпадение по host+port+username обновляет только password/transport; apply атомарен. SOCKS-строки — typed error до решения по SOCKS5.
+- `FR-082`: пользователь импортирует proxy profiles из текста (вставка или `.txt`/`.csv` ≤ 1 MiB, ≤ 1000 записей) в форматах proxy_switcher_vpn: URI, `host:port`, `user:pass@host:port`, `host:port:user:pass`/`user:pass:host:port` с выбором порядка при неоднозначности, protocol word, whitespace и CSV/TSV/`;`, IPv6 в скобках. Строки без протокола получают выбранный HTTP/HTTPS/SOCKS5 — сетевого автоопределения нет. Preview показывает статус New/Update/Unchanged/Duplicate/Error без паролей; совпадение по host+port+username обновляет только password/transport; apply атомарен. `socks5://` и `socks5h://` импортируются как `SOCKS5` с DNS на стороне proxy; `socks4`/`socks4a` и неоднозначное `socks` — typed error.
 
 ## 24. Incognito
 
@@ -638,7 +639,7 @@ ProxyProfile
   lastCheck: ProxyCheckResult | null
 
 ProxyEndpoint
-  transport: HTTP | HTTPS
+  transport: HTTP | HTTPS | SOCKS5
   host: string
   port: integer
   username: string
@@ -834,6 +835,8 @@ E2E:
 10. Download error не привязан безопасно к произвольной visible tab для error page; используются log/notification.
 11. Service worker может быть остановлен в любой момент; long-lived globals ненадёжны.
 12. Другой extension/policy может забрать proxy control; владелец может быть известен не по имени.
+13. Chromium-family не поддерживает SOCKS5 authentication: MV3 не передаёт credentials SOCKS5 и не вызывает `onAuthRequired`; userinfo в PAC directive stock Chromium отбрасывает и идёт `DIRECT`, поэтому не используется (ADR-016). Firefox поддерживает SOCKS5 authentication через `ProxyInfo`.
+14. Firefox сообщает отказ SOCKS5 authentication как `NS_ERROR_CONNECTION_REFUSED`, неотличимо от отказа соединения; UI не утверждает «неверный пароль».
 
 ## 36. Risks
 

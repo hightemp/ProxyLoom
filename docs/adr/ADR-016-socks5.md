@@ -128,3 +128,12 @@ SOCKS5 добавляется как третий `ProxyTransport` (`SOCKS5`) в
 - Форма API сверена с
   [MDN ProxyInfo](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/proxy/ProxyInfo)
   и [Chrome `chrome.proxy`](https://developer.chrome.com/docs/extensions/reference/api/proxy).
+
+## Реализация (PL-145)
+
+Решение реализовано в 0.2.0: config schema v6, PAC directive `SOCKS5 host:port`, Firefox
+`ProxyInfo` `socks` с `proxyDNS: true` и credentials, capability `socks5Auth`, статус в UI.
+Production builds проверены теми же fixtures: `tests/e2e/socks5.spec.ts` (Chromium) и
+`tests/integration/firefox-socks5.test.ts` (Firefox). PL-168 закрыл найденный спайком путь
+небезопасного host к PAC directive. Ручные строки выше перенесены в manual matrices release
+checklist.

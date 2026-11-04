@@ -2,7 +2,7 @@ import { browser } from 'wxt/browser'
 
 import { resolveRoute } from '../../domain/routing/resolver'
 import type { RoutingSnapshot } from '../../domain/routing/snapshot'
-import type { ControlStatus } from '../../domain/types/entities'
+import type { ControlStatus, ProxyEndpoint } from '../../domain/types/entities'
 import { err, ok, type Result } from '../../domain/types/result'
 import type {
   PlatformApplyError,
@@ -10,9 +10,12 @@ import type {
 } from '../../application/ports/proxy-platform'
 
 type FirefoxProxyInfo = {
-  readonly type: 'direct' | 'http' | 'https'
+  readonly type: 'direct' | 'http' | 'https' | 'socks'
   readonly host?: string
   readonly port?: number
+  readonly proxyDNS?: boolean
+  readonly username?: string
+  readonly password?: string
 }
 
 type FirefoxProxyResult = FirefoxProxyInfo | null | undefined
@@ -74,12 +77,37 @@ const mapControlStatus = (level: LevelOfControl | undefined): ControlStatus => {
   }
 }
 
+/**
+ * One ProxyInfo per request, never an array (ADR-004). SOCKS5 resolves names on the proxy and
+ * carries its credentials in the ProxyInfo itself, because Firefox does not raise onAuthRequired
+ * for SOCKS (ADR-016). HTTP/HTTPS credentials stay out and go through onAuthRequired (ADR-005).
+ */
+const toProxyInfo = (endpoint: ProxyEndpoint): FirefoxProxyInfo => {
+  if (endpoint.transport !== 'SOCKS5') {
+    return {
+      host: endpoint.host,
+      port: endpoint.port,
+      type: endpoint.transport === 'HTTPS' ? 'https' : 'http',
+    }
+  }
+  return {
+    host: endpoint.host,
+    port: endpoint.port,
+    proxyDNS: true,
+    type: 'socks',
+    ...(endpoint.username === ''
+      ? {}
+      : { password: endpoint.password, username: endpoint.username }),
+  }
+}
+
 export class FirefoxProxyAdapter implements ProxyPlatformAdapter {
   readonly capabilities = {
     actualProxyInfo: false,
     fullUrlRules: true,
     guaranteedErrorPage: false,
     platform: 'FIREFOX',
+    socks5Auth: true,
     tabSpecificOverrides: true,
   } as const
 
@@ -191,11 +219,7 @@ export class FirefoxProxyAdapter implements ProxyPlatformAdapter {
     if (decision.action === 'CONFIG_ERROR' || decision.endpoint === null) {
       return FAIL_CLOSED_PROXY
     }
-    return {
-      host: decision.endpoint.host,
-      port: decision.endpoint.port,
-      type: decision.endpoint.transport === 'HTTPS' ? 'https' : 'http',
-    }
+    return toProxyInfo(decision.endpoint)
   }
 
   private setRouteState(state: FirefoxRouteState): void {

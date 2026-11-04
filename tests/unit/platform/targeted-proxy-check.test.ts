@@ -73,6 +73,7 @@ const makeRequest = (checked: ReturnType<typeof profile>) =>
       capabilities: {
         actualProxyInfo: false,
         fullUrlRules: false,
+        socks5Auth: false,
         guaranteedErrorPage: false,
         platform: 'CHROMIUM',
         tabSpecificOverrides: false,
@@ -160,6 +161,7 @@ describe('targeted proxy check', () => {
         capabilities: {
           actualProxyInfo: false,
           fullUrlRules: false,
+          socks5Auth: false,
           guaranteedErrorPage: false,
           platform: 'CHROMIUM',
           tabSpecificOverrides: false,

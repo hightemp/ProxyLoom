@@ -13,6 +13,7 @@ class FakeAdapter implements ProxyPlatformAdapter {
   readonly capabilities = {
     actualProxyInfo: false,
     fullUrlRules: false,
+    socks5Auth: false,
     guaranteedErrorPage: false,
     platform: 'CHROMIUM',
     tabSpecificOverrides: false,

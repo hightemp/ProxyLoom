@@ -65,6 +65,7 @@ export const runtimeState = (
     capabilities: {
       actualProxyInfo: false,
       fullUrlRules: false,
+      socks5Auth: false,
       guaranteedErrorPage: false,
       platform: 'CHROMIUM',
       tabSpecificOverrides: false,
@@ -76,7 +77,7 @@ export const runtimeState = (
     lastApplyError: null,
     persistedRevision: 1,
     platform: 'CHROMIUM',
-    schemaVersion: 5,
+    schemaVersion: 6,
   },
   inspection: null,
   logs: [],

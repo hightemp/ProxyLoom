@@ -16,7 +16,6 @@ export type ProxyStringErrorCode =
   | 'IPV4_INVALID'
   | 'IPV6_INVALID'
   | 'SCHEME_UNSUPPORTED'
-  | 'SOCKS5_UNSUPPORTED'
   | 'SOCKS4_UNSUPPORTED'
   | 'SOCKS_AMBIGUOUS'
   | 'PROTOCOL_CONFLICT'
@@ -73,9 +72,10 @@ const protocolToken = (value: string): ProxyTransport | null => {
       return 'HTTP'
     case 'https':
       return 'HTTPS'
+    // Both mean SOCKS5 here: ProxyLoom always resolves names on the proxy (ADR-016).
     case 'socks5':
     case 'socks5h':
-      return fail('SOCKS5_UNSUPPORTED')
+      return 'SOCKS5'
     case 'socks4':
     case 'socks4a':
       return fail('SOCKS4_UNSUPPORTED')

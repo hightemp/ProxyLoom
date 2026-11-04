@@ -3,6 +3,11 @@
 - Full URL path/query rules are Firefox-only. Chromium receives origin-only PAC targets for HTTPS
   and WSS; HTTP/WS exposure is not a portable cross-scheme contract. ProxyLoom intentionally
   offers only portable Origin Rules there.
+- SOCKS5 authentication works only in Firefox. Chromium-based browsers have no MV3 API for SOCKS5
+  credentials, so a SOCKS5 proxy that requires a username and password fails there (no direct
+  fallback) and the profile is marked **Authentication unsupported in this browser**. Firefox
+  reports a rejected SOCKS5 login like a refused connection, so ProxyLoom cannot say that the
+  password is wrong. See ADR-016.
 - Chromium temporary Once overrides are origin-scoped across tabs until source-tab cleanup.
 - Firefox uses terminal `null` for DIRECT, but secure proxy routing still requires control of
   `proxy.settings` so an unavailable assigned proxy cannot fall back to a user manual/system

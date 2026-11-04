@@ -20,5 +20,5 @@ export const createDefaultConfig = (): AppConfig => ({
   profiles: [],
   revision: 0,
   rules: [],
-  schemaVersion: 5,
+  schemaVersion: 6,
 })

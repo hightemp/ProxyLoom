@@ -76,7 +76,12 @@ export const launchPreparedFirefox = async ({
   environment?: Readonly<Record<string, string>>
   extensionDirectories: readonly string[]
   prefs: Readonly<Record<string, boolean | number | string>>
-}): Promise<{ child: ChildProcess; output: () => string }> => {
+}): Promise<{
+  bidi: BidiConnection
+  child: ChildProcess
+  output: () => string
+  webSocketUrl: string
+}> => {
   await access(FIREFOX_BINARY)
   await Promise.all(extensionDirectories.map((extensionDirectory) => access(extensionDirectory)))
   const geckodriverBinary = await access(SNAP_GECKODRIVER_BINARY)
@@ -99,6 +104,8 @@ export const launchPreparedFirefox = async ({
     output += chunk.toString('utf8')
   })
   children.push(child)
+  let sessionSocketUrl: string | undefined
+  let bidiSocket: WebSocket | undefined
   try {
     await waitFor(() => /Listening on 127\.0\.0\.1:\d+/.test(output), 5_000)
     const port = Number(/Listening on 127\.0\.0\.1:(\d+)/.exec(output)?.[1])
@@ -133,15 +140,17 @@ export const launchPreparedFirefox = async ({
     if (!sessionResponse.ok || !webSocketUrl) {
       throw new Error(`Could not create Firefox BiDi session: ${JSON.stringify(sessionPayload)}`)
     }
+    sessionSocketUrl = webSocketUrl
+    const socket = new WebSocket(webSocketUrl)
+    bidiSocket = socket
     await new Promise<void>((resolvePromise, rejectPromise) => {
-      const socket = new WebSocket(webSocketUrl)
       let extensionIndex = 0
       let settled = false
       const complete = (error?: Error) => {
         if (settled) return
         settled = true
         clearTimeout(timeout)
-        socket.close()
+        if (error !== undefined) socket.close()
         if (error === undefined) resolvePromise()
         else rejectPromise(error)
       }
@@ -197,5 +206,63 @@ ${output}`,
       { cause: error },
     )
   }
-  return { child, output: () => output }
+  if (bidiSocket === undefined || sessionSocketUrl === undefined) {
+    throw new Error('Firefox BiDi session missing.')
+  }
+  // The installing connection stays open: geckodriver answers only on it.
+  return {
+    bidi: wrapBidiSocket(bidiSocket),
+    child,
+    output: () => output,
+    webSocketUrl: sessionSocketUrl,
+  }
+}
+
+export interface BidiConnection {
+  send<T = unknown>(method: string, params: Readonly<Record<string, unknown>>): Promise<T>
+  close(): void
+}
+
+/** Request/response client over an open WebDriver BiDi socket. */
+const wrapBidiSocket = (socket: WebSocket): BidiConnection => {
+  let nextId = 1_000
+  const pending = new Map<number, { resolve(value: unknown): void; reject(error: Error): void }>()
+  socket.addEventListener('message', (event) => {
+    const message = JSON.parse(String(event.data)) as {
+      id?: number
+      type?: string
+      result?: unknown
+      error?: string
+      message?: string
+    }
+    if (message.id === undefined) return
+    const entry = pending.get(message.id)
+    if (entry === undefined) return
+    pending.delete(message.id)
+    if (message.type === 'success') entry.resolve(message.result)
+    else entry.reject(new Error(`${message.error ?? 'error'}: ${message.message ?? ''}`))
+  })
+  return {
+    close: () => socket.close(),
+    send: <T>(method: string, params: Readonly<Record<string, unknown>>) =>
+      new Promise<T>((resolvePromise, rejectPromise) => {
+        nextId += 1
+        const id = nextId
+        const timer = setTimeout(() => {
+          pending.delete(id)
+          rejectPromise(new Error(`BiDi ${method} timed out.`))
+        }, 10_000)
+        pending.set(id, {
+          reject: (error) => {
+            clearTimeout(timer)
+            rejectPromise(error)
+          },
+          resolve: (value) => {
+            clearTimeout(timer)
+            resolvePromise(value as T)
+          },
+        })
+        socket.send(JSON.stringify({ id, method, params }))
+      }),
+  }
 }

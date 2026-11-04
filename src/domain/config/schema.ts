@@ -11,7 +11,7 @@ const endpointSchema = z
     host: z.string().min(1).max(253),
     password: z.string().max(4_096),
     port: z.number().int().min(1).max(65_535),
-    transport: z.enum(['HTTP', 'HTTPS']),
+    transport: z.enum(['HTTP', 'HTTPS', 'SOCKS5']),
     username: z.string().max(1_024),
   })
   .strict()
@@ -112,7 +112,7 @@ export const appConfigSchema = z
     profiles: z.array(profileSchema).max(10_000),
     revision: z.number().int().nonnegative(),
     rules: z.array(ruleSchema).max(10_000),
-    schemaVersion: z.literal(5),
+    schemaVersion: z.literal(6),
   })
   .strict()
 

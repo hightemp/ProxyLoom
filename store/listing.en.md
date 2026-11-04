@@ -2,11 +2,12 @@
 
 ## Short description
 
-Clear, deterministic HTTP and HTTPS proxy routing with ordered rules and no hidden direct fallback.
+Clear, deterministic HTTP, HTTPS and SOCKS5 proxy routing with ordered rules and no hidden direct fallback.
 
 ## Full description
 
 ProxyLoom gives you explicit DIRECT, PROXY, and RULES modes; separate HTTP/HTTPS endpoints;
+SOCKS5 proxies with proxy-side DNS (SOCKS5 login in Firefox only);
 first-match ordered rules; per-site Once/Always actions with a manageable list of Once overrides;
 proxy import from pasted lines or text files with a preview; copy as URL or curl; local
 diagnostics; and safe import/export.

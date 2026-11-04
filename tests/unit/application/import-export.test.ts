@@ -6,6 +6,7 @@ import {
 } from '../../../src/application/import-export/export'
 import { NativeImportService } from '../../../src/application/import-export/import'
 import { MAX_IMPORT_BYTES } from '../../../src/domain/import-export/native-schema'
+import { CURRENT_SCHEMA_VERSION } from '../../../src/storage/migrations/runner'
 import { config, profile, rule } from '../domain/fixtures'
 
 const now = new Date('2026-07-26T12:00:00.000Z')
@@ -170,7 +171,7 @@ describe('NativeImportService', () => {
     const preview = service.preview(JSON.stringify(legacy), config())
     expect(preview.ok).toBe(true)
     if (!preview.ok) return
-    expect(preview.value.document.config.schemaVersion).toBe(5)
+    expect(preview.value.document.config.schemaVersion).toBe(CURRENT_SCHEMA_VERSION)
     expect(preview.value.document.config).not.toHaveProperty('groups')
     expect(preview.value.document.config.rules[0]).not.toHaveProperty('groupId')
     expect(preview.value.document.config.rules[0]?.id).toBe('legacy-rule')
@@ -196,7 +197,7 @@ describe('NativeImportService', () => {
     const preview = service.preview(JSON.stringify(legacy), config())
     expect(preview.ok).toBe(true)
     if (!preview.ok) return
-    expect(preview.value.document.config.schemaVersion).toBe(5)
+    expect(preview.value.document.config.schemaVersion).toBe(CURRENT_SCHEMA_VERSION)
     expect(preview.value.document.config.rules[0]?.pattern).toContain('instagram\\.com')
   })
 

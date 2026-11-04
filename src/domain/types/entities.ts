@@ -1,7 +1,7 @@
 import type { IsoTimestamp, ProxyProfileId, RuleId, TemporaryOverrideId } from './brand'
 
 export type GlobalMode = 'DIRECT' | 'PROXY' | 'RULES'
-export type ProxyTransport = 'HTTP' | 'HTTPS'
+export type ProxyTransport = 'HTTP' | 'HTTPS' | 'SOCKS5'
 export type TargetScheme = 'http' | 'https' | 'ws' | 'wss'
 export type MatcherType = 'ORIGIN' | 'FULL_URL'
 export type RuleActionType = 'DIRECT' | 'PROXY'

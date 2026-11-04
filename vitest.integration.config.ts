@@ -5,6 +5,8 @@ export default defineConfig({
     environment: 'node',
     include: ['tests/integration/**/*.test.ts'],
     testTimeout: 30_000,
+    // Firefox suites share the Remote Agent port, so files must not run concurrently.
+    fileParallelism: false,
     hookTimeout: 30_000,
     sequence: {
       concurrent: false,

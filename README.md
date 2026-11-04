@@ -4,7 +4,7 @@
 
 <h1 align="center">ProxyLoom</h1>
 
-<p align="center">Explicit, deterministic HTTP and HTTPS proxy routing for Chromium browsers and Firefox.</p>
+<p align="center">Explicit, deterministic HTTP, HTTPS and SOCKS5 proxy routing for Chromium browsers and Firefox.</p>
 
 <p align="center">
   <a href="https://github.com/hightemp/ProxyLoom/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/hightemp/ProxyLoom/actions/workflows/ci.yml/badge.svg"></a>
@@ -26,8 +26,8 @@
 
 <p align="center"><b>English</b> · <a href="README.ru.md">Русский</a></p>
 
-ProxyLoom is a Manifest V3 browser extension for explicit, deterministic HTTP and HTTPS proxy
-routing. One WXT/Vue/TypeScript codebase produces a Chromium package for Chrome, Chromium, Edge,
+ProxyLoom is a Manifest V3 browser extension for explicit, deterministic HTTP, HTTPS and SOCKS5
+proxy routing. One WXT/Vue/TypeScript codebase produces a Chromium package for Chrome, Chromium, Edge,
 and Yandex Browser, plus a Firefox MV3 package.
 
 ## Routing model
@@ -48,6 +48,8 @@ the HTTPS endpoint.
 ## Features
 
 - separate HTTP and HTTPS proxy endpoints, including proxy authentication;
+- SOCKS5 proxies with host names resolved by the proxy; SOCKS5 username/password works in Firefox
+  only, because Chromium browsers have no extension API for it;
 - globally ordered first-match rules with an explicit direct or proxy-profile route, domain-suffix
   templates plus editable Russian-sites and social-network examples, search, filters,
   drag-and-drop and keyboard ordering;

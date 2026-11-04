@@ -107,3 +107,43 @@ describe('proxy auth challenge matching', () => {
     })
   })
 })
+
+describe('SOCKS5 credentials never answer an HTTP proxy challenge (ADR-016)', () => {
+  it('does not hand SOCKS5 credentials to a challenger on the same host and port', () => {
+    const socks = profile('socks', {
+      httpEndpoint: {
+        ...endpoint('proxy.local', 1080, 'SOCKS5'),
+        password: 'canary-socks-password',
+        username: 'alice',
+      },
+      useSameProxy: true,
+    })
+    const built = buildRoutingSnapshot(
+      config({
+        general: { ...config().general, activeProxyProfileId: socks.id, mode: 'PROXY' },
+        profiles: [socks],
+      }),
+      [],
+      now,
+    )
+    if (!built.ok) throw new Error(built.error.code)
+    for (const platform of ['CHROMIUM', 'FIREFOX'] as const) {
+      expect(
+        matchProxyAuthChallenge(
+          built.value,
+          platform,
+          {
+            challengerHost: 'proxy.local',
+            challengerPort: 1080,
+            incognito: false,
+            isProxy: true,
+            requestId: '1',
+            tabId: 1,
+            url: 'http://example.com/',
+          },
+          now,
+        ),
+      ).toEqual({ matched: false, reason: 'ROUTE_IS_NOT_PROXY' })
+    }
+  })
+})

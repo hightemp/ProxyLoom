@@ -4,7 +4,7 @@
 
 <h1 align="center">ProxyLoom</h1>
 
-<p align="center">Явная и предсказуемая маршрутизация через HTTP- и HTTPS-прокси для браузеров на Chromium и Firefox.</p>
+<p align="center">Явная и предсказуемая маршрутизация через HTTP-, HTTPS- и SOCKS5-прокси для браузеров на Chromium и Firefox.</p>
 
 <p align="center">
   <a href="https://github.com/hightemp/ProxyLoom/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/hightemp/ProxyLoom/actions/workflows/ci.yml/badge.svg"></a>
@@ -27,7 +27,7 @@
 <p align="center"><a href="README.md">English</a> · <b>Русский</b></p>
 
 ProxyLoom — браузерное расширение Manifest V3 для явной и детерминированной маршрутизации через
-HTTP- и HTTPS-прокси. Из одной кодовой базы на WXT/Vue/TypeScript собираются пакет для Chromium
+HTTP-, HTTPS- и SOCKS5-прокси. Из одной кодовой базы на WXT/Vue/TypeScript собираются пакет для Chromium
 (Chrome, Chromium, Edge и Яндекс Браузер) и пакет Firefox MV3.
 
 ## Модель маршрутизации
@@ -49,6 +49,8 @@ HTTP-эндпоинт, HTTPS/WSS — через HTTPS-эндпоинт.
 ## Возможности
 
 - раздельные эндпоинты прокси для HTTP и HTTPS, включая аутентификацию на прокси;
+- SOCKS5-прокси, имена хостов разрешает сам прокси; логин и пароль SOCKS5 работают только в
+  Firefox: у браузеров на Chromium нет для этого API расширений;
 - глобально упорядоченные правила «первое совпадение побеждает» с явным маршрутом напрямую или
   через профиль, шаблоны по суффиксам доменов, поиск, фильтры, перетаскивание и сортировка с
   клавиатуры;

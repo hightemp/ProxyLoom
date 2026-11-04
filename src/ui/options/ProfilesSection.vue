@@ -19,6 +19,7 @@ import {
   ShieldAlert,
   Terminal,
   Trash2,
+  TriangleAlert,
   Upload,
   User,
 } from '@lucide/vue'
@@ -37,7 +38,7 @@ import { parseProxyString, type ParsedProxyString } from '../../domain/profiles/
 import { copyText } from '../clipboard'
 import { runtimeClient } from '../runtime/client'
 import { filterProfiles, type ProfileFilter } from '../../application/profiles/profile-filter'
-import { proxyStringErrorLabel } from '../labels'
+import { proxyStringErrorLabel, transportLabel } from '../labels'
 import ProxyLineImportPanel from './ProxyLineImportPanel.vue'
 import IconButton from '../components/IconButton.vue'
 import Modal from '../components/Modal.vue'
@@ -416,6 +417,16 @@ const endpointRows = (profile: ProxyProfile) =>
         { endpoint: profile.httpsEndpoint, label: t('httpsWss') },
       ]
 
+// Chromium keeps SOCKS5 credentials but cannot send them (ADR-016); routing is unchanged and
+// fails closed, so the profile says so instead of silently skipping or going DIRECT.
+const socks5AuthUnsupported = (endpoint: Pick<ProxyEndpoint, 'transport' | 'username'>): boolean =>
+  endpoint.transport === 'SOCKS5' &&
+  endpoint.username !== '' &&
+  !props.state.diagnostics.capabilities.socks5Auth
+
+const profileSocks5AuthUnsupported = (profile: ProxyProfile): boolean =>
+  endpointRows(profile).some((row) => socks5AuthUnsupported(row.endpoint))
+
 const ruleUsage = (profile: ProxyProfile): number =>
   props.state.config.rules.filter((rule) => rule.action.targetProxyProfileId === profile.id).length
 
@@ -496,6 +507,9 @@ watch(() => props.busy, restoreFocus)
           </option>
           <option value="HTTPS">
             {{ t('proxyInfoHttps') }}
+          </option>
+          <option value="SOCKS5">
+            {{ t('transportSocks5') }}
           </option>
         </select>
         <select
@@ -615,7 +629,9 @@ watch(() => props.busy, restoreFocus)
           </div>
           <div class="proxy-endpoint">
             <div v-for="row in endpointRows(profile)" :key="row.label" class="endpoint-line">
-              <span class="badge neutral protocol">{{ row.endpoint.transport }}</span>
+              <span class="badge neutral protocol">{{
+                transportLabel(row.endpoint.transport)
+              }}</span>
               <code class="truncate" :title="`${row.endpoint.host}:${row.endpoint.port}`"
                 >{{ row.endpoint.host }}:{{ row.endpoint.port }}</code
               >
@@ -631,6 +647,14 @@ watch(() => props.busy, restoreFocus)
             <span v-else class="muted">{{ t('noAuth') }}</span>
           </div>
           <div class="proxy-status">
+            <span
+              v-if="profileSocks5AuthUnsupported(profile)"
+              class="badge warning socks5-auth-unsupported"
+              :title="t('socks5AuthUnsupportedDetail')"
+            >
+              <TriangleAlert :size="12" aria-hidden="true" />
+              {{ t('socks5AuthUnsupported') }}
+            </span>
             <span v-if="isChecking(profile)" class="badge checking" role="status">
               <LoaderCircle :size="12" aria-hidden="true" class="spin" />
               {{ speedTestingId === profile.id ? t('testingSpeedNow') : t('checkingNow') }}
@@ -831,9 +855,10 @@ watch(() => props.busy, restoreFocus)
                   <div class="endpoint-row">
                     <label>
                       {{ t('transport') }}
-                      <select v-model="draft.httpEndpoint.transport">
+                      <select v-model="draft.httpEndpoint.transport" name="http-endpoint-transport">
                         <option value="HTTP">{{ t('proxyInfoHttp') }}</option>
                         <option value="HTTPS">{{ t('proxyInfoHttps') }}</option>
+                        <option value="SOCKS5">{{ t('transportSocks5') }}</option>
                       </select>
                     </label>
                     <label>
@@ -862,15 +887,29 @@ watch(() => props.busy, restoreFocus)
                     </label>
                     <PasswordInput v-model="draft.httpEndpoint.password" :label="t('password')" />
                   </div>
+                  <template v-if="draft.httpEndpoint.transport === 'SOCKS5'">
+                    <small>{{ t('socks5DnsNote') }}</small>
+                    <p
+                      v-if="socks5AuthUnsupported(draft.httpEndpoint)"
+                      class="notice warning socks5-auth-warning"
+                      role="status"
+                    >
+                      {{ t('socks5AuthUnsupportedDetail') }}
+                    </p>
+                  </template>
                 </fieldset>
                 <fieldset v-if="!draft.useSameProxy" class="endpoint-block">
                   <legend>{{ t('httpsWssEndpoint') }}</legend>
                   <div class="endpoint-row">
                     <label>
                       {{ t('transport') }}
-                      <select v-model="draft.httpsEndpoint.transport">
+                      <select
+                        v-model="draft.httpsEndpoint.transport"
+                        name="https-endpoint-transport"
+                      >
                         <option value="HTTP">{{ t('proxyInfoHttp') }}</option>
                         <option value="HTTPS">{{ t('proxyInfoHttps') }}</option>
+                        <option value="SOCKS5">{{ t('transportSocks5') }}</option>
                       </select>
                     </label>
                     <label>
@@ -899,6 +938,16 @@ watch(() => props.busy, restoreFocus)
                     </label>
                     <PasswordInput v-model="draft.httpsEndpoint.password" :label="t('password')" />
                   </div>
+                  <template v-if="draft.httpsEndpoint.transport === 'SOCKS5'">
+                    <small>{{ t('socks5DnsNote') }}</small>
+                    <p
+                      v-if="socks5AuthUnsupported(draft.httpsEndpoint)"
+                      class="notice warning socks5-auth-warning"
+                      role="status"
+                    >
+                      {{ t('socks5AuthUnsupportedDetail') }}
+                    </p>
+                  </template>
                 </fieldset>
                 <small v-if="draft.useSameProxy">
                   {{ t('useHttpForAllDescription') }}
@@ -1018,6 +1067,22 @@ watch(() => props.busy, restoreFocus)
 
 .proxy-status .badge {
   max-width: 100%;
+}
+
+.proxy-status {
+  flex-wrap: wrap;
+}
+
+.badge.socks5-auth-unsupported {
+  align-items: flex-start;
+  border-radius: 8px;
+  line-height: 1.3;
+  white-space: normal;
+}
+
+.badge.socks5-auth-unsupported svg {
+  flex: none;
+  margin-top: 2px;
 }
 
 .badge.checking {

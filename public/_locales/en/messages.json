@@ -1181,6 +1181,18 @@
   "proxyInfoSocks": {
     "message": "SOCKS"
   },
+  "transportSocks5": {
+    "message": "SOCKS5"
+  },
+  "socks5AuthUnsupported": {
+    "message": "Authentication unsupported in this browser"
+  },
+  "socks5AuthUnsupportedDetail": {
+    "message": "This browser cannot send a username and password to a SOCKS5 proxy. They stay saved, but requests through this proxy fail while the proxy requires authentication. Firefox supports SOCKS5 authentication."
+  },
+  "socks5DnsNote": {
+    "message": "SOCKS5: host names are resolved by the proxy."
+  },
   "proxyInfoUnknown": {
     "message": "Unknown"
   },
@@ -1452,9 +1464,6 @@
   },
   "proxyStringSchemeUnsupported": {
     "message": "Unsupported scheme; use http or https"
-  },
-  "proxyStringSocks5Unsupported": {
-    "message": "SOCKS5 is not supported yet"
   },
   "proxyStringSocks4Unsupported": {
     "message": "SOCKS4 is not supported"
@@ -2091,7 +2100,7 @@
     "message": "Proxy profiles and endpoints"
   },
   "helpProxiesBody1": {
-    "message": "A profile is a proxy server with a name, color and short name used on the badge. Its transport (HTTP or HTTPS) is how the browser talks to the proxy, not which sites it serves."
+    "message": "A profile is a proxy server with a name, color and short name used on the badge. Its transport (HTTP, HTTPS or SOCKS5) is how the browser talks to the proxy, not which sites it serves. A SOCKS5 proxy also resolves host names; its username and password work only in Firefox."
   },
   "helpProxiesBody2": {
     "message": "By default one endpoint handles all traffic. Turn off One endpoint for all traffic to send HTTPS and WSS targets to a different endpoint."

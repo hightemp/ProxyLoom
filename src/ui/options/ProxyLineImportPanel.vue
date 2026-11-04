@@ -143,6 +143,7 @@ const runImport = async (): Promise<void> => {
         <select v-model="defaultTransport" name="default-transport">
           <option value="HTTP">{{ t('proxyInfoHttp') }}</option>
           <option value="HTTPS">{{ t('proxyInfoHttps') }}</option>
+          <option value="SOCKS5">{{ t('transportSocks5') }}</option>
         </select>
       </label>
       <label>

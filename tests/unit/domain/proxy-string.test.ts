@@ -96,14 +96,20 @@ const parsed: readonly (readonly [string, ParsedProxyString])[] = [
   ],
   ['bücher.example:3128', proxy('xn--bcher-kva.example', 3128)],
   ['http://user:p@ss@proxy.example:8080', proxy('proxy.example', 8080, 'HTTP', 'user', 'p@ss')],
+  // ADR-016: socks5 and socks5h both mean SOCKS5 with proxy-side DNS.
+  [
+    'socks5://demo-user:demo-pass@proxy.example:1080',
+    proxy('proxy.example', 1080, 'SOCKS5', 'demo-user', 'demo-pass'),
+  ],
+  ['socks5h://proxy.example:1080', proxy('proxy.example', 1080, 'SOCKS5')],
+  ['192.0.2.10:1080 socks5', proxy('192.0.2.10', 1080, 'SOCKS5')],
+  ['SOCKS5H 192.0.2.10:1080', proxy('192.0.2.10', 1080, 'SOCKS5')],
+  ['192.0.2.10,1080,u,p,socks5', proxy('192.0.2.10', 1080, 'SOCKS5', 'u', 'p')],
 ]
 
 const failures: readonly (readonly [string, ProxyStringErrorCode])[] = [
   ['http://proxy.example:8080 https', 'PROTOCOL_CONFLICT'],
   ['localhost:8080:user:pass', 'FOUR_FIELDS_INVALID'],
-  ['socks5://demo-user:demo-pass@proxy.example:1080', 'SOCKS5_UNSUPPORTED'],
-  ['192.0.2.10:1080 socks5', 'SOCKS5_UNSUPPORTED'],
-  ['socks5h://proxy.example:1080', 'SOCKS5_UNSUPPORTED'],
   ['socks4://192.0.2.10:1080', 'SOCKS4_UNSUPPORTED'],
   ['socks4a://demo-user@proxy.example:1080', 'SOCKS4_UNSUPPORTED'],
   ['socks://proxy.example:1080', 'SOCKS_AMBIGUOUS'],

@@ -5,11 +5,12 @@ import {
   upgradeLegacyExamplesFromVersionTwo,
 } from '../../domain/config/remove-groups-migration'
 import { addSpeedTestFromVersionFour } from '../../domain/config/speed-migration'
+import { addSocks5TransportFromVersionFive } from '../../domain/config/socks5-migration'
 import { addAppearanceAccentFromVersionThree } from '../../domain/config/accent-migration'
 import { createDefaultConfig } from '../seed/create-default-config'
 import { parseAppConfig, type ConfigSchemaError } from '../../domain/config/schema'
 
-export const CURRENT_SCHEMA_VERSION = 5
+export const CURRENT_SCHEMA_VERSION = 6
 
 export interface MigrationError {
   readonly code: 'UNSUPPORTED_SCHEMA_VERSION' | 'INVALID_LEGACY_CONFIG'
@@ -105,6 +106,8 @@ export const migrateConfig = (
       migrated = addAppearanceAccentFromVersionThree(migrated)
     } else if (currentVersion === 4) {
       migrated = addSpeedTestFromVersionFour(migrated)
+    } else if (currentVersion === 5) {
+      migrated = addSocks5TransportFromVersionFive(migrated)
     }
   }
 

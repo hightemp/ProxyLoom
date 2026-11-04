@@ -5,6 +5,8 @@ import type { Result } from '../../domain/types/result'
 export interface PlatformCapabilities {
   readonly platform: 'CHROMIUM' | 'FIREFOX'
   readonly fullUrlRules: boolean
+  /** Whether a SOCKS5 endpoint can authenticate with username/password (ADR-016). */
+  readonly socks5Auth: boolean
   readonly tabSpecificOverrides: boolean
   readonly actualProxyInfo: boolean
   readonly guaranteedErrorPage: false

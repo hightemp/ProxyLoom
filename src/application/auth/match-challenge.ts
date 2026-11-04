@@ -47,7 +47,14 @@ export const matchProxyAuthChallenge = (
     tabId: challenge.tabId >= 0 ? challenge.tabId : null,
     url: challenge.url,
   })
-  if (decision.action !== 'PROXY' || decision.endpoint === null || decision.profileId === null) {
+  // Only HTTP/HTTPS proxies authenticate through onAuthRequired. SOCKS5 credentials travel in
+  // Firefox ProxyInfo or not at all (Chromium), so they never answer a challenge (ADR-016).
+  if (
+    decision.action !== 'PROXY' ||
+    decision.endpoint === null ||
+    decision.profileId === null ||
+    decision.endpoint.transport === 'SOCKS5'
+  ) {
     return { matched: false, reason: 'ROUTE_IS_NOT_PROXY' }
   }
   if (

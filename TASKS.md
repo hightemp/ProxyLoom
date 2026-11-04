@@ -1651,7 +1651,7 @@
     (Chromium 151, Brave 155, Firefox 153/157), traces в `spikes/socks5/evidence/`; ручные строки
     Google Chrome/Edge/Яндекс/Chromium incognito перенесены в release gate PL-145. Version 0.1.35.
 
-- [ ] **PL-145 — Поддержка SOCKS5 transport**
+- [x] **PL-145 — Поддержка SOCKS5 transport**
   - **Цель:** SOCKS5 профили в рамках ADR-016.
   - **Требования:** FR-006, FR-010, FR-015–FR-016, FR-075, FR-076–FR-078, FR-082, COMPAT-001, SEC-003.
   - **Действия:** PRD (non-goals, FR, limitations); `ProxyTransport` + `SOCKS5`, config schema v6
@@ -1668,10 +1668,20 @@ this browser`, routing не меняется (fail-closed); parser/formatter `so
   - **Критерии приёмки:** fail-closed без fallback; Chromium хранит SOCKS5 credentials без потерь
     и явно показывает, что auth не поддержан, без skip/`DIRECT`; Firefox SOCKS5 auth работает.
   - **Тесты:** migration fixture/interruption, PAC golden/parity/injection, local SOCKS5 integration
-    обоих семейств (fixture из PL-144), E2E; ручной gate ADR-016 (Google Chrome, Edge, Яндекс,
-    Chromium incognito, Firefox signed build).
+    обоих семейств (fixture из PL-144), E2E; ручные строки ADR-016 (Google Chrome, Edge, Яндекс,
+    Chromium incognito, Firefox signed build) — в manual matrices release checklist.
   - **Миграции/permissions/privacy:** config schema v6; permissions не меняются.
   - **Готово, когда:** все test suites/dual builds зелёные, version 0.2.0/docs обновлены.
+  - **Результат:** schema v6 (`addSocks5TransportFromVersionFive`, storage и native import); PAC
+    `SOCKS5 host:port`; Firefox `ProxyInfo {type: 'socks', proxyDNS: true, username, password}`;
+    `socks5Auth` в capabilities; `onAuthRequired` не отдаёт SOCKS5 credentials; SOCKS ошибки —
+    proxy failure; UI: transport/filter/import default, статус и пояснение в Chromium; parser
+    `socks5`/`socks5h` → SOCKS5, formatter `socks5h://`/`socks5`. Тесты (красные до изменения):
+    `tests/unit/storage/socks5-migration.test.ts`, `tests/parity/socks5-pac.test.ts`,
+    `tests/unit/application/firefox-socks5.test.ts`, `tests/unit/domain/socks5-format.test.ts`,
+    `tests/unit/ui/socks5-profile.test.ts`, SOCKS5 case в `auth.test.ts`; browser:
+    `tests/e2e/socks5.spec.ts` (Chromium production build), `tests/integration/firefox-socks5.test.ts`
+    (Firefox production build). FoxyProxy `socks5` вынесен в PL-169. Version 0.2.0.
 
 - [x] **PL-146 — Новая иконка расширения**
   - **Цель:** узнаваемый знак «нити → узел → маршруты» вместо буквы «P» и текстового «PL».
@@ -1923,6 +1933,15 @@ rules`, compact check pill; `Use globally`/`Check` + «⋯» (Edit, Duplicate, C
     применяется и показывает ошибку профиля.
   - **Готово, когда:** unit/parity/dual builds зелёные, version 0.1.36.
 
+- [ ] **PL-169 — FoxyProxy import SOCKS5 профилей**
+  - **Цель:** после PL-145 импортировать записи FoxyProxy `socks5` (и legacy type `3`) как SOCKS5
+    профили с credentials; `socks`/`socks4` остаются пропущенными.
+  - **Требования:** FR-085, FoxyProxy import (раздел 23.2 PRD).
+  - **Зависимости:** PL-145.
+  - **Тесты:** parser/importer table tests, fixture v8 (`Unsupported SOCKS` → импорт), E2E
+    `extended-ui.spec.ts`.
+  - **Готово, когда:** unit/E2E зелёные, user guide обновлён, version bump.
+
 ---
 
 # Release checklist
@@ -1958,6 +1977,8 @@ rules`, compact check pill; `Use globally`/`Check` + «⋯» (Edit, Duplicate, C
 - [ ] Control by another extension/policy and recovery without fight.
 - [ ] Popup/options/error themes, keyboard, zoom, focus and contrast smoke.
 - [ ] Service worker suspension/restart restores committed effective configuration.
+- [ ] SOCKS5 (ADR-016): HTTP/HTTPS through SOCKS5, unreachable endpoint without DIRECT, SOCKS5 with
+      credentials fails and shows `Authentication unsupported in this browser`, incognito tab routed.
 
 # Firefox manual matrix
 
@@ -1978,6 +1999,8 @@ rules`, compact check pill; `Use globally`/`Check` + «⋯» (Edit, Duplicate, C
 - [ ] Proxy settings conflict/control status.
 - [ ] Firefox automated smoke result or documented tooling limitation.
 - [ ] Theme/accessibility/performance smoke.
+- [ ] SOCKS5 (ADR-016) on the signed build: auth success/wrong password without DIRECT, private
+      window routed through SOCKS5.
 
 # Edge manual matrix
 
@@ -1989,6 +2012,7 @@ rules`, compact check pill; `Use globally`/`Check` + «⋯» (Edit, Duplicate, C
 - [ ] InPrivate behavior and control conflict.
 - [ ] Badge/themes/keyboard/options/popup.
 - [ ] Worker restart and build/store metadata.
+- [ ] SOCKS5 without auth, unreachable SOCKS5 without DIRECT, credentials marked unsupported.
 
 # Yandex Browser manual matrix
 
@@ -2000,6 +2024,7 @@ rules`, compact check pill; `Use globally`/`Check` + «⋯» (Edit, Duplicate, C
 - [ ] Private-window behavior and proxy control conflict.
 - [ ] Badge/themes/keyboard/options/popup.
 - [ ] Worker restart and any vendor-specific limitation documented.
+- [ ] SOCKS5 without auth, unreachable SOCKS5 without DIRECT, credentials marked unsupported.
 
 # Security checklist
 

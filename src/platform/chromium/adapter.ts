@@ -41,6 +41,8 @@ export class ChromiumProxyAdapter implements ProxyPlatformAdapter {
     fullUrlRules: false,
     guaranteedErrorPage: false,
     platform: 'CHROMIUM',
+    // MV3 has no SOCKS5 credential API and onAuthRequired never fires for SOCKS (ADR-016).
+    socks5Auth: false,
     tabSpecificOverrides: false,
   } as const
 

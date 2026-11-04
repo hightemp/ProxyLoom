@@ -4,8 +4,12 @@ import type { ProxyEndpoint, ProxyProfile } from '../types/entities'
 export type ProxyTextFormat = 'URL' | 'CURL' | 'COMPACT'
 
 /** `scheme://user:pass@host:port`; userinfo is percent-encoded so it parses back unchanged. */
+// `socks5h` states proxy-side DNS, which is what ProxyLoom does for SOCKS5 (ADR-016).
+const URL_SCHEME = { HTTP: 'http', HTTPS: 'https', SOCKS5: 'socks5h' } as const
+const COMPACT_SUFFIX = { HTTP: '', HTTPS: ' https', SOCKS5: ' socks5' } as const
+
 export const formatProxyUrl = (endpoint: ProxyEndpoint): string => {
-  const scheme = endpoint.transport === 'HTTPS' ? 'https' : 'http'
+  const scheme = URL_SCHEME[endpoint.transport]
   const userInfo =
     endpoint.username === ''
       ? ''
@@ -19,11 +23,11 @@ export const formatProxyUrl = (endpoint: ProxyEndpoint): string => {
 const COMPACT_UNSAFE = /[:@,;\s]/u
 
 /**
- * `host:port[:user:pass]` with a trailing `https` word for HTTPS transport, or null when the
+ * `host:port[:user:pass]` with a trailing `https`/`socks5` word, or null when the
  * credentials cannot be written without changing how the line parses.
  */
 export const formatProxyCompact = (endpoint: ProxyEndpoint): string | null => {
-  const suffix = endpoint.transport === 'HTTPS' ? ' https' : ''
+  const suffix = COMPACT_SUFFIX[endpoint.transport]
   const address = `${endpoint.host}:${endpoint.port}`
   if (endpoint.username === '' && endpoint.password === '') return `${address}${suffix}`
   if (

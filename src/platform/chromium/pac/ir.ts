@@ -28,10 +28,12 @@ export interface PacIrError {
   readonly entityId: string | null
 }
 
-const endpointDirective = (endpoint: ProxyEndpoint): string => {
-  const keyword = endpoint.transport === 'HTTPS' ? 'HTTPS' : 'PROXY'
-  return `${keyword} ${endpoint.host}:${endpoint.port}`
-}
+const DIRECTIVE_KEYWORD = { HTTP: 'PROXY', HTTPS: 'HTTPS', SOCKS5: 'SOCKS5' } as const
+
+// Host and port only: credentials never enter PAC, and userinfo in a SOCKS5 directive makes
+// stock Chromium discard it and go DIRECT (ADR-016). The snapshot has validated the host.
+const endpointDirective = (endpoint: ProxyEndpoint): string =>
+  `${DIRECTIVE_KEYWORD[endpoint.transport]} ${endpoint.host}:${endpoint.port}`
 
 const routeForAction = (
   snapshot: RoutingSnapshot,

@@ -31,18 +31,20 @@ test('imports proxies from pasted lines with a preview and updates on repeat', a
         'https://alice:s3cret@192.0.2.10:8443',
         '192.0.2.11:3128:bob:pw',
         'socks5://192.0.2.12:1080',
+        'socks4://192.0.2.13:1080',
       ].join('\n'),
     )
   const rows = panel.locator('tbody tr')
-  await expect(rows).toHaveCount(3)
+  await expect(rows).toHaveCount(4)
   await expect(rows.nth(0)).toContainText('HTTPS 192.0.2.10:8443')
   await expect(rows.nth(1)).toContainText('HTTP 192.0.2.11:3128')
-  await expect(rows.nth(2)).toContainText('SOCKS5 is not supported yet')
+  await expect(rows.nth(2)).toContainText('SOCKS5 192.0.2.12:1080')
+  await expect(rows.nth(3)).toContainText('SOCKS4 is not supported')
   await expect(panel).not.toContainText('s3cret')
 
-  await panel.getByRole('button', { name: 'Import (2)' }).click()
+  await panel.getByRole('button', { name: 'Import (3)' }).click()
   await expect(extensionPage.getByRole('status')).toContainText(
-    'Imported: 2 created, 0 updated, 1 skipped.',
+    'Imported: 3 created, 0 updated, 1 skipped.',
   )
   await expect(extensionPage.getByRole('heading', { name: '192.0.2.10:8443' })).toBeVisible()
   await expect(extensionPage.getByRole('heading', { name: '192.0.2.11:3128' })).toBeVisible()
@@ -79,6 +81,17 @@ test('imports proxies from pasted lines with a preview and updates on repeat', a
         username: 'bob',
       },
       name: '192.0.2.11:3128',
+      same: true,
+    },
+    {
+      endpoint: {
+        host: '192.0.2.12',
+        password: '',
+        port: 1080,
+        transport: 'SOCKS5',
+        username: '',
+      },
+      name: '192.0.2.12:1080',
       same: true,
     },
   ])

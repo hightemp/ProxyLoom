@@ -13,6 +13,7 @@ import type {
   BrowserPlatform,
   ControlStatus,
   GlobalMode,
+  ProxyTransport,
   RuleValidity,
 } from '../domain/types/entities'
 import { t, type MessageKey } from '../i18n/messages'
@@ -87,6 +88,12 @@ export const proxyInfoTypeLabel = labeler<ActualProxyInfo['type']>({
   UNKNOWN: 'proxyInfoUnknown',
 })
 
+export const transportLabel = labeler<ProxyTransport>({
+  HTTP: 'proxyInfoHttp',
+  HTTPS: 'proxyInfoHttps',
+  SOCKS5: 'transportSocks5',
+})
+
 export const platformLabel = labeler<BrowserPlatform>({
   CHROMIUM: 'chromium',
   FIREFOX: 'firefox',
@@ -118,7 +125,6 @@ export const proxyStringErrorLabel = labeler<ProxyStringErrorCode>({
   PROTOCOL_CONFLICT: 'proxyStringProtocolConflict',
   SCHEME_UNSUPPORTED: 'proxyStringSchemeUnsupported',
   SOCKS4_UNSUPPORTED: 'proxyStringSocks4Unsupported',
-  SOCKS5_UNSUPPORTED: 'proxyStringSocks5Unsupported',
   SOCKS_AMBIGUOUS: 'proxyStringSocksAmbiguous',
   TOO_LONG: 'proxyStringTooLong',
   USERNAME_REQUIRED: 'proxyStringUsernameRequired',

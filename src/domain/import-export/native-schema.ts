@@ -4,6 +4,7 @@ import type { AppConfig } from '../types/entities'
 import { err, ok, type Result } from '../types/result'
 import { addAppearanceAccentFromVersionThree } from '../config/accent-migration'
 import { addSpeedTestFromVersionFour } from '../config/speed-migration'
+import { addSocks5TransportFromVersionFive } from '../config/socks5-migration'
 import { parseAppConfig } from '../config/schema'
 import { isValidProxyHost } from '../profiles/profile'
 import {
@@ -21,7 +22,7 @@ const endpointSchema = z
     host: z.string().min(1).max(253).refine(isValidProxyHost),
     password: z.string().max(4_096).optional(),
     port: z.number().int().min(1).max(65_535),
-    transport: z.enum(['HTTP', 'HTTPS']),
+    transport: z.enum(['HTTP', 'HTTPS', 'SOCKS5']),
     username: z.string().max(1_024).optional(),
   })
   .strict()
@@ -141,7 +142,11 @@ export const parseNativeExportText = (
     sourceVersion <= 3 ? addAppearanceAccentFromVersionThree(migratedCandidate) : migratedCandidate
   const versionFiveCandidate =
     sourceVersion <= 4 ? addSpeedTestFromVersionFour(versionFourCandidate) : versionFourCandidate
-  const config = parseAppConfig(versionFiveCandidate)
+  const versionSixCandidate =
+    sourceVersion <= 5
+      ? addSocks5TransportFromVersionFive(versionFiveCandidate)
+      : versionFiveCandidate
+  const config = parseAppConfig(versionSixCandidate)
   if (!config.ok) {
     return err({
       code: 'CONFIG_INVALID',
